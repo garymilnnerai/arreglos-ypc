@@ -11,7 +11,7 @@ export default function App({ Component, pageProps }) {
         <meta name="apple-mobile-web-app-title" content="Arreglos" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.svg" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         {/* Open Graph */}
         <meta property="og:title" content="Arreglos de Conferencias" />
         <meta property="og:description" content="Coordinación de arreglos de conferencias — Congregación Ypacaraí" />
