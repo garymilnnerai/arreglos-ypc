@@ -230,6 +230,7 @@ export default function App() {
 
   const sundaysForSel = getSundaysForSel();
   const D = isDark ? DARK : LIGHT;
+  const css = makeCss(D);
 
   useEffect(() => {
     document.body.style.background = D.bg;
@@ -319,12 +320,12 @@ export default function App() {
               <div style={{ position: 'relative', marginBottom: 12 }}>
                 <svg style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: D.text3 }} width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" strokeWidth="1.3"><circle cx="6.5" cy="6.5" r="4.5" /><path d="M10 10l3 3" /></svg>
                 <input value={searchBQ} onChange={e => setSearchBQ(e.target.value)} placeholder="Buscar por número o título..."
-                  style={{ ...css.input, paddingLeft: 36 }} />
+                  style={{ width: '100%', background: D.bg3, border: `1px solid ${D.border2}`, borderRadius: 10, padding: '13px 14px 13px 36px', fontSize: 15, fontWeight: 300, color: D.text, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none', transition: 'background 0.3s ease' }} />
               </div>
               <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
                 {[['num', 'Numérico'], ['old', 'Sin asignar primero']].map(([m, lbl]) => (
                   <button key={m} onClick={() => setSortMode(m)}
-                    style={{ fontSize: 11, padding: '5px 12px', borderRadius: 20, border: `1px solid ${sortMode === m ? D.accent : D.border2}`, background: sortMode === m ? D.accentDim : 'transparent', color: sortMode === m ? D.accent : D.text3, cursor: 'pointer', fontFamily: 'Geist, system-ui, sans-serif' }}>
+                    style={{ fontSize: 11, padding: '5px 12px', borderRadius: 20, border: `1px solid ${sortMode === m ? D.accent : D.border2}`, background: sortMode === m ? D.accentDim : D.bg3, color: sortMode === m ? D.accent : D.text3, cursor: 'pointer', fontFamily: 'Geist, system-ui, sans-serif' }}>
                     {lbl}
                   </button>
                 ))}
@@ -334,7 +335,7 @@ export default function App() {
                 const ld = lastDate(b.n); const rec = isRecent(b.n);
                 return (
                   <div key={b.n} onClick={() => { setModalBQ({ num: b.n }); setForm({}); setSelMonthOpt(''); setSelSunday(''); }}
-                    style={{ display: 'flex', alignItems: 'center', gap: 14, ...css.card, padding: '14px 16px', marginBottom: 8, cursor: 'pointer', position: 'relative', overflow: 'hidden' }}>
+                    style={{ display: 'flex', alignItems: 'center', gap: 14, background: D.bg2, border: `1px solid ${D.border}`, borderRadius: 14, padding: '14px 16px', marginBottom: 8, cursor: 'pointer', position: 'relative', overflow: 'hidden', transition: 'background 0.3s ease' }}>
                     {rec && <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 3, background: D.amber }} />}
                     {!ld && !rec && <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 3, background: D.green }} />}
                     <div style={{ fontSize: 26, fontWeight: 300, color: D.text3, width: 48, textAlign: 'center', letterSpacing: '-.5px' }}>{b.n}</div>
@@ -374,7 +375,7 @@ export default function App() {
                 const congs = [...new Set(sundays.map(s => assignments[dateStr(s)]?.cong).filter(Boolean).map(c => c.trim()))];
                 return (
                   <div key={m} onClick={() => setDetailMonth(m)}
-                    style={{ background: bgMap[cls], border: `1px solid ${borderMap[cls]}`, borderRadius: 14, padding: '16px 18px', marginBottom: 10, cursor: 'pointer' }}>
+                    style={{ background: bgMap[cls], border: `1px solid ${borderMap[cls]}`, borderRadius: 14, padding: '16px 18px', marginBottom: 10, cursor: 'pointer', transition: 'background 0.3s ease' }}>
                     <div style={{ fontSize: 24, fontWeight: 300, color: D.text, letterSpacing: '-.5px', marginBottom: 4 }}>{mn}</div>
                     <div style={{ fontSize: 13, fontWeight: 400, color: colorMap[cls] }}>{txtMap[cls]}</div>
                     <div style={{ display: 'flex', gap: 5, marginTop: 10, flexWrap: 'wrap' }}>
@@ -413,7 +414,7 @@ export default function App() {
                 const bdC = a ? a.asamblea ? `rgba(123,140,222,0.25)` : `rgba(76,175,125,0.25)` : D.border;
                 return (
                   <div key={ds} onClick={() => { setModalSunday({ date: ds, assignment: a }); setSunBQNum(a?.bqNum || null); setForm({ asamblea: a?.asamblea || false, name: a?.name || '', cong: a?.cong || '', tel: a?.tel || '' }); }}
-                    style={{ background: bgC, border: `1px solid ${bdC}`, borderRadius: 12, padding: '14px 16px', marginBottom: 8, cursor: 'pointer' }}>
+                    style={{ background: bgC, border: `1px solid ${bdC}`, borderRadius: 12, padding: '14px 16px', marginBottom: 8, cursor: 'pointer', transition: 'background 0.3s ease' }}>
                     <div style={{ fontSize: 16, fontWeight: 500, color: D.text, marginBottom: 4 }}>Domingo {lbl}</div>
                     {a?.asamblea && <div style={{ fontSize: 14, color: D.accent }}>🏛 Fin de semana de asamblea</div>}
                     {a?.bqNum && <><div style={{ fontSize: 14, color: D.text2 }}>{a.name || '—'} · {a.cong || '—'}{a.tel ? ' · ' + a.tel : ''}</div><div style={{ fontSize: 13, color: D.text3, marginTop: 3 }}>{a.bqNum} — {ALL_B[a.bqNum] || ''}</div></>}
@@ -428,13 +429,13 @@ export default function App() {
           {view === 'historial' && (
             <div>
               <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
-                <Chip active={!histYear} onClick={() => { setHistYear(null); setHistMonth(null); }}>Todo</Chip>
+                <Chip active={!histYear} onClick={() => { setHistYear(null); setHistMonth(null); }} D={D}>Todo</Chip>
                 {histYears.map(y => <Chip key={y} active={histYear === y} onClick={() => { setHistYear(y); setHistMonth(null); }}>{y}</Chip>)}
                 {histYear && histMonths.map(m => <Chip key={m} active={histMonth === m} onClick={() => setHistMonth(m)}>{MONTHS[m]}</Chip>)}
               </div>
               {histEntries.length === 0 && <div style={{ textAlign: 'center', padding: '40px 0', color: D.text3, fontSize: 13 }}>Sin registros</div>}
               {histEntries.map(([ds, a]) => (
-                <div key={ds} style={{ ...css.card, padding: '14px 16px', marginBottom: 8 }}>
+                <div key={ds} style={{ background: D.bg2, border: `1px solid ${D.border}`, borderRadius: 14, padding: '14px 16px', marginBottom: 8, transition: 'background 0.3s ease' }}>
                   <div style={{ fontSize: 13, color: D.text3, marginBottom: 5 }}>{fmtDate(ds)}</div>
                   <div><span style={{ fontSize: 13, fontWeight: 500, color: D.accent, marginRight: 6 }}>{a.bqNum}</span><span style={{ fontSize: 13, color: D.text }}>{ALL_B[a.bqNum] || ''}</span></div>
                   <div style={{ fontSize: 11, color: D.text2, marginTop: 3 }}>{[a.name, a.cong, a.tel].filter(Boolean).join(' · ')}</div>
@@ -446,7 +447,7 @@ export default function App() {
 
         {/* SAVE BANNER */}
         {pending && (
-          <div style={{ position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: '100%', maxWidth: 400, background: D.bg3, padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', zIndex: 50, borderTop: `1px solid ${D.border2}` }}>
+          <div style={{ position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: '100%', maxWidth: 420, background: D.bg3, padding: '14px 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', zIndex: 50, borderTop: `1px solid ${D.border2}`, transition: 'background 0.3s ease' }}>
             <div style={{ fontSize: 14, color: D.text2 }}>¿Deseás confirmar y guardar?</div>
             <div style={{ display: 'flex', gap: 8 }}>
               <button onClick={discardChanges} style={{ fontSize: 11, fontWeight: 500, padding: '6px 14px', borderRadius: 20, border: `1px solid ${D.border2}`, background: 'transparent', color: D.text3, cursor: 'pointer', fontFamily: 'Geist, system-ui, sans-serif' }}>Descartar</button>
@@ -457,7 +458,7 @@ export default function App() {
 
         {/* MODAL: BQ — con selector de mes y domingos */}
         {modalBQ && (
-          <Overlay onClose={() => setModalBQ(null)}>
+          <Overlay onClose={() => setModalBQ(null)} D={D}>
             <div style={{ fontSize: 17, fontWeight: 500, color: D.text, marginBottom: 4 }}>Bosquejo {modalBQ.num}</div>
             <div style={{ fontSize: 11, color: D.text2, marginBottom: 18, lineHeight: 1.4 }}>{ALL_B[modalBQ.num]}</div>
             {isRecent(modalBQ.num) && (
@@ -465,7 +466,7 @@ export default function App() {
                 ⚠ Presentado en los últimos 6 meses ({fmtShort(lastDate(modalBQ.num))})
               </div>
             )}
-            <AsambleaCheck checked={form.asamblea} onChange={v => setForm(f => ({ ...f, asamblea: v }))} />
+            <AsambleaCheck checked={form.asamblea} onChange={v => setForm(f => ({ ...f, asamblea: v }))} D={D} />
             {!form.asamblea && (
               <>
                 <div style={{ marginBottom: 13 }}>
@@ -498,9 +499,9 @@ export default function App() {
                     </div>
                   </div>
                 )}
-                <FField label="Conferenciante" placeholder="Nombre y apellido" value={form.name || ''} onChange={v => setForm(f => ({ ...f, name: v }))} />
-                <FField label="Congregación" placeholder="De dónde proviene" value={form.cong || ''} onChange={v => setForm(f => ({ ...f, cong: v }))} />
-                <FField label="Teléfono" placeholder="09xx xxx xxx" value={form.tel || ''} onChange={v => setForm(f => ({ ...f, tel: v }))} />
+                <FField label="Conferenciante" placeholder="Nombre y apellido" value={form.name || \'\'} onChange={v => setForm(f => ({ ...f, name: v }))} D={D} />
+                <FField label="Congregación" placeholder="De dónde proviene" value={form.cong || \'\'} onChange={v => setForm(f => ({ ...f, cong: v }))} D={D} />
+                <FField label="Teléfono" placeholder="09xx xxx xxx" value={form.tel || \'\'} onChange={v => setForm(f => ({ ...f, tel: v }))} D={D} />
               </>
             )}
             {form.asamblea && (
@@ -532,17 +533,17 @@ export default function App() {
               </>
             )}
             <div style={{ display: 'flex', gap: 8, marginTop: 18 }}>
-              <Btn onClick={() => setModalBQ(null)} secondary>Cancelar</Btn>
-              <Btn onClick={saveBQModal}>Confirmar</Btn>
+              <Btn onClick={() => setModalBQ(null)} secondary D={D}>Cancelar</Btn>
+              <Btn onClick={saveBQModal} D={D}>Confirmar</Btn>
             </div>
           </Overlay>
         )}
 
         {/* MODAL: SUNDAY */}
         {modalSunday && !modalBQSel && (
-          <Overlay onClose={() => setModalSunday(null)}>
+          <Overlay onClose={() => setModalSunday(null)} D={D}>
             <div style={{ fontSize: 17, fontWeight: 500, color: D.text, marginBottom: 18 }}>{fmtDate(modalSunday.date)}</div>
-            <AsambleaCheck checked={form.asamblea} onChange={v => setForm(f => ({ ...f, asamblea: v }))} />
+            <AsambleaCheck checked={form.asamblea} onChange={v => setForm(f => ({ ...f, asamblea: v }))} D={D} />
             {!form.asamblea && (
               <>
                 <div style={{ marginBottom: 13 }}>
@@ -552,27 +553,27 @@ export default function App() {
                     {sunBQNum ? `${sunBQNum} — ${ALL_B[sunBQNum]}` : 'Seleccionar bosquejo →'}
                   </div>
                 </div>
-                <FField label="Conferenciante" placeholder="Nombre y apellido" value={form.name || ''} onChange={v => setForm(f => ({ ...f, name: v }))} />
-                <FField label="Congregación" placeholder="De dónde proviene" value={form.cong || ''} onChange={v => setForm(f => ({ ...f, cong: v }))} />
-                <FField label="Teléfono" placeholder="09xx xxx xxx" value={form.tel || ''} onChange={v => setForm(f => ({ ...f, tel: v }))} />
+                <FField label="Conferenciante" placeholder="Nombre y apellido" value={form.name || \'\'} onChange={v => setForm(f => ({ ...f, name: v }))} D={D} />
+                <FField label="Congregación" placeholder="De dónde proviene" value={form.cong || \'\'} onChange={v => setForm(f => ({ ...f, cong: v }))} D={D} />
+                <FField label="Teléfono" placeholder="09xx xxx xxx" value={form.tel || \'\'} onChange={v => setForm(f => ({ ...f, tel: v }))} D={D} />
               </>
             )}
             <div style={{ display: 'flex', gap: 8, marginTop: 18 }}>
-              <Btn onClick={() => { setModalSunday(null); setSunBQNum(null); }} secondary>Cancelar</Btn>
-              {modalSunday.assignment && <Btn onClick={deleteSunday} danger>Borrar</Btn>}
-              <Btn onClick={saveSundayModal}>Guardar</Btn>
+              <Btn onClick={() => { setModalSunday(null); setSunBQNum(null); }} secondary D={D}>Cancelar</Btn>
+              {modalSunday.assignment && <Btn onClick={deleteSunday} danger D={D}>Borrar</Btn>}
+              <Btn onClick={saveSundayModal} D={D}>Guardar</Btn>
             </div>
           </Overlay>
         )}
 
         {/* MODAL: BQ SELECTOR */}
         {modalBQSel && (
-          <Overlay onClose={() => setModalBQSel(false)} tall>
+          <Overlay onClose={() => setModalBQSel(false)} D={D} tall>
             <div style={{ fontSize: 14, fontWeight: 500, color: D.text, marginBottom: 12 }}>Elegir bosquejo</div>
             <div style={{ position: 'relative', marginBottom: 10 }}>
               <svg style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: D.text3 }} width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" strokeWidth="1.3"><circle cx="6.5" cy="6.5" r="4.5" /><path d="M10 10l3 3" /></svg>
               <input value={bqSelSearch} onChange={e => setBqSelSearch(e.target.value)} placeholder="Número o título..."
-                style={{ ...css.input, paddingLeft: 36 }} />
+                style={{ width: '100%', background: D.bg3, border: `1px solid ${D.border2}`, borderRadius: 10, padding: '13px 14px 13px 36px', fontSize: 15, fontWeight: 300, color: D.text, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none', transition: 'background 0.3s ease' }} />
             </div>
             <div style={{ overflowY: 'auto', flex: 1 }}>
               {(() => {
@@ -613,22 +614,26 @@ export default function App() {
   );
 }
 
-function Overlay({ children, onClose, tall }) {
+function Overlay({ children, onClose, tall, D }) {
+  const bg = D ? D.bg2 : '#1C1C1F';
+  const border = D ? `1px solid ${D.border2}` : '1px solid rgba(255,255,255,0.1)';
   return (
     <div onClick={e => e.target === e.currentTarget && onClose()}
-      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 100, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
-      <div style={{ background: '#1C1C1F', borderRadius: '18px 18px 0 0', padding: '24px 20px 36px', width: '100%', maxWidth: 400, maxHeight: tall ? '88vh' : '90vh', display: tall ? 'flex' : 'block', flexDirection: tall ? 'column' : undefined, overflowY: tall ? undefined : 'auto', border: '1px solid rgba(255,255,255,0.1)', borderBottom: 'none' }}>
+      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 100, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+      <div style={{ background: bg, borderRadius: '20px 20px 0 0', padding: '24px 20px 40px', width: '100%', maxWidth: 420, maxHeight: tall ? '88vh' : '90vh', display: tall ? 'flex' : 'block', flexDirection: tall ? 'column' : undefined, overflowY: tall ? undefined : 'auto', border, borderBottom: 'none', transition: 'background 0.3s ease' }}>
         {children}
       </div>
     </div>
   );
 }
 
-function AsambleaCheck({ checked, onChange }) {
+function AsambleaCheck({ checked, onChange, D }) {
+  const accent = D ? D.accent : '#7B8CDE';
+  const accentDim = D ? D.accentDim : 'rgba(123,140,222,0.08)';
   return (
-    <label style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 14px', background: 'rgba(123,140,222,0.08)', border: '1px solid rgba(123,140,222,0.2)', borderRadius: 10, cursor: 'pointer', marginBottom: 16 }}>
-      <input type="checkbox" checked={checked || false} onChange={e => onChange(e.target.checked)} style={{ width: 16, height: 16, accentColor: '#7B8CDE' }} onClick={e => e.stopPropagation()} />
-      <span style={{ fontSize: 13, fontWeight: 400, color: '#7B8CDE' }}>Fin de semana de asamblea</span>
+    <label style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', background: accentDim, border: `1px solid ${accent}33`, borderRadius: 10, cursor: 'pointer', marginBottom: 16 }}>
+      <input type="checkbox" checked={checked || false} onChange={e => onChange(e.target.checked)} style={{ width: 16, height: 16, accentColor: accent }} onClick={e => e.stopPropagation()} />
+      <span style={{ fontSize: 14, fontWeight: 400, color: accent }}>Fin de semana de asamblea</span>
     </label>
   );
 }
@@ -644,19 +649,28 @@ function FField({ label, placeholder, value, onChange, type = 'text' }) {
   );
 }
 
-function Btn({ children, onClick, secondary, danger }) {
+function Btn({ children, onClick, secondary, danger, D }) {
+  const accent = D ? D.accent : '#7B8CDE';
+  const secBg = D ? `${D.bg4}` : 'rgba(255,255,255,0.06)';
+  const secColor = D ? D.text3 : '#9A9AA8';
+  const redBg = D ? D.redDim : 'rgba(224,92,92,0.15)';
+  const redColor = D ? D.red : '#E05C5C';
   return (
     <button onClick={onClick}
-      style={{ flex: danger ? 'none' : 1, padding: danger ? '11px 16px' : '11px 0', borderRadius: 100, border: 'none', fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'Geist, system-ui, sans-serif', background: danger ? 'rgba(224,92,92,0.15)' : secondary ? 'rgba(255,255,255,0.06)' : '#7B8CDE', color: danger ? '#E05C5C' : secondary ? '#9A9AA8' : '#fff' }}>
+      style={{ flex: danger ? 'none' : 1, padding: danger ? '12px 18px' : '12px 0', borderRadius: 100, border: 'none', fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: 'Geist, system-ui, sans-serif', background: danger ? redBg : secondary ? secBg : accent, color: danger ? redColor : secondary ? secColor : '#fff' }}>
       {children}
     </button>
   );
 }
 
-function Chip({ children, active, onClick }) {
+function Chip({ children, active, onClick, D }) {
+  const accent = D ? D.accent : '#7B8CDE';
+  const accentDim = D ? D.accentDim : 'rgba(123,140,222,0.15)';
+  const border = D ? (active ? accent : D.border2) : (active ? '#7B8CDE' : 'rgba(255,255,255,0.1)');
+  const color = D ? (active ? accent : D.text3) : (active ? '#7B8CDE' : '#5A5A68');
   return (
     <button onClick={onClick}
-      style={{ fontSize: 11, padding: '5px 12px', borderRadius: 20, border: `1px solid ${active ? '#7B8CDE' : 'rgba(255,255,255,0.1)'}`, background: active ? 'rgba(123,140,222,0.15)' : 'transparent', color: active ? '#7B8CDE' : '#5A5A68', cursor: 'pointer', fontFamily: 'Geist, system-ui, sans-serif' }}>
+      style={{ fontSize: 12, padding: '6px 14px', borderRadius: 20, border: `1px solid ${border}`, background: active ? accentDim : 'transparent', color, cursor: 'pointer', fontFamily: 'Geist, system-ui, sans-serif' }}>
       {children}
     </button>
   );
