@@ -418,7 +418,8 @@ export default function App() {
                 const borderMap = { complete: `rgba(76,175,125,0.25)`, partial: `rgba(232,168,56,0.25)`, empty: D.border };
                 const colorMap = { complete: D.green, partial: D.amber, empty: D.text3 };
                 const txtMap = { complete: `Todos los domingos asignados — ${sundays.length}/${sundays.length}`, partial: `${filled} de ${sundays.length} domingos asignados`, empty: `Sin asignaciones — ${sundays.length} domingos` };
-                const congs = [...new Set(sundays.map(s => assignments[dateStr(s)]?.cong).filter(Boolean).map(c => c.trim()))];
+                const mcKey2 = `${curYear}-${m}`;
+                const congs = [...new Set((monthContacts[mcKey2] || []).filter(c => c.cong).map(c => c.cong.trim()))];
                 const mcKey = `${curYear}-${m}`;
                 const hasContact = (monthContacts[mcKey] || []).some(c => c.confirmed || (c.name && c.cong && c.tel));
 
