@@ -283,10 +283,14 @@ export default function App() {
       newA[ds] = { bqNum: sunBQNum, name: form.name || '', cong: form.cong || '', tel: form.tel || '' };
     }
     markChanged(newA);
-    playSound('sunday');
-    setSundayFlash(ds);
-    setTimeout(() => setSundayFlash(null), 800);
-    setModalSunday(null); setSunBQNum(null);
+    const flashDs = ds;
+    setModalSunday(null);
+    setSunBQNum(null);
+    setTimeout(() => {
+      try { playSound('sunday'); } catch(e) {}
+      setSundayFlash(flashDs);
+      setTimeout(() => setSundayFlash(null), 800);
+    }, 50);
   }
 
 
@@ -767,25 +771,7 @@ export default function App() {
 
         {/* MODAL: SUNDAY */}
         {modalSunday && !modalBQSel && (
-          <Overlay onClose={() => {
-            // Auto-save on close if there's a bosquejo selected and basic data
-            if (!form.asamblea && sunBQNum && form.name && form.cong) {
-              const ds = modalSunday.date;
-              const newA = { ...assignments };
-              newA[ds] = { bqNum: sunBQNum, name: form.name, cong: form.cong, tel: form.tel || '' };
-              markChanged(newA);
-              playSound('sunday');
-              setSundayFlash(ds);
-              setTimeout(() => setSundayFlash(null), 800);
-            } else if (form.asamblea) {
-              const ds = modalSunday.date;
-              const newA = { ...assignments };
-              newA[ds] = { asamblea: true };
-              markChanged(newA);
-              playSound('tick');
-            }
-            setModalSunday(null); setSunBQNum(null);
-          }} D={D}>
+          <Overlay onClose={() => { setModalSunday(null); setSunBQNum(null); }} D={D}>
             <div style={{ fontSize: 17, fontWeight: 500, color: D.text, marginBottom: 18 }}>{fmtDate(modalSunday.date)}</div>
             <AsambleaCheck checked={form.asamblea} onChange={v => setForm(f => ({ ...f, asamblea: v }))} D={D} />
             {!form.asamblea && (
@@ -803,7 +789,7 @@ export default function App() {
               </>
             )}
             <div style={{ display: 'flex', gap: 8, marginTop: 18 }}>
-              <Btn onClick={() => { setModalSunday(null); setSunBQNum(null); }} secondary D={D}>Cancelar</Btn>
+              <Btn onClick={() => { setModalSunday(null); setSunBQNum(null); }} secondary D={D}>Cerrar</Btn>
               {modalSunday.assignment && <Btn onClick={deleteSunday} danger D={D}>Borrar</Btn>}
               <Btn onClick={saveSundayModal} D={D}>Confirmar</Btn>
             </div>
@@ -887,7 +873,7 @@ function FField({ label, placeholder, value, onChange, type = 'text' }) {
   return (
     <div style={{ marginBottom: 13 }}>
       <div style={{ fontSize: 10, fontWeight: 500, color: D2.text3, letterSpacing: '.1em', textTransform: 'uppercase', marginBottom: 6 }}>{label}</div>
-      <input type={type} value={value} onChange={e => onChange(e.target.value)} onBlur={onBlur} placeholder={placeholder}
+      <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
         style={{ width: '100%', background: value ? 'rgba(123,140,222,0.08)' : '#242428', border: `1px solid ${value ? 'rgba(123,140,222,0.3)' : 'rgba(255,255,255,0.12)'}`, borderRadius: 8, padding: "13px 14px", fontSize: 14, fontWeight: 300, color: value ? D2.accent : D2.text, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none' }} />
     </div>
   );
