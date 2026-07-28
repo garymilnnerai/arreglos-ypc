@@ -499,9 +499,9 @@ export default function App() {
                     </div>
                   </div>
                 )}
-                <FField label="Conferenciante" placeholder="Nombre y apellido" value={form.name || \'\'} onChange={v => setForm(f => ({ ...f, name: v }))} D={D} />
-                <FField label="Congregación" placeholder="De dónde proviene" value={form.cong || \'\'} onChange={v => setForm(f => ({ ...f, cong: v }))} D={D} />
-                <FField label="Teléfono" placeholder="09xx xxx xxx" value={form.tel || \'\'} onChange={v => setForm(f => ({ ...f, tel: v }))} D={D} />
+                <FField label="Conferenciante" placeholder="Nombre y apellido" value={form.name || ''} onChange={v => setForm(f => ({ ...f, name: v }))} D={D} />
+                <FField label="Congregación" placeholder="De dónde proviene" value={form.cong || ''} onChange={v => setForm(f => ({ ...f, cong: v }))} D={D} />
+                <FField label="Teléfono" placeholder="09xx xxx xxx" value={form.tel || ''} onChange={v => setForm(f => ({ ...f, tel: v }))} D={D} />
               </>
             )}
             {form.asamblea && (
@@ -553,9 +553,9 @@ export default function App() {
                     {sunBQNum ? `${sunBQNum} — ${ALL_B[sunBQNum]}` : 'Seleccionar bosquejo →'}
                   </div>
                 </div>
-                <FField label="Conferenciante" placeholder="Nombre y apellido" value={form.name || \'\'} onChange={v => setForm(f => ({ ...f, name: v }))} D={D} />
-                <FField label="Congregación" placeholder="De dónde proviene" value={form.cong || \'\'} onChange={v => setForm(f => ({ ...f, cong: v }))} D={D} />
-                <FField label="Teléfono" placeholder="09xx xxx xxx" value={form.tel || \'\'} onChange={v => setForm(f => ({ ...f, tel: v }))} D={D} />
+                <FField label="Conferenciante" placeholder="Nombre y apellido" value={form.name || ''} onChange={v => setForm(f => ({ ...f, name: v }))} D={D} />
+                <FField label="Congregación" placeholder="De dónde proviene" value={form.cong || ''} onChange={v => setForm(f => ({ ...f, cong: v }))} D={D} />
+                <FField label="Teléfono" placeholder="09xx xxx xxx" value={form.tel || ''} onChange={v => setForm(f => ({ ...f, tel: v }))} D={D} />
               </>
             )}
             <div style={{ display: 'flex', gap: 8, marginTop: 18 }}>
