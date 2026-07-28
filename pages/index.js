@@ -276,7 +276,7 @@ export default function App() {
     <div style={{ background: DARK.bg, minHeight: '100vh', color: DARK.text, fontFamily: 'Geist, system-ui, sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '32px 24px' }}>
       <div style={{ width: '100%', maxWidth: 340 }}>
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
-          <img src="/favicon.png" width="52" height="52" alt="Arreglos" style={{ opacity: 0.85, marginBottom: 16, filter: 'invert(0)' }} />
+          <img src="/favicon.png" width="52" height="52" alt="Arreglos" style={{ opacity: 0.9, marginBottom: 16, filter: isDark ? 'invert(1)' : 'none' }} />
           <div style={{ fontSize: 30, fontWeight: 300, color: D.text, letterSpacing: -1 }}>Arreglos</div>
           <div style={{ fontSize: 10, color: D.text3, letterSpacing: '.12em', textTransform: 'uppercase', marginTop: 6 }}>de Conferencias · Ypacaraí</div>
         </div>
@@ -411,11 +411,33 @@ export default function App() {
                 const colorMap = { complete: D.green, partial: D.amber, empty: D.text3 };
                 const txtMap = { complete: `Todos los domingos asignados — ${sundays.length}/${sundays.length}`, partial: `${filled} de ${sundays.length} domingos asignados`, empty: `Sin asignaciones — ${sundays.length} domingos` };
                 const congs = [...new Set(sundays.map(s => assignments[dateStr(s)]?.cong).filter(Boolean).map(c => c.trim()))];
+                const mcKey = `${curYear}-${m}`;
+                const hasContact = (monthContacts[mcKey] || []).some(c => c.confirmed || (c.name && c.cong && c.tel));
+
+                // State: complete > partial+contact > empty+contact > empty
+                let cardState = cls;
+                if (cls !== 'complete' && hasContact) cardState = 'contact';
+
+                const bgMapNew = { complete: D.greenDim, contact: isDark ? 'rgba(210,120,30,0.15)' : 'rgba(200,100,20,0.1)', partial: D.amberDim, empty: 'transparent' };
+                const borderMapNew = { complete: 'rgba(76,175,125,0.25)', contact: isDark ? 'rgba(210,120,30,0.3)' : 'rgba(180,90,10,0.25)', partial: 'rgba(232,168,56,0.25)', empty: D.border };
+                const colorMapNew = { complete: D.green, contact: isDark ? '#D4780A' : '#A05A08', partial: D.amber, empty: D.text3 };
+                const txtMapNew = { complete: txtMap.complete, contact: `Vínculo establecido · ${filled > 0 ? filled + ' dom. asignados' : 'domingos pendientes'}`, partial: txtMap.partial, empty: txtMap.empty };
+                const showHandshake = cardState === 'complete' || cardState === 'contact';
+                const handshakeFilter = isDark ? 'invert(1) opacity(0.75)' : 'opacity(0.6)';
+
                 return (
                   <div key={m} onClick={() => setDetailMonth(m)}
-                    style={{ background: bgMap[cls], border: `1px solid ${borderMap[cls]}`, borderRadius: 14, padding: '16px 18px', marginBottom: 10, cursor: 'pointer', transition: 'background 0.3s ease' }}>
-                    <div style={{ fontSize: 24, fontWeight: 300, color: D.text, letterSpacing: '-.5px', marginBottom: 4 }}>{mn}</div>
-                    <div style={{ fontSize: 13, fontWeight: 400, color: colorMap[cls] }}>{txtMap[cls]}</div>
+                    style={{ background: bgMapNew[cardState], border: `1px solid ${borderMapNew[cardState]}`, borderRadius: 14, padding: '16px 18px', marginBottom: 10, cursor: 'pointer', transition: 'background 0.3s ease' }}>
+                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: 24, fontWeight: 300, color: D.text, letterSpacing: '-.5px', marginBottom: 4 }}>{mn}</div>
+                        <div style={{ fontSize: 13, fontWeight: 400, color: colorMapNew[cardState] }}>{txtMapNew[cardState]}</div>
+                      </div>
+                      {showHandshake && (
+                        <img src="/handshake.png" width="28" height="28" alt="vínculo"
+                          style={{ filter: handshakeFilter, marginTop: 2, flexShrink: 0 }} />
+                      )}
+                    </div>
                     <div style={{ display: 'flex', gap: 5, marginTop: 10, flexWrap: 'wrap' }}>
                       {sundays.map(s => {
                         const a = assignments[dateStr(s)];
@@ -424,7 +446,7 @@ export default function App() {
                       })}
                     </div>
                     {congs.length > 0 && (
-                      <div style={{ marginTop: 10, paddingTop: 10, borderTop: `1px solid rgba(255,255,255,0.06)` }}>
+                      <div style={{ marginTop: 10, paddingTop: 10, borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'}` }}>
                         <span style={{ fontSize: 11, fontWeight: 500, color: D.text3, letterSpacing: '.06em', textTransform: 'uppercase', marginRight: 8 }}>Arreglos con:</span>
                         <span style={{ fontSize: 13, fontWeight: 400, color: D.text2 }}>{congs.join(' · ')}</span>
                       </div>
