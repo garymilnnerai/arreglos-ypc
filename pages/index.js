@@ -706,7 +706,7 @@ export default function App() {
                 <div style={{ marginBottom: 13 }}>
                   <div style={css.label}>Mes</div>
                   <select value={selMonthOpt} onChange={e => { setSelMonthOpt(e.target.value); setSelSunday(''); }}
-                    style={{ ...css.input, ...(selMonthOpt ? css.inputFilled : {}), cursor: 'pointer', appearance: 'none' }}>
+                    style={{ width: '100%', background: selMonthOpt ? D.accentDim2 : D.bg3, border: `1px solid ${selMonthOpt ? D.accent+'55' : D.border2}`, borderRadius: 10, padding: '13px 14px', fontSize: 16, fontWeight: 300, color: selMonthOpt ? D.accent : D.text, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none', cursor: 'pointer', appearance: 'none', boxSizing: 'border-box' }}>
                     <option value="">Seleccionar mes...</option>
                     {MONTH_OPTIONS.map(o => <option key={`${o.year}-${o.month}`} value={`${o.year}-${o.month}`}>{o.label}</option>)}
                   </select>
@@ -743,7 +743,7 @@ export default function App() {
                 <div style={{ marginBottom: 13 }}>
                   <div style={css.label}>Mes</div>
                   <select value={selMonthOpt} onChange={e => { setSelMonthOpt(e.target.value); setSelSunday(''); }}
-                    style={{ ...css.input, ...(selMonthOpt ? css.inputFilled : {}), cursor: 'pointer', appearance: 'none' }}>
+                    style={{ width: '100%', background: selMonthOpt ? D.accentDim2 : D.bg3, border: `1px solid ${selMonthOpt ? D.accent+'55' : D.border2}`, borderRadius: 10, padding: '13px 14px', fontSize: 16, fontWeight: 300, color: selMonthOpt ? D.accent : D.text, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none', cursor: 'pointer', appearance: 'none', boxSizing: 'border-box' }}>
                     <option value="">Seleccionar mes...</option>
                     {MONTH_OPTIONS.map(o => <option key={`${o.year}-${o.month}`} value={`${o.year}-${o.month}`}>{o.label}</option>)}
                   </select>
@@ -783,7 +783,7 @@ export default function App() {
                 <div style={{ marginBottom: 13 }}>
                   <div style={css.label}>Bosquejo</div>
                   <div onClick={() => { setModalBQSel(true); setBqSelSearch(''); }}
-                    style={{ ...css.input, color: sunBQNum ? D.accent : D.text3, background: sunBQNum ? D.accentDim2 : D.bg3, borderColor: sunBQNum ? `rgba(123,140,222,0.3)` : D.border2, cursor: 'pointer' }}>
+                    style={{ width: '100%', background: sunBQNum ? D.accentDim2 : D.bg3, border: `1px solid ${sunBQNum ? 'rgba(123,140,222,0.3)' : D.border2}`, borderRadius: 10, padding: '13px 14px', fontSize: 16, fontWeight: 300, color: sunBQNum ? D.accent : D.text3, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none', cursor: 'pointer', boxSizing: 'border-box' }}>
                     {sunBQNum ? `${sunBQNum} — ${ALL_B[sunBQNum]}` : 'Seleccionar bosquejo →'}
                   </div>
                 </div>
