@@ -282,23 +282,14 @@ export default function App() {
       if (!sunBQNum) return alert('Elegí un bosquejo');
       newA[ds] = { bqNum: sunBQNum, name: form.name || '', cong: form.cong || '', tel: form.tel || '' };
     }
-    markChanged(newA); setModalSunday(null); setSunBQNum(null);
+    markChanged(newA);
+    playSound('sunday');
+    setSundayFlash(ds);
+    setTimeout(() => setSundayFlash(null), 800);
+    setModalSunday(null); setSunBQNum(null);
   }
 
-  function autoSaveSundayIfComplete(newForm, bqNum) {
-    if (!modalSunday) return;
-    if (newForm.asamblea) return;
-    if (bqNum && newForm.name && newForm.cong) {
-      const ds = modalSunday.date;
-      const newA = { ...assignments };
-      newA[ds] = { bqNum, name: newForm.name, cong: newForm.cong, tel: newForm.tel || '' };
-      markChanged(newA);
-      playSound('sunday');
-      setSundayFlash(ds);
-      setTimeout(() => setSundayFlash(null), 800);
-      setTimeout(() => { setModalSunday(null); setSunBQNum(null); }, 400);
-    }
-  }
+
 
   function deleteSunday() {
     if (!confirm('¿Borrar esta asignación?')) return;
@@ -648,7 +639,7 @@ export default function App() {
                 const bgC = a ? a.asamblea ? D.accentDim : D.greenDim : 'transparent';
                 const bdC = a ? a.asamblea ? `rgba(123,140,222,0.25)` : `rgba(76,175,125,0.25)` : D.border;
                 return (
-                  <div key={ds} onClick={() => { setModalSunday({ date: ds, assignment: a }); setSunBQNum(a?.bqNum || null); setForm({ asamblea: a?.asamblea || false, name: a?.name || '', cong: a?.cong || '', tel: a?.tel || '' }); setFormDirty(false); }}
+                  <div key={ds} onClick={() => { setModalSunday({ date: ds, assignment: a }); setSunBQNum(a?.bqNum || null); setForm({ asamblea: a?.asamblea || false, name: a?.name || '', cong: a?.cong || '', tel: a?.tel || '' }); }}
                     style={{ background: sundayFlash === ds ? D.greenDim : bgC, border: `1px solid ${sundayFlash === ds ? 'rgba(76,175,125,0.4)' : bdC}`, borderRadius: 12, padding: '14px 16px', marginBottom: 8, cursor: 'pointer', transition: 'background 0.4s ease, border-color 0.4s ease', transform: sundayFlash === ds ? 'scale(1.01)' : 'scale(1)' }}>
                     <div style={{ fontSize: 16, fontWeight: 500, color: D.text, marginBottom: 4 }}>Domingo {lbl}</div>
                     {a?.asamblea && <div style={{ fontSize: 14, color: D.accent }}>🏛 Fin de semana de asamblea</div>}
@@ -734,8 +725,8 @@ export default function App() {
                     </div>
                   </div>
                 )}
-                <FField label="Conferenciante" placeholder="Nombre y apellido" value={form.name || ''} onChange={v => { setFormDirty(true); setForm(f => ({ ...f, name: v })); }} onBlur={() => { if(formDirty) autoSaveSundayIfComplete(form, sunBQNum); }} D={D} />
-                <FField label="Congregación" placeholder="De dónde proviene" value={form.cong || ''} onChange={v => { setFormDirty(true); setForm(f => ({ ...f, cong: v })); }} onBlur={() => { if(formDirty) autoSaveSundayIfComplete(form, sunBQNum); }} D={D} />
+                <FField label="Conferenciante" placeholder="Nombre y apellido" value={form.name || ''} onChange={v => setForm(f => ({ ...f, name: v }))} D={D} />
+                <FField label="Congregación" placeholder="De dónde proviene" value={form.cong || ''} onChange={v => setForm(f => ({ ...f, cong: v }))} D={D} />
                 <FField label="Teléfono" placeholder="09xx xxx xxx" value={form.tel || ''} onChange={v => setForm(f => ({ ...f, tel: v }))} D={D} />
               </>
             )}
@@ -776,7 +767,25 @@ export default function App() {
 
         {/* MODAL: SUNDAY */}
         {modalSunday && !modalBQSel && (
-          <Overlay onClose={() => setModalSunday(null)} D={D}>
+          <Overlay onClose={() => {
+            // Auto-save on close if there's a bosquejo selected and basic data
+            if (!form.asamblea && sunBQNum && form.name && form.cong) {
+              const ds = modalSunday.date;
+              const newA = { ...assignments };
+              newA[ds] = { bqNum: sunBQNum, name: form.name, cong: form.cong, tel: form.tel || '' };
+              markChanged(newA);
+              playSound('sunday');
+              setSundayFlash(ds);
+              setTimeout(() => setSundayFlash(null), 800);
+            } else if (form.asamblea) {
+              const ds = modalSunday.date;
+              const newA = { ...assignments };
+              newA[ds] = { asamblea: true };
+              markChanged(newA);
+              playSound('tick');
+            }
+            setModalSunday(null); setSunBQNum(null);
+          }} D={D}>
             <div style={{ fontSize: 17, fontWeight: 500, color: D.text, marginBottom: 18 }}>{fmtDate(modalSunday.date)}</div>
             <AsambleaCheck checked={form.asamblea} onChange={v => setForm(f => ({ ...f, asamblea: v }))} D={D} />
             {!form.asamblea && (
@@ -788,15 +797,15 @@ export default function App() {
                     {sunBQNum ? `${sunBQNum} — ${ALL_B[sunBQNum]}` : 'Seleccionar bosquejo →'}
                   </div>
                 </div>
-                <FField label="Conferenciante" placeholder="Nombre y apellido" value={form.name || ''} onChange={v => { setFormDirty(true); setForm(f => ({ ...f, name: v })); }} onBlur={() => { if(formDirty) autoSaveSundayIfComplete(form, sunBQNum); }} D={D} />
-                <FField label="Congregación" placeholder="De dónde proviene" value={form.cong || ''} onChange={v => { setFormDirty(true); setForm(f => ({ ...f, cong: v })); }} onBlur={() => { if(formDirty) autoSaveSundayIfComplete(form, sunBQNum); }} D={D} />
+                <FField label="Conferenciante" placeholder="Nombre y apellido" value={form.name || ''} onChange={v => setForm(f => ({ ...f, name: v }))} D={D} />
+                <FField label="Congregación" placeholder="De dónde proviene" value={form.cong || ''} onChange={v => setForm(f => ({ ...f, cong: v }))} D={D} />
                 <FField label="Teléfono" placeholder="09xx xxx xxx" value={form.tel || ''} onChange={v => setForm(f => ({ ...f, tel: v }))} D={D} />
               </>
             )}
             <div style={{ display: 'flex', gap: 8, marginTop: 18 }}>
               <Btn onClick={() => { setModalSunday(null); setSunBQNum(null); }} secondary D={D}>Cancelar</Btn>
               {modalSunday.assignment && <Btn onClick={deleteSunday} danger D={D}>Borrar</Btn>}
-              <Btn onClick={saveSundayModal} D={D}>Guardar</Btn>
+              <Btn onClick={saveSundayModal} D={D}>Confirmar</Btn>
             </div>
           </Overlay>
         )}
