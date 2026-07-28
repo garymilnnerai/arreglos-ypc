@@ -355,9 +355,9 @@ export default function App() {
     <div style={{ background: DARK.bg, minHeight: '100vh', color: DARK.text, fontFamily: 'Geist, system-ui, sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '32px 24px' }}>
       <div style={{ width: '100%', maxWidth: 340 }}>
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
-          <img src="/favicon.png" width="52" height="52" alt="Arreglos" style={{ opacity: 0.9, marginBottom: 16, filter: isDark ? 'invert(1)' : 'none' }} />
-          <div style={{ fontSize: 30, fontWeight: 300, color: D.text, letterSpacing: -1 }}>Arreglos</div>
-          <div style={{ fontSize: 10, color: D.text3, letterSpacing: '.12em', textTransform: 'uppercase', marginTop: 6 }}>de Conferencias · Ypacaraí</div>
+          <img src="/favicon.png" width="52" height="52" alt="Arreglos" style={{ opacity: 0.9, marginBottom: 16, filter: 'invert(1)' }} />
+          <div style={{ fontSize: 30, fontWeight: 300, color: DARK.text, letterSpacing: -1 }}>Arreglos</div>
+          <div style={{ fontSize: 10, color: DARK.text3, letterSpacing: '.12em', textTransform: 'uppercase', marginTop: 6 }}>de Conferencias · Ypacaraí</div>
         </div>
         <div style={{ marginBottom: 12 }}>
           <div style={css.label}>Contraseña</div>
