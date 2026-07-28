@@ -233,9 +233,11 @@ export default function App() {
   const css = makeCss(D);
 
   useEffect(() => {
-    document.body.style.background = D.bg;
-    document.body.style.color = D.text;
-    document.body.style.transition = 'background 0.3s ease, color 0.3s ease';
+    if (typeof window !== 'undefined') {
+      document.body.style.background = D.bg;
+      document.body.style.color = D.text;
+      document.body.style.transition = 'background 0.3s ease, color 0.3s ease';
+    }
   }, [isDark, D.bg, D.text]);
 
   // LOGIN
