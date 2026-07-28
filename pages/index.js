@@ -311,6 +311,7 @@ export default function App() {
                 const borderMap = { complete: `rgba(76,175,125,0.25)`, partial: `rgba(232,168,56,0.25)`, empty: D.border };
                 const colorMap = { complete: D.green, partial: D.amber, empty: D.text3 };
                 const txtMap = { complete: `Todos los domingos asignados — ${sundays.length}/${sundays.length}`, partial: `${filled} de ${sundays.length} domingos asignados`, empty: `Sin asignaciones — ${sundays.length} domingos` };
+                const congs = [...new Set(sundays.map(s => assignments[dateStr(s)]?.cong).filter(Boolean))];
                 return (
                   <div key={m} onClick={() => setDetailMonth(m)}
                     style={{ background: bgMap[cls], border: `1px solid ${borderMap[cls]}`, borderRadius: 14, padding: '16px 18px', marginBottom: 10, cursor: 'pointer' }}>
@@ -323,6 +324,12 @@ export default function App() {
                         return <div key={dateStr(s)} style={{ width: 9, height: 9, borderRadius: '50%', background: c }} />;
                       })}
                     </div>
+                    {congs.length > 0 && (
+                      <div style={{ marginTop: 10, paddingTop: 10, borderTop: `1px solid rgba(255,255,255,0.06)` }}>
+                        <span style={{ fontSize: 11, fontWeight: 500, color: D.text3, letterSpacing: '.06em', textTransform: 'uppercase', marginRight: 8 }}>Arreglos con:</span>
+                        <span style={{ fontSize: 13, fontWeight: 400, color: D.text2 }}>{congs.join(' · ')}</span>
+                      </div>
+                    )}
                   </div>
                 );
               })}
