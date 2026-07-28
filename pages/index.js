@@ -215,15 +215,25 @@ export default function App() {
       <div style={css.shell}>
 
         {/* TOPBAR */}
-        <div style={css.topbar}>
-          <div>
-            <div style={{ fontSize: 18, fontWeight: 500, color: D.text, letterSpacing: '-.2px' }}>Arreglos</div>
-            <div style={{ fontSize: 10, color: D.text3, letterSpacing: '.04em' }}>{role === 'admin' ? 'Administrador' : 'Colaborador'}</div>
+        <div style={{ ...css.topbar, flexDirection: 'column', alignItems: 'stretch', padding: '16px 22px 0', gap: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 14 }}>
+            <div>
+              <div style={{ fontSize: 18, fontWeight: 600, color: D.text, letterSpacing: '-.3px', lineHeight: 1.15 }}>Arreglos de Conferencias</div>
+              <div style={{ fontSize: 12, color: D.text3, letterSpacing: '.03em', marginTop: 3 }}>Ypacaraí · {role === 'admin' ? 'Administrador' : 'Colaborador'}</div>
+            </div>
+            <button onClick={doLogout} title="Salir"
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: D.text3, padding: 4, marginTop: 2, display: 'flex', alignItems: 'center' }}>
+              <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" strokeWidth="1.4">
+                <path d="M15 4h4a1 1 0 011 1v12a1 1 0 01-1 1h-4" />
+                <path d="M9 15l-5-4 5-4" />
+                <path d="M4 11h10" />
+              </svg>
+            </button>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            <button onClick={doLogout} style={{ fontSize: 11, color: D.text3, cursor: 'pointer', background: 'none', border: 'none', fontFamily: 'Geist, system-ui, sans-serif' }}>Salir</button>
+          <div style={{ display: 'flex', gap: 0 }}>
             {['bosquejos', 'agenda', 'historial'].map(v => {
               const active = view === v;
+              const labels = { bosquejos: 'Bosquejos', agenda: 'Agenda', historial: 'Historial' };
               const icons = {
                 bosquejos: <path d="M4 5h12M4 10h12M4 15h7" />,
                 agenda: <><rect x="3" y="4" width="14" height="13" rx="2" /><path d="M7 2v4M13 2v4M3 9h14" /></>,
@@ -231,9 +241,9 @@ export default function App() {
               };
               return (
                 <button key={v} onClick={() => { setView(v); setDetailMonth(null); }}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, padding: 0 }}>
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke={active ? D.accent : D.text3} strokeWidth="1.3">{icons[v]}</svg>
-                  <span style={{ fontSize: 9, color: active ? D.accent : D.text3, letterSpacing: '.04em', textTransform: 'uppercase' }}>{v}</span>
+                  style={{ flex: 1, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: '10px 0 13px', borderBottom: active ? `2px solid ${D.accent}` : '2px solid transparent' }}>
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke={active ? D.accent : D.text3} strokeWidth="1.4">{icons[v]}</svg>
+                  <span style={{ fontSize: 12, fontWeight: active ? 500 : 400, color: active ? D.accent : D.text3, letterSpacing: '.02em' }}>{labels[v]}</span>
                 </button>
               );
             })}
