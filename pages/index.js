@@ -119,7 +119,7 @@ export default function App() {
   const [savedSnap, setSavedSnap] = useState('{}');
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [view, setView] = useState('bosquejos');
+  const [view, setView] = useState('agenda');
   const [curYear, setCurYear] = useState(2026);
   const [sortMode, setSortMode] = useState('num');
   const [searchBQ, setSearchBQ] = useState('');
@@ -156,7 +156,15 @@ export default function App() {
       if (res.status === 401) { setLoginError('Contraseña incorrecta'); setLoading(false); return; }
       const data = await res.json();
       setAssignments(data.assignments || {});
-      setMonthContacts(data.monthContacts || {});
+      // Auto-confirm contacts that have all fields
+      const mc = data.monthContacts || {};
+      Object.keys(mc).forEach(k => {
+        mc[k] = mc[k].map(c => ({
+          ...c,
+          confirmed: c.confirmed || (!!c.name && !!c.cong && !!c.tel)
+        }));
+      });
+      setMonthContacts(mc);
       setSavedSnap(JSON.stringify({ assignments: data.assignments || {}, monthContacts: data.monthContacts || {} }));
       setRole(data.role);
       if (data.role === 'admin') await fetch('/api/init', { headers: { 'x-password': pwd } });
