@@ -651,7 +651,28 @@ export default function App() {
               {/* DIVISOR */}
               <div style={{ height: '.5px', background: D.border, margin: '16px 0' }} />
 
-              {/* CONFERENCIANTES QUE SALEN */}
+              {/* DOMINGOS */}
+              {getSundaysOfMonth(curYear, detailMonth).map(s => {
+                const ds = dateStr(s); const a = assignments[ds];
+                const lbl = s.toLocaleDateString('es-PY', { day: 'numeric', month: 'long' });
+                const bgC = a ? a.asamblea ? D.accentDim : D.greenDim : 'transparent';
+                const bdC = a ? a.asamblea ? `rgba(123,140,222,0.25)` : `rgba(76,175,125,0.25)` : D.border;
+                return (
+                  <div key={ds} onClick={() => { setModalSunday({ date: ds, assignment: a }); setSunBQNum(a?.bqNum || null); setForm({ asamblea: a?.asamblea || false, name: a?.name || '', cong: a?.cong || '', tel: a?.tel || '' }); }}
+                    style={{ background: sundayFlash === ds ? D.greenDim : bgC, border: `1px solid ${sundayFlash === ds ? 'rgba(76,175,125,0.4)' : bdC}`, borderRadius: 12, padding: '14px 16px', marginBottom: 8, cursor: 'pointer', transition: 'background 0.4s ease, border-color 0.4s ease', transform: sundayFlash === ds ? 'scale(1.01)' : 'scale(1)' }}>
+                    <div style={{ fontSize: 16, fontWeight: 500, color: D.text, marginBottom: 4 }}>Domingo {lbl}</div>
+                    {a?.asamblea && <div style={{ fontSize: 14, color: D.accent }}>🏛 Fin de semana de asamblea</div>}
+                    {a?.bqNum && <><div style={{ fontSize: 14, color: D.text2 }}>{a.name || '—'} · {a.cong || '—'}{a.tel ? ' · ' + a.tel : ''}</div><div style={{ fontSize: 13, color: D.text3, marginTop: 3 }}>{a.bqNum} — {ALL_B[a.bqNum] || ''}</div></>}
+                    {!a && <div style={{ fontSize: 12, color: D.text3, fontStyle: 'italic' }}>Sin asignar</div>}
+                  </div>
+                );
+              })}
+
+
+              {/* DIVISOR */}
+              <div style={{ height: '.5px', background: D.border, margin: '16px 0' }} />
+
+                            {/* CONFERENCIANTES QUE SALEN */}
               {(() => {
                 const mcKey = `${curYear}-${detailMonth}`;
                 const entries = outgoing[mcKey] || [];
@@ -763,28 +784,8 @@ export default function App() {
                 );
               })()}
 
-              {/* DIVISOR */}
-              <div style={{ height: '.5px', background: D.border, margin: '16px 0' }} />
-
-              {/* DOMINGOS */}
-              {getSundaysOfMonth(curYear, detailMonth).map(s => {
-                const ds = dateStr(s); const a = assignments[ds];
-                const lbl = s.toLocaleDateString('es-PY', { day: 'numeric', month: 'long' });
-                const bgC = a ? a.asamblea ? D.accentDim : D.greenDim : 'transparent';
-                const bdC = a ? a.asamblea ? `rgba(123,140,222,0.25)` : `rgba(76,175,125,0.25)` : D.border;
-                return (
-                  <div key={ds} onClick={() => { setModalSunday({ date: ds, assignment: a }); setSunBQNum(a?.bqNum || null); setForm({ asamblea: a?.asamblea || false, name: a?.name || '', cong: a?.cong || '', tel: a?.tel || '' }); }}
-                    style={{ background: sundayFlash === ds ? D.greenDim : bgC, border: `1px solid ${sundayFlash === ds ? 'rgba(76,175,125,0.4)' : bdC}`, borderRadius: 12, padding: '14px 16px', marginBottom: 8, cursor: 'pointer', transition: 'background 0.4s ease, border-color 0.4s ease', transform: sundayFlash === ds ? 'scale(1.01)' : 'scale(1)' }}>
-                    <div style={{ fontSize: 16, fontWeight: 500, color: D.text, marginBottom: 4 }}>Domingo {lbl}</div>
-                    {a?.asamblea && <div style={{ fontSize: 14, color: D.accent }}>🏛 Fin de semana de asamblea</div>}
-                    {a?.bqNum && <><div style={{ fontSize: 14, color: D.text2 }}>{a.name || '—'} · {a.cong || '—'}{a.tel ? ' · ' + a.tel : ''}</div><div style={{ fontSize: 13, color: D.text3, marginTop: 3 }}>{a.bqNum} — {ALL_B[a.bqNum] || ''}</div></>}
-                    {!a && <div style={{ fontSize: 12, color: D.text3, fontStyle: 'italic' }}>Sin asignar</div>}
-                  </div>
-                );
-              })}
             </div>
           )}
-
           {/* HISTORIAL */}
           {view === 'historial' && (
             <div>
