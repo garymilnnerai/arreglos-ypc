@@ -304,8 +304,8 @@ export default function App() {
         <div style={{ ...css.topbar, flexDirection: 'column', alignItems: 'stretch', padding: '16px 22px 0', gap: 0 }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 14 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <img src="/favicon.svg" width="28" height="28" alt="Speaker"
-                style={{ flexShrink: 0, opacity: 0.9 }} />
+              <img src="/favicon.png" width="28" height="28" alt="Speaker"
+                style={{ flexShrink: 0, opacity: 0.9, filter: isDark ? 'invert(1)' : 'none' }} />
               <div>
                 <div style={{ fontSize: 18, fontWeight: 600, color: D.text, letterSpacing: '-.3px', lineHeight: 1.15 }}>Arreglos de Conferencias</div>
                 <div style={{ fontSize: 12, color: D.text3, letterSpacing: '.03em', marginTop: 3 }}>Ypacaraí · {role === 'admin' ? 'Administrador' : 'Colaborador'}</div>
