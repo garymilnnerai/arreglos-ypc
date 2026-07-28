@@ -5,6 +5,49 @@ const ALL_B = {1:'¿Conoce bien a Dios?',2:'¿Sobreviviremos a los últimos día
 const BOSQUEJOS = Object.entries(ALL_B).filter(([n]) => !EXCL.has(parseInt(n))).map(([n, t]) => ({ n: parseInt(n), t }));
 const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
+// Paletas
+const DARK = {
+  bg: '#141416',
+  bg2: '#1C1C1F',
+  bg3: '#242428',
+  bg4: '#2C2C31',
+  border: 'rgba(255,255,255,0.07)',
+  border2: 'rgba(255,255,255,0.12)',
+  text: '#E8E8EC',
+  text2: '#9A9AA8',
+  text3: '#5A5A68',
+  accent: '#7B8CDE',
+  accentDim: 'rgba(123,140,222,0.15)',
+  accentDim2: 'rgba(123,140,222,0.08)',
+  green: '#4CAF7D',
+  greenDim: 'rgba(76,175,125,0.15)',
+  amber: '#E8A838',
+  amberDim: 'rgba(232,168,56,0.15)',
+  red: '#E05C5C',
+  redDim: 'rgba(224,92,92,0.12)',
+};
+
+const LIGHT = {
+  bg: '#F5F1EA',
+  bg2: '#FFFFFF',
+  bg3: '#EDE8DF',
+  bg4: '#E2DBD0',
+  border: 'rgba(44,40,32,0.08)',
+  border2: 'rgba(44,40,32,0.15)',
+  text: '#1C1714',
+  text2: '#5A5248',
+  text3: '#9A9088',
+  accent: '#4A5CC8',
+  accentDim: 'rgba(74,92,200,0.12)',
+  accentDim2: 'rgba(74,92,200,0.07)',
+  green: '#2A7A50',
+  greenDim: 'rgba(42,122,80,0.12)',
+  amber: '#B87820',
+  amberDim: 'rgba(184,120,32,0.12)',
+  red: '#C04040',
+  redDim: 'rgba(192,64,64,0.1)',
+};
+
 // Paleta Nickel Dark
 const D = {
   bg: '#141416',
@@ -88,6 +131,7 @@ export default function App() {
   const [bqSelSearch, setBqSelSearch] = useState('');
   const [sunBQNum, setSunBQNum] = useState(null);
   const [form, setForm] = useState({});
+  const [isDark, setIsDark] = useState(true);
   // Date selector state for BQ modal
   const [selMonthOpt, setSelMonthOpt] = useState('');
   const [selSunday, setSelSunday] = useState('');
@@ -185,10 +229,11 @@ export default function App() {
   const histMonths = histYear ? [...new Set(Object.entries(assignments).filter(([, a]) => a.bqNum).filter(([ds]) => ds.startsWith(histYear)).map(([ds]) => parseInt(ds.substring(5, 7)) - 1))] : [];
 
   const sundaysForSel = getSundaysForSel();
+  const D = isDark ? DARK : LIGHT;
 
   // LOGIN
   if (screen === 'login') return (
-    <div style={{ ...css.body, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '32px 24px' }}>
+    <div style={{ background: DARK.bg, minHeight: '100vh', color: DARK.text, fontFamily: 'Geist, system-ui, sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '32px 24px' }}>
       <div style={{ width: '100%', maxWidth: 340 }}>
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
           <div style={{ fontSize: 30, fontWeight: 300, color: D.text, letterSpacing: -1 }}>Arreglos</div>
@@ -221,14 +266,23 @@ export default function App() {
               <div style={{ fontSize: 18, fontWeight: 600, color: D.text, letterSpacing: '-.3px', lineHeight: 1.15 }}>Arreglos de Conferencias</div>
               <div style={{ fontSize: 12, color: D.text3, letterSpacing: '.03em', marginTop: 3 }}>Ypacaraí · {role === 'admin' ? 'Administrador' : 'Colaborador'}</div>
             </div>
-            <button onClick={doLogout} title="Salir"
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: D.text3, padding: 4, marginTop: 2, display: 'flex', alignItems: 'center' }}>
-              <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" strokeWidth="1.4">
-                <path d="M15 4h4a1 1 0 011 1v12a1 1 0 01-1 1h-4" />
-                <path d="M9 15l-5-4 5-4" />
-                <path d="M4 11h10" />
-              </svg>
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <button onClick={() => setIsDark(d => !d)} title={isDark ? 'Modo claro' : 'Modo oscuro'}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: D.text3, padding: 4, display: 'flex', alignItems: 'center' }}>
+                {isDark
+                  ? <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4"><circle cx="10" cy="10" r="4"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.9 4.9l1.4 1.4M13.7 13.7l1.4 1.4M4.9 15.1l1.4-1.4M13.7 6.3l1.4-1.4"/></svg>
+                  : <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4"><path d="M17 11.5A7 7 0 119 3a5 5 0 008 8.5z"/></svg>
+                }
+              </button>
+              <button onClick={doLogout} title="Salir"
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: D.text3, padding: 4, display: 'flex', alignItems: 'center' }}>
+                <svg width="20" height="20" viewBox="0 0 22 22" fill="none" stroke="currentColor" strokeWidth="1.4">
+                  <path d="M15 4h4a1 1 0 011 1v12a1 1 0 01-1 1h-4" />
+                  <path d="M9 15l-5-4 5-4" />
+                  <path d="M4 11h10" />
+                </svg>
+              </button>
+            </div>
           </div>
           <div style={{ display: 'flex', gap: 0 }}>
             {['bosquejos', 'agenda', 'historial'].map(v => {
@@ -311,7 +365,7 @@ export default function App() {
                 const borderMap = { complete: `rgba(76,175,125,0.25)`, partial: `rgba(232,168,56,0.25)`, empty: D.border };
                 const colorMap = { complete: D.green, partial: D.amber, empty: D.text3 };
                 const txtMap = { complete: `Todos los domingos asignados — ${sundays.length}/${sundays.length}`, partial: `${filled} de ${sundays.length} domingos asignados`, empty: `Sin asignaciones — ${sundays.length} domingos` };
-                const congs = [...new Set(sundays.map(s => assignments[dateStr(s)]?.cong).filter(Boolean))];
+                const congs = [...new Set(sundays.map(s => assignments[dateStr(s)]?.cong).filter(Boolean).map(c => c.trim()))];
                 return (
                   <div key={m} onClick={() => setDetailMonth(m)}
                     style={{ background: bgMap[cls], border: `1px solid ${borderMap[cls]}`, borderRadius: 14, padding: '16px 18px', marginBottom: 10, cursor: 'pointer' }}>
