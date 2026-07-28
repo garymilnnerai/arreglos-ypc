@@ -1,21 +1,28 @@
 @import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&display=swap');
-
 * { box-sizing: border-box; margin: 0; padding: 0; }
-
 body {
   font-family: 'Geist', system-ui, sans-serif;
-  background: #F5F1EA;
+  background: #141416;
+  color: #E8E8EC;
   min-height: 100vh;
-  color: #2C2820;
+  -webkit-font-smoothing: antialiased;
 }
+select option { background: #1C1C1F; color: #E8E8EC; }
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
 
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  opacity: .025;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size: 160px;
+@keyframes fadeScale {
+  0% { opacity: 0; transform: scale(0.97); }
+  100% { opacity: 1; transform: scale(1); }
 }
+@keyframes slideDown {
+  0% { transform: translateY(-8px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(76,175,125,0.3); }
+  70% { box-shadow: 0 0 0 8px rgba(76,175,125,0); }
+  100% { box-shadow: 0 0 0 0 rgba(76,175,125,0); }
+}
+* { transition-property: background, border-color, color, transform, opacity; transition-timing-function: cubic-bezier(0.4,0,0.2,1); }

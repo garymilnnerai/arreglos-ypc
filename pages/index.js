@@ -1,4 +1,55 @@
 import { useState, useCallback, useEffect } from 'react';
+
+// ── Sound Engine ──────────────────────────────────────────
+function playSound(type) {
+  if (typeof window === 'undefined') return;
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const master = ctx.createGain();
+    master.gain.setValueAtTime(0.18, ctx.currentTime);
+    master.connect(ctx.destination);
+
+    const note = (freq, start, dur, vol = 1) => {
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.connect(g); g.connect(master);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime + start);
+      g.gain.setValueAtTime(0, ctx.currentTime + start);
+      g.gain.linearRampToValueAtTime(vol, ctx.currentTime + start + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + start + dur);
+      osc.start(ctx.currentTime + start);
+      osc.stop(ctx.currentTime + start + dur + 0.05);
+    };
+
+    if (type === 'contact') {
+      // Two soft ascending notes — vínculo establecido
+      note(880, 0, 0.18);
+      note(1108, 0.16, 0.25);
+    } else if (type === 'sunday') {
+      // Warm chord — domingo asignado
+      note(523, 0, 0.3);
+      note(659, 0.02, 0.28, 0.7);
+      note(784, 0.04, 0.26, 0.5);
+    } else if (type === 'save') {
+      // iOS-style single confirmation tone
+      note(1047, 0, 0.12);
+      note(1319, 0.1, 0.2, 0.8);
+      note(1047, 0.25, 0.3, 0.4);
+    } else if (type === 'tick') {
+      // Subtle tick for minor interactions
+      note(1200, 0, 0.06, 0.5);
+    }
+    setTimeout(() => ctx.close(), 1000);
+  } catch (e) {}
+}
+
+// ── Animation helper ──────────────────────────────────────
+function useFlash(duration = 600) {
+  const [flashing, setFlashing] = useState(false);
+  const flash = () => { setFlashing(true); setTimeout(() => setFlashing(false), duration); };
+  return [flashing, flash];
+}
 export const dynamic = 'force-dynamic';
 
 const EXCL = new Set([59,82,122,123,84,85,87,92,94,97,105,106,109,117,119,120,124,126,139,141,144,145,148,149,151,154,155,157,158,163,164,165,167,168]);
@@ -138,7 +189,9 @@ export default function App() {
   const [selSunday, setSelSunday] = useState('');
   // monthContacts: { 'YYYY-M': [{name, cong, tel, confirmed}] }
   const [monthContacts, setMonthContacts] = useState({});
-  const [editingContact, setEditingContact] = useState({}); // { 'YYYY-M-idx': true }
+  const [editingContact, setEditingContact] = useState({});
+  const [savedFlash, setSavedFlash] = useState(false);
+  const [sundayFlash, setSundayFlash] = useState(null); // date string // { 'YYYY-M-idx': true }
 
   const isRecent = useCallback((num, excl = null) => {
     const ago = new Date(); ago.setMonth(ago.getMonth() - 6);
@@ -179,7 +232,11 @@ export default function App() {
     setSaving(true);
     try {
       await fetch('/api/assignments', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-password': pwd }, body: JSON.stringify({ assignments, monthContacts }) });
-      setSavedSnap(JSON.stringify({ assignments, monthContacts })); setPending(false);
+      setSavedSnap(JSON.stringify({ assignments, monthContacts }));
+      setPending(false);
+      playSound('save');
+      setSavedFlash(true);
+      setTimeout(() => setSavedFlash(false), 1000);
     } catch (e) { console.error(e); }
     setSaving(false);
   }
@@ -235,7 +292,10 @@ export default function App() {
       const newA = { ...assignments };
       newA[ds] = { bqNum, name: newForm.name, cong: newForm.cong, tel: newForm.tel || '' };
       markChanged(newA);
-      setTimeout(() => { setModalSunday(null); setSunBQNum(null); }, 300);
+      playSound('sunday');
+      setSundayFlash(ds);
+      setTimeout(() => setSundayFlash(null), 800);
+      setTimeout(() => { setModalSunday(null); setSunBQNum(null); }, 400);
     }
   }
 
@@ -487,8 +547,9 @@ export default function App() {
                   const updated = contacts.map((c, i) => {
                     if (i !== idx) return c;
                     const newC = { ...c, [field]: val };
-                    // Auto-confirm when all 3 required fields filled
+                    const wasConfirmed = c.confirmed;
                     if (newC.name && newC.cong && newC.tel) newC.confirmed = true;
+                    if (!wasConfirmed && newC.confirmed) playSound('contact');
                     return newC;
                   });
                   setMonthContacts({ ...monthContacts, [mcKey]: updated });
@@ -587,7 +648,7 @@ export default function App() {
                 const bdC = a ? a.asamblea ? `rgba(123,140,222,0.25)` : `rgba(76,175,125,0.25)` : D.border;
                 return (
                   <div key={ds} onClick={() => { setModalSunday({ date: ds, assignment: a }); setSunBQNum(a?.bqNum || null); setForm({ asamblea: a?.asamblea || false, name: a?.name || '', cong: a?.cong || '', tel: a?.tel || '' }); }}
-                    style={{ background: bgC, border: `1px solid ${bdC}`, borderRadius: 12, padding: '14px 16px', marginBottom: 8, cursor: 'pointer', transition: 'background 0.3s ease' }}>
+                    style={{ background: sundayFlash === ds ? D.greenDim : bgC, border: `1px solid ${sundayFlash === ds ? 'rgba(76,175,125,0.4)' : bdC}`, borderRadius: 12, padding: '14px 16px', marginBottom: 8, cursor: 'pointer', transition: 'background 0.4s ease, border-color 0.4s ease', transform: sundayFlash === ds ? 'scale(1.01)' : 'scale(1)' }}>
                     <div style={{ fontSize: 16, fontWeight: 500, color: D.text, marginBottom: 4 }}>Domingo {lbl}</div>
                     {a?.asamblea && <div style={{ fontSize: 14, color: D.accent }}>🏛 Fin de semana de asamblea</div>}
                     {a?.bqNum && <><div style={{ fontSize: 14, color: D.text2 }}>{a.name || '—'} · {a.cong || '—'}{a.tel ? ' · ' + a.tel : ''}</div><div style={{ fontSize: 13, color: D.text3, marginTop: 3 }}>{a.bqNum} — {ALL_B[a.bqNum] || ''}</div></>}
@@ -621,7 +682,7 @@ export default function App() {
         {/* SAVE BANNER */}
         {pending && (
           <div style={{ position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: '100%', maxWidth: 420, background: D.bg3, padding: '14px 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', zIndex: 50, borderTop: `1px solid ${D.border2}`, transition: 'background 0.3s ease' }}>
-            <div style={{ fontSize: 14, color: D.text2 }}>¿Deseás confirmar y guardar?</div>
+            <div style={{ fontSize: 14, color: savedFlash ? D.green : D.text2, transition: 'color 0.3s ease' }}>{savedFlash ? '✓ Guardado' : '¿Deseás confirmar y guardar?'}</div>
             <div style={{ display: 'flex', gap: 8 }}>
               <button onClick={discardChanges} style={{ fontSize: 11, fontWeight: 500, padding: '6px 14px', borderRadius: 20, border: `1px solid ${D.border2}`, background: 'transparent', color: D.text3, cursor: 'pointer', fontFamily: 'Geist, system-ui, sans-serif' }}>Descartar</button>
               <button onClick={saveToSheet} disabled={saving} style={{ fontSize: 11, fontWeight: 500, padding: '6px 14px', borderRadius: 20, border: 'none', background: D.accent, color: '#fff', cursor: 'pointer', fontFamily: 'Geist, system-ui, sans-serif' }}>{saving ? 'Guardando...' : 'Guardar'}</button>
