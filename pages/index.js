@@ -59,7 +59,7 @@ const css = {
   shell: { maxWidth: 400, margin: '0 auto', minHeight: '100vh', display: 'flex', flexDirection: 'column' },
   topbar: { padding: '14px 20px 10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, background: D.bg, zIndex: 10, borderBottom: `1px solid ${D.border}` },
   card: { background: D.bg2, border: `1px solid ${D.border}`, borderRadius: 12 },
-  input: { width: '100%', background: D.bg3, border: `1px solid ${D.border2}`, borderRadius: 8, padding: '10px 12px', fontSize: 14, fontWeight: 300, color: D.text, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none' },
+  input: { width: '100%', background: D.bg3, border: `1px solid ${D.border2}`, borderRadius: 8, padding: "13px 14px", fontSize: 14, fontWeight: 300, color: D.text, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none' },
   inputFilled: { background: D.accentDim2, borderColor: `rgba(123,140,222,0.3)`, color: D.accent },
   label: { fontSize: 10, fontWeight: 500, color: D.text3, letterSpacing: '.1em', textTransform: 'uppercase', marginBottom: 6 },
   modal: { background: D.bg2, borderRadius: '18px 18px 0 0', padding: '24px 20px 36px', width: '100%', maxWidth: 400, maxHeight: '90vh', overflowY: 'auto', border: `1px solid ${D.border2}`, borderBottom: 'none' },
@@ -217,7 +217,7 @@ export default function App() {
         {/* TOPBAR */}
         <div style={css.topbar}>
           <div>
-            <div style={{ fontSize: 15, fontWeight: 500, color: D.text, letterSpacing: '-.2px' }}>Arreglos</div>
+            <div style={{ fontSize: 18, fontWeight: 500, color: D.text, letterSpacing: '-.2px' }}>Arreglos</div>
             <div style={{ fontSize: 10, color: D.text3, letterSpacing: '.04em' }}>{role === 'admin' ? 'Administrador' : 'Colaborador'}</div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
@@ -267,10 +267,10 @@ export default function App() {
                     style={{ display: 'flex', alignItems: 'center', gap: 14, ...css.card, padding: '14px 16px', marginBottom: 8, cursor: 'pointer', position: 'relative', overflow: 'hidden' }}>
                     {rec && <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 3, background: D.amber }} />}
                     {!ld && !rec && <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 3, background: D.green }} />}
-                    <div style={{ fontSize: 22, fontWeight: 300, color: D.text3, width: 42, textAlign: 'center', letterSpacing: '-.5px' }}>{b.n}</div>
+                    <div style={{ fontSize: 26, fontWeight: 300, color: D.text3, width: 48, textAlign: 'center', letterSpacing: '-.5px' }}>{b.n}</div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 13, fontWeight: 400, color: D.text, lineHeight: 1.35 }}>{b.t}</div>
-                      <div style={{ fontSize: 11, fontWeight: 300, color: rec ? D.amber : D.text3, marginTop: 3 }}>
+                      <div style={{ fontSize: 16, fontWeight: 400, color: D.text, lineHeight: 1.4 }}>{b.t}</div>
+                      <div style={{ fontSize: 13, fontWeight: 300, color: rec ? D.amber : D.text3, marginTop: 4 }}>
                         {rec ? `⚠ Presentado recientemente · ${fmtShort(ld)}` : ld ? `Último: ${fmtShort(ld)}` : 'Nunca presentado'}
                       </div>
                     </div>
@@ -304,8 +304,8 @@ export default function App() {
                 return (
                   <div key={m} onClick={() => setDetailMonth(m)}
                     style={{ background: bgMap[cls], border: `1px solid ${borderMap[cls]}`, borderRadius: 14, padding: '16px 18px', marginBottom: 10, cursor: 'pointer' }}>
-                    <div style={{ fontSize: 20, fontWeight: 300, color: D.text, letterSpacing: '-.5px', marginBottom: 4 }}>{mn}</div>
-                    <div style={{ fontSize: 11, fontWeight: 400, color: colorMap[cls] }}>{txtMap[cls]}</div>
+                    <div style={{ fontSize: 24, fontWeight: 300, color: D.text, letterSpacing: '-.5px', marginBottom: 4 }}>{mn}</div>
+                    <div style={{ fontSize: 13, fontWeight: 400, color: colorMap[cls] }}>{txtMap[cls]}</div>
                     <div style={{ display: 'flex', gap: 5, marginTop: 10, flexWrap: 'wrap' }}>
                       {sundays.map(s => {
                         const a = assignments[dateStr(s)];
@@ -327,8 +327,8 @@ export default function App() {
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.2"><path d="M9 2L4 7l5 5" /></svg>
                 {curYear}
               </button>
-              <div style={{ fontSize: 28, fontWeight: 300, color: D.text, letterSpacing: -1, marginBottom: 4 }}>{MONTHS[detailMonth]}</div>
-              <div style={{ fontSize: 12, color: D.text3, marginBottom: 18 }}>{curYear}</div>
+              <div style={{ fontSize: 32, fontWeight: 300, color: D.text, letterSpacing: -1, marginBottom: 4 }}>{MONTHS[detailMonth]}</div>
+              <div style={{ fontSize: 14, color: D.text3, marginBottom: 18 }}>{curYear}</div>
               {getSundaysOfMonth(curYear, detailMonth).map(s => {
                 const ds = dateStr(s); const a = assignments[ds];
                 const lbl = s.toLocaleDateString('es-PY', { day: 'numeric', month: 'long' });
@@ -337,9 +337,9 @@ export default function App() {
                 return (
                   <div key={ds} onClick={() => { setModalSunday({ date: ds, assignment: a }); setSunBQNum(a?.bqNum || null); setForm({ asamblea: a?.asamblea || false, name: a?.name || '', cong: a?.cong || '', tel: a?.tel || '' }); }}
                     style={{ background: bgC, border: `1px solid ${bdC}`, borderRadius: 12, padding: '14px 16px', marginBottom: 8, cursor: 'pointer' }}>
-                    <div style={{ fontSize: 13, fontWeight: 500, color: D.text, marginBottom: 3 }}>Domingo {lbl}</div>
-                    {a?.asamblea && <div style={{ fontSize: 12, color: D.accent }}>🏛 Fin de semana de asamblea</div>}
-                    {a?.bqNum && <><div style={{ fontSize: 12, color: D.text2 }}>{a.name || '—'} · {a.cong || '—'}{a.tel ? ' · ' + a.tel : ''}</div><div style={{ fontSize: 11, color: D.text3, marginTop: 2 }}>{a.bqNum} — {ALL_B[a.bqNum] || ''}</div></>}
+                    <div style={{ fontSize: 16, fontWeight: 500, color: D.text, marginBottom: 4 }}>Domingo {lbl}</div>
+                    {a?.asamblea && <div style={{ fontSize: 14, color: D.accent }}>🏛 Fin de semana de asamblea</div>}
+                    {a?.bqNum && <><div style={{ fontSize: 14, color: D.text2 }}>{a.name || '—'} · {a.cong || '—'}{a.tel ? ' · ' + a.tel : ''}</div><div style={{ fontSize: 13, color: D.text3, marginTop: 3 }}>{a.bqNum} — {ALL_B[a.bqNum] || ''}</div></>}
                     {!a && <div style={{ fontSize: 12, color: D.text3, fontStyle: 'italic' }}>Sin asignar</div>}
                   </div>
                 );
@@ -358,7 +358,7 @@ export default function App() {
               {histEntries.length === 0 && <div style={{ textAlign: 'center', padding: '40px 0', color: D.text3, fontSize: 13 }}>Sin registros</div>}
               {histEntries.map(([ds, a]) => (
                 <div key={ds} style={{ ...css.card, padding: '14px 16px', marginBottom: 8 }}>
-                  <div style={{ fontSize: 11, color: D.text3, marginBottom: 4 }}>{fmtDate(ds)}</div>
+                  <div style={{ fontSize: 13, color: D.text3, marginBottom: 5 }}>{fmtDate(ds)}</div>
                   <div><span style={{ fontSize: 13, fontWeight: 500, color: D.accent, marginRight: 6 }}>{a.bqNum}</span><span style={{ fontSize: 13, color: D.text }}>{ALL_B[a.bqNum] || ''}</span></div>
                   <div style={{ fontSize: 11, color: D.text2, marginTop: 3 }}>{[a.name, a.cong, a.tel].filter(Boolean).join(' · ')}</div>
                 </div>
@@ -370,7 +370,7 @@ export default function App() {
         {/* SAVE BANNER */}
         {pending && (
           <div style={{ position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)', width: '100%', maxWidth: 400, background: D.bg3, padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', zIndex: 50, borderTop: `1px solid ${D.border2}` }}>
-            <div style={{ fontSize: 12, color: D.text2 }}>¿Deseás confirmar y guardar?</div>
+            <div style={{ fontSize: 14, color: D.text2 }}>¿Deseás confirmar y guardar?</div>
             <div style={{ display: 'flex', gap: 8 }}>
               <button onClick={discardChanges} style={{ fontSize: 11, fontWeight: 500, padding: '6px 14px', borderRadius: 20, border: `1px solid ${D.border2}`, background: 'transparent', color: D.text3, cursor: 'pointer', fontFamily: 'Geist, system-ui, sans-serif' }}>Descartar</button>
               <button onClick={saveToSheet} disabled={saving} style={{ fontSize: 11, fontWeight: 500, padding: '6px 14px', borderRadius: 20, border: 'none', background: D.accent, color: '#fff', cursor: 'pointer', fontFamily: 'Geist, system-ui, sans-serif' }}>{saving ? 'Guardando...' : 'Guardar'}</button>
@@ -381,10 +381,10 @@ export default function App() {
         {/* MODAL: BQ — con selector de mes y domingos */}
         {modalBQ && (
           <Overlay onClose={() => setModalBQ(null)}>
-            <div style={{ fontSize: 14, fontWeight: 500, color: D.text, marginBottom: 3 }}>Bosquejo {modalBQ.num}</div>
+            <div style={{ fontSize: 17, fontWeight: 500, color: D.text, marginBottom: 4 }}>Bosquejo {modalBQ.num}</div>
             <div style={{ fontSize: 11, color: D.text2, marginBottom: 18, lineHeight: 1.4 }}>{ALL_B[modalBQ.num]}</div>
             {isRecent(modalBQ.num) && (
-              <div style={{ background: D.amberDim, border: `1px solid rgba(232,168,56,0.3)`, borderRadius: 8, padding: '10px 12px', marginBottom: 14, fontSize: 12, color: D.amber }}>
+              <div style={{ background: D.amberDim, border: `1px solid rgba(232,168,56,0.3)`, borderRadius: 8, padding: "13px 14px", marginBottom: 14, fontSize: 12, color: D.amber }}>
                 ⚠ Presentado en los últimos 6 meses ({fmtShort(lastDate(modalBQ.num))})
               </div>
             )}
@@ -464,7 +464,7 @@ export default function App() {
         {/* MODAL: SUNDAY */}
         {modalSunday && !modalBQSel && (
           <Overlay onClose={() => setModalSunday(null)}>
-            <div style={{ fontSize: 14, fontWeight: 500, color: D.text, marginBottom: 18 }}>{fmtDate(modalSunday.date)}</div>
+            <div style={{ fontSize: 17, fontWeight: 500, color: D.text, marginBottom: 18 }}>{fmtDate(modalSunday.date)}</div>
             <AsambleaCheck checked={form.asamblea} onChange={v => setForm(f => ({ ...f, asamblea: v }))} />
             {!form.asamblea && (
               <>
@@ -503,7 +503,7 @@ export default function App() {
                 return (
                   <div key={b.n} onClick={() => { setSunBQNum(b.n); setModalBQSel(false); }}
                     style={{ display: 'flex', gap: 12, padding: '10px 4px', borderBottom: `1px solid ${D.border}`, cursor: 'pointer', borderLeft: rec ? `3px solid ${D.amber}` : 'none', paddingLeft: rec ? 8 : 4 }}>
-                    <div style={{ fontSize: 15, fontWeight: 300, color: D.text3, width: 30, flexShrink: 0 }}>{b.n}</div>
+                    <div style={{ fontSize: 18, fontWeight: 300, color: D.text3, width: 34, flexShrink: 0 }}>{b.n}</div>
                     <div>
                       <div style={{ fontSize: 12, color: D.text, lineHeight: 1.3 }}>{b.t}</div>
                       {rec && <div style={{ fontSize: 10, color: D.amber, marginTop: 2 }}>⚠ Presentado recientemente</div>}
@@ -547,7 +547,7 @@ function FField({ label, placeholder, value, onChange, type = 'text' }) {
     <div style={{ marginBottom: 13 }}>
       <div style={{ fontSize: 10, fontWeight: 500, color: D2.text3, letterSpacing: '.1em', textTransform: 'uppercase', marginBottom: 6 }}>{label}</div>
       <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
-        style={{ width: '100%', background: value ? 'rgba(123,140,222,0.08)' : '#242428', border: `1px solid ${value ? 'rgba(123,140,222,0.3)' : 'rgba(255,255,255,0.12)'}`, borderRadius: 8, padding: '10px 12px', fontSize: 14, fontWeight: 300, color: value ? D2.accent : D2.text, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none' }} />
+        style={{ width: '100%', background: value ? 'rgba(123,140,222,0.08)' : '#242428', border: `1px solid ${value ? 'rgba(123,140,222,0.3)' : 'rgba(255,255,255,0.12)'}`, borderRadius: 8, padding: "13px 14px", fontSize: 14, fontWeight: 300, color: value ? D2.accent : D2.text, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none' }} />
     </div>
   );
 }
