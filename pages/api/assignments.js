@@ -19,13 +19,13 @@ export default async function handler(req, res) {
 
   if (req.method === 'GET') {
     const data = await readAssignments();
-    return res.status(200).json({ assignments: data.assignments, monthContacts: data.monthContacts, role: isAdmin ? 'admin' : 'colab' });
+    return res.status(200).json({ assignments: data.assignments, monthContacts: data.monthContacts, outgoing: data.outgoing, role: isAdmin ? 'admin' : 'colab' });
   }
 
   if (req.method === 'POST') {
-    const { assignments, monthContacts } = req.body;
+    const { assignments, monthContacts, outgoing } = req.body;
     if (!assignments) return res.status(400).json({ error: 'Sin datos' });
-    const ok = await writeAssignments(assignments, monthContacts || {});
+    const ok = await writeAssignments(assignments, monthContacts || {}, outgoing || {});
     if (ok) return res.status(200).json({ success: true });
     return res.status(500).json({ error: 'Error al guardar' });
   }

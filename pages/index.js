@@ -55,6 +55,16 @@ export const dynamic = 'force-dynamic';
 const EXCL = new Set([59,82,122,123,84,85,87,92,94,97,105,106,109,117,119,120,124,126,139,141,144,145,148,149,151,154,155,157,158,163,164,165,167,168]);
 const ALL_B = {1:'¿Conoce bien a Dios?',2:'¿Sobreviviremos a los últimos días?',3:'Avancemos con la organización unida de Jehová',4:'El mundo que nos rodea prueba que Dios existe',5:'Ayuda práctica para las familias',6:'Qué aprendemos del diluvio universal',7:'Imitemos al Padre de tiernas misericordias',8:'Vivamos para hacer la voluntad de Dios',9:'Escuchemos y pongamos en práctica la Palabra de Dios',10:'Seamos honrados en todo',11:'Imitemos a Jesús y no seamos parte del mundo',12:'A Dios le importa cómo vemos la autoridad',13:'Cómo ve Dios el sexo y el matrimonio',14:'Un pueblo limpio da gloria a Jehová',15:'Hagamos el bien a todos',16:'Fortalezcamos nuestra amistad con Dios',17:'Demos gloria a Dios con todo lo que tenemos',18:'Haga de Jehová su fortaleza',19:'Cómo puede usted conocer su futuro',20:'¿Ha llegado el tiempo para que Dios gobierne el mundo?',21:'Valoremos nuestro lugar en el Reino de Dios',22:'¿Aprovecha usted todas las ayudas espirituales?',23:'La vida tiene propósito',24:'¿Ha encontrado usted una perla muy valiosa?',25:'Luchemos contra el espíritu del mundo',26:'¿Le importamos a Dios?',27:'Cómo iniciar bien el matrimonio',28:'Muestre respeto y amor en su matrimonio',29:'Las responsabilidades que tienen los padres',30:'Cómo mejorar la comunicación en la familia',31:'¿Estamos al tanto de nuestras necesidades espirituales?',32:'Cómo enfrentarse a las inquietudes de la vida',33:'¿Habrá algún día justicia para todos?',34:'¿Tendrá usted la marca para sobrevivir?',35:'¿Se puede vivir para siempre?',36:'¿Es esta vida todo lo que podemos esperar?',37:'¿Por qué andar en el camino de Dios?',38:'¿Cómo puede usted sobrevivir al fin del mundo?',39:'¿En qué sentido es Jesucristo el vencedor del mundo?',40:'¿Qué sucederá en el futuro cercano?',41:'Estense quietos y vean cómo los salva Jehová',42:'¿Puede el amor vencer al odio?',43:'Lo que Dios espera de nosotros siempre nos beneficia',44:'¿Cómo le benefician a usted las enseñanzas de Jesús?',45:'Sigamos el camino que lleva a la vida',46:'Mantengamos nuestra confianza fuerte hasta el fin',47:'Tengan fe en las buenas noticias',48:'Cómo ser leales ante las pruebas',49:'¿Viviremos algún día en una Tierra limpia?',50:'Cómo tomar buenas decisiones',51:'¿Está la verdad transformando su vida?',52:'¿Quién es su Dios?',53:'¿Piensa usted igual que Dios?',54:'Tenga fe en Dios y sus promesas',55:'¿Cómo puede ganarse una buena reputación ante Dios?',56:'¿En qué líder podemos confiar?',57:'Aguantemos la persecución',58:'¿Quiénes son los verdaderos discípulos de Cristo?',60:'¿Cuál es su propósito en la vida?',61:'¿En las promesas de quién confía usted?',62:'¿Dónde encontrará una esperanza segura?',63:'¿Es posible encontrar la verdad?',64:'¿Amamos los placeres en vez de a Dios?',65:'¿Cómo podemos ser pacíficos en un mundo violento?',66:'¿Será usted un buen trabajador en la cosecha?',67:'Medite en la Palabra de Jehová y en su creación',68:'Sigan perdonándose con generosidad',69:'¿Por qué es importante mostrar amor desinteresado?',70:'¿Por qué se merece Dios toda nuestra confianza?',71:'Ahora es el momento de estar despiertos',72:'El amor identifica a la religión verdadera',73:'Consigamos que nuestro corazón sea sabio',74:'Jehová está pendiente de nosotros',75:'Demuestre que apoya el gobierno de Dios',76:'¿Pueden los principios bíblicos ayudarnos?',77:'Sean siempre hospitalarios',78:'Sirva a Jehová con alegría',79:'¿A quién prefiere como amigo?',80:'¿Confía usted en la ciencia o en la Biblia?',81:'¿Quiénes están preparados para hacer discípulos?',83:'¿Tienen que obedecer los cristianos los Diez Mandamientos?',86:'Cómo lograr que Dios escuche nuestras oraciones',88:'Por qué vivir de acuerdo con las normas de la Biblia',89:'Venga a beber el agua de la verdad',90:'Esfuércese por conseguir la vida que realmente es vida',91:'La presencia y la gobernación del Mesías',93:'¿Cuándo se acabarán los desastres naturales?',95:'No caiga en la trampa del ocultismo',96:'¿Cuál es el futuro de la religión?',98:'La escena de este mundo está cambiando',99:'Por qué se puede confiar en la Biblia',100:'Haga amistades que duren para siempre',101:'Jehová el Gran Creador',102:'Prestémosle atención a la palabra profética',103:'Cómo ser verdaderamente felices',104:'Padres ¿están construyendo con materiales resistentes al fuego?',107:'Eduquemos nuestra conciencia y nos irá bien',108:'Mire al futuro sin miedo',110:'La familia feliz es la que pone a Dios en primer lugar',111:'La humanidad recuperará la salud por completo',112:'Mostremos amor en un mundo egoísta',113:'Joven ¿cómo puedes ser feliz y tener éxito?',114:'Aprecie las maravillas de la creación de Dios',115:'Protéjase de las astutas trampas de Satanás',116:'Sea sabio al elegir sus compañías',118:'Veamos a los jóvenes como los ve Jehová',121:'Una hermandad mundial sobrevivirá a la mayor calamidad',125:'Por qué necesita la humanidad un rescate',127:'¿Qué nos sucede cuando morimos?',128:'¿Es el infierno realmente un lugar de tormento?',129:'¿Enseña la Biblia que Dios es una trinidad?',130:'La Tierra existirá para siempre',131:'Pongámonos en contra del Diablo',132:'La resurrección una victoria sobre la muerte',133:'¿Importa lo que creemos sobre el origen de los seres humanos?',134:'¿Deben los cristianos observar el sábado?',135:'La santidad de la vida y la sangre',136:'¿Aprueba Dios las imágenes en la adoración?',137:'¿De verdad tuvieron lugar los milagros de la Biblia?',138:'Vivamos con buen juicio en un mundo perverso',140:'¿Quién es Jesucristo en realidad?',142:'Por qué refugiarse en Jehová',143:'Confiemos en el Dios de todo consuelo',146:'Utilice la educación para alabar a Jehová',147:'Confiemos en que Jehová tiene el poder para salvarnos',150:'¿Está este mundo condenado a la destrucción?',152:'¿Cuándo y por qué vendrá el verdadero Armagedón?',153:'Estemos muy pendientes del impresionante día de Jehová',156:'¿Es el Día del Juicio un tiempo de temor o de esperanza?',159:'Cómo encontrar seguridad en un mundo peligroso',160:'Protejamos nuestra identidad cristiana',161:'¿Por qué sufrió y murió Jesús?',162:'Liberados de un mundo de oscuridad',166:'¿Qué es la verdadera fe y cómo se demuestra?',169:'¿Por qué debemos guiarnos por la Biblia?',170:'¿Quién es el único que puede gobernar bien a la humanidad?',171:'Usted puede disfrutar de la vida en paz ahora y para siempre',172:'¿Qué posición tenemos ante Dios?',173:'¿Le importa a Dios qué religión tengamos?',174:'¿Quién será digno de entrar en el nuevo mundo de Dios?',175:'¿Qué pruebas demuestran la autenticidad de la Biblia?',176:'¿Cuándo tendremos verdadera paz y seguridad?',177:'¿A quién podemos acudir en tiempos de angustia?',178:'Andemos en el camino de la integridad',179:'Rechace las fantasías mundanales busque las realidades del Reino',180:'¿Por qué debe ser real para nosotros la esperanza de la resurrección?',181:'¿Faltará menos de lo que usted cree?',182:'¿Qué está haciendo por nosotros el Reino de Dios?',183:'Alejemos la mirada de lo que es inútil',184:'¿Es la muerte el final de todo?',185:'¿Influye la verdad en su vida?',186:'Unidos al feliz pueblo de Dios',187:'¿Cómo es posible que un Dios de amor permita la maldad?',188:'¿Ha puesto usted su confianza en Jehová?',189:'Andar con Dios nos beneficia ahora y para siempre',190:'Una familia unida y feliz para siempre',191:'Cómo vencen al mundo la fe y el amor',192:'¿Anda usted por el camino que lleva a la vida eterna?',193:'Pronto se nos librará de la angustia mundial',194:'Cómo nos beneficia la sabiduría divina'};
 const BOSQUEJOS = Object.entries(ALL_B).filter(([n]) => !EXCL.has(parseInt(n))).map(([n, t]) => ({ n: parseInt(n), t }));
+
+const SPEAKERS = [
+  { name: 'Agustín Egusquiza', bqs: [11,17,40,55,68,112,153,160] },
+  { name: 'Bernardo Roa',      bqs: [30,74,76,190] },
+  { name: 'Celso Roa',         bqs: [1,2,25,62] },
+  { name: 'Claudelino Rojas',  bqs: [66,172,190] },
+  { name: 'Gary Martínez',     bqs: [1,2,6,28,29,40,50,52,90,100,110,116,140,169,174,181] },
+  { name: 'Osvaldo Díaz',      bqs: [2,7,176,183] },
+  { name: 'Rafael Minesi',     bqs: [3,9,10,48,77] },
+];
 const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
 // Paletas
@@ -189,6 +199,9 @@ export default function App() {
   const [selSunday, setSelSunday] = useState('');
   // monthContacts: { 'YYYY-M': [{name, cong, tel, confirmed}] }
   const [monthContacts, setMonthContacts] = useState({});
+  // outgoing: { 'YYYY-M': [{speaker, bqNum, cong, day, time}] }
+  const [outgoing, setOutgoing] = useState({});
+  const [outgoingOpen, setOutgoingOpen] = useState({});
   const [editingContact, setEditingContact] = useState({});
   const [savedFlash, setSavedFlash] = useState(false);
   const [sundayFlash, setSundayFlash] = useState(null);
@@ -210,6 +223,7 @@ export default function App() {
       if (res.status === 401) { setLoginError('Contraseña incorrecta'); setLoading(false); return; }
       const data = await res.json();
       setAssignments(data.assignments || {});
+      setOutgoing(data.outgoing || {});
       // Auto-confirm contacts that have all fields
       const mc = data.monthContacts || {};
       Object.keys(mc).forEach(k => {
@@ -232,8 +246,8 @@ export default function App() {
   async function saveToSheet() {
     setSaving(true);
     try {
-      await fetch('/api/assignments', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-password': pwd }, body: JSON.stringify({ assignments, monthContacts }) });
-      setSavedSnap(JSON.stringify({ assignments, monthContacts }));
+      await fetch('/api/assignments', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-password': pwd }, body: JSON.stringify({ assignments, monthContacts, outgoing }) });
+      setSavedSnap(JSON.stringify({ assignments, monthContacts, outgoing }));
       setPending(false);
       playSound('save');
       setSavedFlash(true);
@@ -246,6 +260,7 @@ export default function App() {
     const snap = JSON.parse(savedSnap);
     setAssignments(snap.assignments || snap);
     setMonthContacts(snap.monthContacts || {});
+    setOutgoing(snap.outgoing || {});
     setPending(false);
   }
 
@@ -628,6 +643,121 @@ export default function App() {
                         <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.3"><circle cx="7" cy="7" r="6"/><path d="M7 4v6M4 7h6"/></svg>
                         Agregar otro contacto
                       </button>
+                    )}
+                  </div>
+                );
+              })()}
+
+              {/* DIVISOR */}
+              <div style={{ height: '.5px', background: D.border, margin: '16px 0' }} />
+
+              {/* CONFERENCIANTES QUE SALEN */}
+              {(() => {
+                const mcKey = `${curYear}-${detailMonth}`;
+                const entries = outgoing[mcKey] || [];
+                const isOpen = outgoingOpen[mcKey] || false;
+
+                const toggleOpen = () => setOutgoingOpen(o => ({ ...o, [mcKey]: !o[mcKey] }));
+
+                const addEntry = () => {
+                  const newEntries = [...entries, { speaker: '', bqNum: '', cong: '', day: 'dom', time: '' }];
+                  setOutgoing(o => ({ ...o, [mcKey]: newEntries }));
+                  setPending(true);
+                };
+
+                const updateEntry = (idx, field, val) => {
+                  const updated = entries.map((e, i) => i === idx ? { ...e, [field]: val, ...(field === 'speaker' ? { bqNum: '' } : {}) } : e);
+                  setOutgoing(o => ({ ...o, [mcKey]: updated }));
+                  setPending(true);
+                };
+
+                const removeEntry = (idx) => {
+                  const updated = entries.filter((_, i) => i !== idx);
+                  setOutgoing(o => ({ ...o, [mcKey]: updated }));
+                  setPending(true);
+                };
+
+                // Check speaker limit: max 2 per month
+                const speakerCount = (name) => entries.filter(e => e.speaker === name).length;
+
+                const speakerBqs = (name) => SPEAKERS.find(s => s.name === name)?.bqs || [];
+
+                // Accent color for this section — warm violet
+                const VC = isDark ? '#A991D4' : '#6B4FA0';
+                const VDim = isDark ? 'rgba(169,145,212,0.12)' : 'rgba(107,79,160,0.09)';
+                const VBorder = isDark ? 'rgba(169,145,212,0.25)' : 'rgba(107,79,160,0.2)';
+
+                return (
+                  <div style={{ marginBottom: 6 }}>
+                    {/* Header — always visible */}
+                    <div onClick={toggleOpen}
+                      style={{ background: VDim, border: `1px solid ${VBorder}`, borderRadius: isOpen ? '14px 14px 0 0' : 14, padding: '13px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke={VC} strokeWidth="1.4" strokeLinecap="round">
+                          <circle cx="7" cy="5" r="3"/>
+                          <path d="M2 14c0-3 10-3 10 0"/>
+                          <path d="M13 8l3-3M13 5l3 3"/>
+                        </svg>
+                        <span style={{ fontSize: 13, fontWeight: 500, color: VC, letterSpacing: '.02em' }}>Conferenciantes que salen</span>
+                        {entries.length > 0 && <span style={{ fontSize: 11, color: VC, background: VDim, border: `1px solid ${VBorder}`, borderRadius: 20, padding: '1px 8px' }}>{entries.length}</span>}
+                      </div>
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke={VC} strokeWidth="1.3">
+                        <path d={isOpen ? 'M2 9l5-5 5 5' : 'M2 5l5 5 5-5'}/>
+                      </svg>
+                    </div>
+
+                    {/* Expanded content */}
+                    {isOpen && (
+                      <div style={{ background: VDim, border: `1px solid ${VBorder}`, borderTop: 'none', borderRadius: '0 0 14px 14px', padding: '12px 16px 14px' }}>
+                        {entries.length === 0 && (
+                          <div style={{ fontSize: 12, color: D.text3, fontStyle: 'italic', marginBottom: 10 }}>Sin salidas programadas este mes</div>
+                        )}
+                        {entries.map((e, idx) => {
+                          const bqs = speakerBqs(e.speaker);
+                          return (
+                            <div key={idx} style={{ marginBottom: 12, paddingBottom: 12, borderBottom: idx < entries.length - 1 ? `1px solid ${VBorder}` : 'none' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                                <span style={{ fontSize: 11, color: VC, fontWeight: 500 }}>Salida {idx + 1}</span>
+                                <button onClick={() => removeEntry(idx)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: D.text3, fontSize: 16, lineHeight: 1 }}>×</button>
+                              </div>
+                              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 8 }}>
+                                <select value={e.speaker} onChange={ev => updateEntry(idx, 'speaker', ev.target.value)}
+                                  style={{ background: D.bg3, border: `1px solid ${e.speaker ? VC+'55' : D.border2}`, borderRadius: 8, padding: '8px 10px', fontSize: 13, color: e.speaker ? VC : D.text3, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none', width: '100%' }}>
+                                  <option value="">Conferenciante...</option>
+                                  {SPEAKERS.map(s => {
+                                    const count = speakerCount(s.name);
+                                    const disabled = s.name !== e.speaker && count >= 2;
+                                    return <option key={s.name} value={s.name} disabled={disabled}>{s.name}{disabled ? ' (límite)' : ''}</option>;
+                                  })}
+                                </select>
+                                <select value={e.bqNum} onChange={ev => updateEntry(idx, 'bqNum', ev.target.value)} disabled={!e.speaker}
+                                  style={{ background: D.bg3, border: `1px solid ${e.bqNum ? VC+'55' : D.border2}`, borderRadius: 8, padding: '8px 10px', fontSize: 13, color: e.bqNum ? VC : D.text3, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none', width: '100%', opacity: e.speaker ? 1 : 0.5 }}>
+                                  <option value="">Bosquejo...</option>
+                                  {bqs.map(n => <option key={n} value={n}>{n} — {ALL_B[n] || ''}</option>)}
+                                </select>
+                              </div>
+                              <input value={e.cong || ''} onChange={ev => updateEntry(idx, 'cong', ev.target.value)}
+                                placeholder="Congregación destino"
+                                style={{ background: D.bg3, border: `1px solid ${e.cong ? VC+'55' : D.border2}`, borderRadius: 8, padding: '8px 10px', fontSize: 13, color: e.cong ? VC : D.text, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none', width: '100%', marginBottom: 8 }} />
+                              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                                <select value={e.day} onChange={ev => updateEntry(idx, 'day', ev.target.value)}
+                                  style={{ background: D.bg3, border: `1px solid ${D.border2}`, borderRadius: 8, padding: '8px 10px', fontSize: 13, color: D.text, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none' }}>
+                                  <option value="dom">Domingo</option>
+                                  <option value="sab">Sábado</option>
+                                </select>
+                                <input value={e.time || ''} onChange={ev => updateEntry(idx, 'time', ev.target.value)}
+                                  placeholder="Horario (ej: 09:30)"
+                                  style={{ background: D.bg3, border: `1px solid ${e.time ? VC+'55' : D.border2}`, borderRadius: 8, padding: '8px 10px', fontSize: 13, color: e.time ? VC : D.text, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none' }} />
+                              </div>
+                            </div>
+                          );
+                        })}
+                        <button onClick={addEntry}
+                          style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4, background: 'none', border: 'none', cursor: 'pointer', color: VC, fontSize: 13, fontFamily: 'Geist, system-ui, sans-serif', padding: 0 }}>
+                          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.3"><circle cx="7" cy="7" r="6"/><path d="M7 4v6M4 7h6"/></svg>
+                          Agregar salida
+                        </button>
+                      </div>
                     )}
                   </div>
                 );
