@@ -302,9 +302,20 @@ export default function App() {
         {/* TOPBAR */}
         <div style={{ ...css.topbar, flexDirection: 'column', alignItems: 'stretch', padding: '16px 22px 0', gap: 0 }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 14 }}>
-            <div>
-              <div style={{ fontSize: 18, fontWeight: 600, color: D.text, letterSpacing: '-.3px', lineHeight: 1.15 }}>Arreglos de Conferencias</div>
-              <div style={{ fontSize: 12, color: D.text3, letterSpacing: '.03em', marginTop: 3 }}>Ypacaraí · {role === 'admin' ? 'Administrador' : 'Colaborador'}</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <svg width="28" height="28" viewBox="0 0 512 512" fill="none" stroke={D.text} strokeWidth="30" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, opacity: 0.85 }}>
+                <circle cx="220" cy="90" r="80" />
+                <path d="M60 310 C60 200 380 200 380 310" />
+                <path d="M10 310 h420 l-40 160 H50 Z" />
+                <path d="M160 470 v-80" />
+                <path d="M280 470 v-80" />
+                <circle cx="390" cy="170" r="22" fill={D.text} stroke="none" />
+                <path d="M390 170 Q450 140 450 90" strokeWidth="28" />
+              </svg>
+              <div>
+                <div style={{ fontSize: 18, fontWeight: 600, color: D.text, letterSpacing: '-.3px', lineHeight: 1.15 }}>Arreglos de Conferencias</div>
+                <div style={{ fontSize: 12, color: D.text3, letterSpacing: '.03em', marginTop: 3 }}>Ypacaraí · {role === 'admin' ? 'Administrador' : 'Colaborador'}</div>
+              </div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <button onClick={() => setIsDark(d => !d)} title={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
