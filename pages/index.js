@@ -136,8 +136,9 @@ export default function App() {
   // Date selector state for BQ modal
   const [selMonthOpt, setSelMonthOpt] = useState('');
   const [selSunday, setSelSunday] = useState('');
-  // monthContacts: { 'YYYY-M': [{name, cong, tel}] }
+  // monthContacts: { 'YYYY-M': [{name, cong, tel, confirmed}] }
   const [monthContacts, setMonthContacts] = useState({});
+  const [editingContact, setEditingContact] = useState({}); // { 'YYYY-M-idx': true }
 
   const isRecent = useCallback((num, excl = null) => {
     const ago = new Date(); ago.setMonth(ago.getMonth() - 6);
@@ -216,6 +217,18 @@ export default function App() {
       newA[ds] = { bqNum: sunBQNum, name: form.name || '', cong: form.cong || '', tel: form.tel || '' };
     }
     markChanged(newA); setModalSunday(null); setSunBQNum(null);
+  }
+
+  function autoSaveSundayIfComplete(newForm, bqNum) {
+    if (!modalSunday) return;
+    if (newForm.asamblea) return;
+    if (bqNum && newForm.name && newForm.cong) {
+      const ds = modalSunday.date;
+      const newA = { ...assignments };
+      newA[ds] = { bqNum, name: newForm.name, cong: newForm.cong, tel: newForm.tel || '' };
+      markChanged(newA);
+      setTimeout(() => { setModalSunday(null); setSunBQNum(null); }, 300);
+    }
   }
 
   function deleteSunday() {
@@ -431,56 +444,98 @@ export default function App() {
               {/* CONTACTOS DEL MES */}
               {(() => {
                 const mcKey = `${curYear}-${detailMonth}`;
-                const contacts = monthContacts[mcKey] || [{ name: '', cong: '', tel: '' }];
+                const contacts = monthContacts[mcKey] || [{ name: '', cong: '', tel: '', confirmed: false }];
+                const hasAnyConfirmed = contacts.some(c => c.confirmed);
+
                 const updateContact = (idx, field, val) => {
-                  const updated = contacts.map((c, i) => i === idx ? { ...c, [field]: val } : c);
-                  const newMC = { ...monthContacts, [mcKey]: updated };
-                  setMonthContacts(newMC);
+                  const updated = contacts.map((c, i) => {
+                    if (i !== idx) return c;
+                    const newC = { ...c, [field]: val };
+                    // Auto-confirm when all 3 required fields filled
+                    if (newC.name && newC.cong && newC.tel) newC.confirmed = true;
+                    return newC;
+                  });
+                  setMonthContacts({ ...monthContacts, [mcKey]: updated });
                   setPending(true);
                 };
-                const addContact = () => {
-                  const newMC = { ...monthContacts, [mcKey]: [...contacts, { name: '', cong: '', tel: '' }] };
-                  setMonthContacts(newMC);
-                  setPending(true);
+
+                const editContact = (idx) => {
+                  const updated = contacts.map((c, i) => i === idx ? { ...c, confirmed: false } : c);
+                  setMonthContacts({ ...monthContacts, [mcKey]: updated });
                 };
+
                 const removeContact = (idx) => {
                   const updated = contacts.filter((_, i) => i !== idx);
-                  const newMC = { ...monthContacts, [mcKey]: updated.length ? updated : [{ name: '', cong: '', tel: '' }] };
-                  setMonthContacts(newMC);
+                  setMonthContacts({ ...monthContacts, [mcKey]: updated.length ? updated : [{ name: '', cong: '', tel: '', confirmed: false }] });
                   setPending(true);
                 };
+
+                const addContact = () => {
+                  setMonthContacts({ ...monthContacts, [mcKey]: [...contacts, { name: '', cong: '', tel: '', confirmed: false }] });
+                  setPending(true);
+                };
+
                 return (
-                  <div style={{ background: D.bg2, border: `1px solid ${D.border}`, borderRadius: 14, padding: '16px 16px 12px', marginBottom: 6 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                      <div style={{ fontSize: 11, fontWeight: 500, color: D.text3, letterSpacing: '.1em', textTransform: 'uppercase' }}>Persona de contacto</div>
-                      <button onClick={addContact}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: D.accent, display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, fontFamily: 'Geist, system-ui, sans-serif' }}>
-                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.3"><circle cx="7" cy="7" r="6"/><path d="M7 4v6M4 7h6"/></svg>
-                        Agregar
-                      </button>
-                    </div>
+                  <div style={{ background: D.bg2, border: `1px solid ${D.border}`, borderRadius: 14, padding: '16px 16px 14px', marginBottom: 6 }}>
+                    <div style={{ fontSize: 11, fontWeight: 500, color: D.text3, letterSpacing: '.1em', textTransform: 'uppercase', marginBottom: 14 }}>Persona de contacto</div>
+
                     {contacts.map((c, idx) => (
-                      <div key={idx} style={{ marginBottom: idx < contacts.length - 1 ? 12 : 4 }}>
-                        {contacts.length > 1 && (
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-                            <div style={{ fontSize: 11, color: D.text3 }}>Contacto {idx + 1}</div>
-                            <button onClick={() => removeContact(idx)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: D.text3, fontSize: 16, lineHeight: 1 }}>×</button>
+                      <div key={idx}>
+                        {idx > 0 && <div style={{ height: '.5px', background: D.border, margin: '12px 0' }} />}
+
+                        {/* CONFIRMADO — vista consolidada */}
+                        {c.confirmed ? (
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 0' }}>
+                            <div>
+                              <div style={{ fontSize: 14, fontWeight: 500, color: D.text }}>{c.name}</div>
+                              <div style={{ fontSize: 12, color: D.text2, marginTop: 2 }}>{c.cong} · {c.tel}</div>
+                            </div>
+                            <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                              <div style={{ width: 20, height: 20, borderRadius: '50%', background: D.greenDim, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke={D.green} strokeWidth="1.5"><path d="M2 5.5l2.5 2.5 4.5-4"/></svg>
+                              </div>
+                              <button onClick={() => editContact(idx)}
+                                style={{ background: 'none', border: 'none', cursor: 'pointer', color: D.text3, display: 'flex', alignItems: 'center', padding: 2 }}>
+                                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.2"><path d="M9.5 2.5l2 2-7 7H2.5v-2l7-7z"/></svg>
+                              </button>
+                              {contacts.length > 1 && (
+                                <button onClick={() => removeContact(idx)}
+                                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: D.text3, fontSize: 16, lineHeight: 1, padding: 2 }}>×</button>
+                              )}
+                            </div>
+                          </div>
+                        ) : (
+                          /* EN EDICIÓN */
+                          <div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 8 }}>
+                              <input value={c.name || ''} onChange={e => updateContact(idx, 'name', e.target.value)}
+                                placeholder="Nombre" autoFocus={idx === contacts.length - 1}
+                                style={{ background: D.bg3, border: `1px solid ${c.name ? D.accent+'55' : D.border2}`, borderRadius: 8, padding: '9px 12px', fontSize: 14, color: D.text, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none', width: '100%' }} />
+                              <input value={c.cong || ''} onChange={e => updateContact(idx, 'cong', e.target.value)}
+                                placeholder="Congregación"
+                                style={{ background: D.bg3, border: `1px solid ${c.cong ? D.accent+'55' : D.border2}`, borderRadius: 8, padding: '9px 12px', fontSize: 14, color: D.text, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none', width: '100%' }} />
+                            </div>
+                            <input value={c.tel || ''} onChange={e => updateContact(idx, 'tel', e.target.value)}
+                              placeholder="Nro. de contacto"
+                              style={{ background: D.bg3, border: `1px solid ${c.tel ? D.accent+'55' : D.border2}`, borderRadius: 8, padding: '9px 12px', fontSize: 14, color: D.text, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none', width: '100%' }} />
+                            {c.name && c.cong && c.tel && (
+                              <div style={{ fontSize: 11, color: D.text3, marginTop: 6, fontStyle: 'italic' }}>
+                                Se consolidará automáticamente ✓
+                              </div>
+                            )}
                           </div>
                         )}
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 8 }}>
-                          <input value={c.name || ''} onChange={e => updateContact(idx, 'name', e.target.value)}
-                            placeholder="Nombre"
-                            style={{ background: D.bg3, border: `1px solid ${c.name ? D.accent+'44' : D.border2}`, borderRadius: 8, padding: '9px 12px', fontSize: 14, color: D.text, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none', width: '100%' }} />
-                          <input value={c.cong || ''} onChange={e => updateContact(idx, 'cong', e.target.value)}
-                            placeholder="Congregación"
-                            style={{ background: D.bg3, border: `1px solid ${c.cong ? D.accent+'44' : D.border2}`, borderRadius: 8, padding: '9px 12px', fontSize: 14, color: D.text, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none', width: '100%' }} />
-                        </div>
-                        <input value={c.tel || ''} onChange={e => updateContact(idx, 'tel', e.target.value)}
-                          placeholder="Nro. de contacto"
-                          style={{ background: D.bg3, border: `1px solid ${c.tel ? D.accent+'44' : D.border2}`, borderRadius: 8, padding: '9px 12px', fontSize: 14, color: D.text, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none', width: '100%' }} />
-                        {idx < contacts.length - 1 && <div style={{ height: '.5px', background: D.border, margin: '12px 0 0' }} />}
                       </div>
                     ))}
+
+                    {/* + AGREGAR — solo si hay al menos un confirmado */}
+                    {hasAnyConfirmed && (
+                      <button onClick={addContact}
+                        style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 14, background: 'none', border: 'none', cursor: 'pointer', color: D.accent, fontSize: 13, fontFamily: 'Geist, system-ui, sans-serif', padding: 0 }}>
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.3"><circle cx="7" cy="7" r="6"/><path d="M7 4v6M4 7h6"/></svg>
+                        Agregar otro contacto
+                      </button>
+                    )}
                   </div>
                 );
               })()}
@@ -581,8 +636,8 @@ export default function App() {
                     </div>
                   </div>
                 )}
-                <FField label="Conferenciante" placeholder="Nombre y apellido" value={form.name || ''} onChange={v => setForm(f => ({ ...f, name: v }))} D={D} />
-                <FField label="Congregación" placeholder="De dónde proviene" value={form.cong || ''} onChange={v => setForm(f => ({ ...f, cong: v }))} D={D} />
+                <FField label="Conferenciante" placeholder="Nombre y apellido" value={form.name || ''} onChange={v => { const nf = { ...form, name: v }; setForm(nf); autoSaveSundayIfComplete(nf, sunBQNum); }} D={D} />
+                <FField label="Congregación" placeholder="De dónde proviene" value={form.cong || ''} onChange={v => { const nf = { ...form, cong: v }; setForm(nf); autoSaveSundayIfComplete(nf, sunBQNum); }} D={D} />
                 <FField label="Teléfono" placeholder="09xx xxx xxx" value={form.tel || ''} onChange={v => setForm(f => ({ ...f, tel: v }))} D={D} />
               </>
             )}
@@ -635,8 +690,8 @@ export default function App() {
                     {sunBQNum ? `${sunBQNum} — ${ALL_B[sunBQNum]}` : 'Seleccionar bosquejo →'}
                   </div>
                 </div>
-                <FField label="Conferenciante" placeholder="Nombre y apellido" value={form.name || ''} onChange={v => setForm(f => ({ ...f, name: v }))} D={D} />
-                <FField label="Congregación" placeholder="De dónde proviene" value={form.cong || ''} onChange={v => setForm(f => ({ ...f, cong: v }))} D={D} />
+                <FField label="Conferenciante" placeholder="Nombre y apellido" value={form.name || ''} onChange={v => { const nf = { ...form, name: v }; setForm(nf); autoSaveSundayIfComplete(nf, sunBQNum); }} D={D} />
+                <FField label="Congregación" placeholder="De dónde proviene" value={form.cong || ''} onChange={v => { const nf = { ...form, cong: v }; setForm(nf); autoSaveSundayIfComplete(nf, sunBQNum); }} D={D} />
                 <FField label="Teléfono" placeholder="09xx xxx xxx" value={form.tel || ''} onChange={v => setForm(f => ({ ...f, tel: v }))} D={D} />
               </>
             )}
