@@ -191,7 +191,8 @@ export default function App() {
   const [monthContacts, setMonthContacts] = useState({});
   const [editingContact, setEditingContact] = useState({});
   const [savedFlash, setSavedFlash] = useState(false);
-  const [sundayFlash, setSundayFlash] = useState(null); // date string // { 'YYYY-M-idx': true }
+  const [sundayFlash, setSundayFlash] = useState(null);
+  const [formDirty, setFormDirty] = useState(false); // date string // { 'YYYY-M-idx': true }
 
   const isRecent = useCallback((num, excl = null) => {
     const ago = new Date(); ago.setMonth(ago.getMonth() - 6);
@@ -647,7 +648,7 @@ export default function App() {
                 const bgC = a ? a.asamblea ? D.accentDim : D.greenDim : 'transparent';
                 const bdC = a ? a.asamblea ? `rgba(123,140,222,0.25)` : `rgba(76,175,125,0.25)` : D.border;
                 return (
-                  <div key={ds} onClick={() => { setModalSunday({ date: ds, assignment: a }); setSunBQNum(a?.bqNum || null); setForm({ asamblea: a?.asamblea || false, name: a?.name || '', cong: a?.cong || '', tel: a?.tel || '' }); }}
+                  <div key={ds} onClick={() => { setModalSunday({ date: ds, assignment: a }); setSunBQNum(a?.bqNum || null); setForm({ asamblea: a?.asamblea || false, name: a?.name || '', cong: a?.cong || '', tel: a?.tel || '' }); setFormDirty(false); }}
                     style={{ background: sundayFlash === ds ? D.greenDim : bgC, border: `1px solid ${sundayFlash === ds ? 'rgba(76,175,125,0.4)' : bdC}`, borderRadius: 12, padding: '14px 16px', marginBottom: 8, cursor: 'pointer', transition: 'background 0.4s ease, border-color 0.4s ease', transform: sundayFlash === ds ? 'scale(1.01)' : 'scale(1)' }}>
                     <div style={{ fontSize: 16, fontWeight: 500, color: D.text, marginBottom: 4 }}>Domingo {lbl}</div>
                     {a?.asamblea && <div style={{ fontSize: 14, color: D.accent }}>🏛 Fin de semana de asamblea</div>}
@@ -733,8 +734,8 @@ export default function App() {
                     </div>
                   </div>
                 )}
-                <FField label="Conferenciante" placeholder="Nombre y apellido" value={form.name || ''} onChange={v => setForm(f => ({ ...f, name: v }))} onBlur={() => autoSaveSundayIfComplete(form, sunBQNum)} D={D} />
-                <FField label="Congregación" placeholder="De dónde proviene" value={form.cong || ''} onChange={v => setForm(f => ({ ...f, cong: v }))} onBlur={() => autoSaveSundayIfComplete(form, sunBQNum)} D={D} />
+                <FField label="Conferenciante" placeholder="Nombre y apellido" value={form.name || ''} onChange={v => { setFormDirty(true); setForm(f => ({ ...f, name: v })); }} onBlur={() => { if(formDirty) autoSaveSundayIfComplete(form, sunBQNum); }} D={D} />
+                <FField label="Congregación" placeholder="De dónde proviene" value={form.cong || ''} onChange={v => { setFormDirty(true); setForm(f => ({ ...f, cong: v })); }} onBlur={() => { if(formDirty) autoSaveSundayIfComplete(form, sunBQNum); }} D={D} />
                 <FField label="Teléfono" placeholder="09xx xxx xxx" value={form.tel || ''} onChange={v => setForm(f => ({ ...f, tel: v }))} D={D} />
               </>
             )}
@@ -787,8 +788,8 @@ export default function App() {
                     {sunBQNum ? `${sunBQNum} — ${ALL_B[sunBQNum]}` : 'Seleccionar bosquejo →'}
                   </div>
                 </div>
-                <FField label="Conferenciante" placeholder="Nombre y apellido" value={form.name || ''} onChange={v => setForm(f => ({ ...f, name: v }))} onBlur={() => autoSaveSundayIfComplete(form, sunBQNum)} D={D} />
-                <FField label="Congregación" placeholder="De dónde proviene" value={form.cong || ''} onChange={v => setForm(f => ({ ...f, cong: v }))} onBlur={() => autoSaveSundayIfComplete(form, sunBQNum)} D={D} />
+                <FField label="Conferenciante" placeholder="Nombre y apellido" value={form.name || ''} onChange={v => { setFormDirty(true); setForm(f => ({ ...f, name: v })); }} onBlur={() => { if(formDirty) autoSaveSundayIfComplete(form, sunBQNum); }} D={D} />
+                <FField label="Congregación" placeholder="De dónde proviene" value={form.cong || ''} onChange={v => { setFormDirty(true); setForm(f => ({ ...f, cong: v })); }} onBlur={() => { if(formDirty) autoSaveSundayIfComplete(form, sunBQNum); }} D={D} />
                 <FField label="Teléfono" placeholder="09xx xxx xxx" value={form.tel || ''} onChange={v => setForm(f => ({ ...f, tel: v }))} D={D} />
               </>
             )}
