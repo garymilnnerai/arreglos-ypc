@@ -28,24 +28,24 @@ const DARK = {
 };
 
 const LIGHT = {
-  bg: '#F5F1EA',
-  bg2: '#FFFFFF',
-  bg3: '#EDE8DF',
-  bg4: '#E2DBD0',
-  border: 'rgba(44,40,32,0.08)',
-  border2: 'rgba(44,40,32,0.15)',
-  text: '#1C1714',
-  text2: '#5A5248',
-  text3: '#9A9088',
-  accent: '#4A5CC8',
-  accentDim: 'rgba(74,92,200,0.12)',
-  accentDim2: 'rgba(74,92,200,0.07)',
-  green: '#2A7A50',
-  greenDim: 'rgba(42,122,80,0.12)',
-  amber: '#B87820',
-  amberDim: 'rgba(184,120,32,0.12)',
-  red: '#C04040',
-  redDim: 'rgba(192,64,64,0.1)',
+  bg: '#F2EDE4',
+  bg2: '#FAF7F2',
+  bg3: '#EAE4D8',
+  bg4: '#DDD6C8',
+  border: 'rgba(44,36,24,0.07)',
+  border2: 'rgba(44,36,24,0.13)',
+  text: '#1E1A14',
+  text2: '#4A4238',
+  text3: '#8A8278',
+  accent: '#3D4FA0',
+  accentDim: 'rgba(61,79,160,0.1)',
+  accentDim2: 'rgba(61,79,160,0.06)',
+  green: '#2A6E48',
+  greenDim: 'rgba(42,110,72,0.12)',
+  amber: '#A06A10',
+  amberDim: 'rgba(160,106,16,0.12)',
+  red: '#B03030',
+  redDim: 'rgba(176,48,48,0.1)',
 };
 
 // Paleta Nickel Dark
@@ -267,11 +267,11 @@ export default function App() {
               <div style={{ fontSize: 12, color: D.text3, letterSpacing: '.03em', marginTop: 3 }}>Ypacaraí · {role === 'admin' ? 'Administrador' : 'Colaborador'}</div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <button onClick={() => setIsDark(d => !d)} title={isDark ? 'Modo claro' : 'Modo oscuro'}
+              <button onClick={() => setIsDark(d => !d)} title={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
                 style={{ background: 'none', border: 'none', cursor: 'pointer', color: D.text3, padding: 4, display: 'flex', alignItems: 'center' }}>
                 {isDark
-                  ? <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4"><circle cx="10" cy="10" r="4"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.9 4.9l1.4 1.4M13.7 13.7l1.4 1.4M4.9 15.1l1.4-1.4M13.7 6.3l1.4-1.4"/></svg>
-                  : <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4"><path d="M17 11.5A7 7 0 119 3a5 5 0 008 8.5z"/></svg>
+                  ? <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4"><path d="M17 11.5A7 7 0 119 3a5 5 0 008 8.5z"/></svg>
+                  : <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4"><circle cx="10" cy="10" r="4"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2M4.9 4.9l1.4 1.4M13.7 13.7l1.4 1.4M4.9 15.1l1.4-1.4M13.7 6.3l1.4-1.4"/></svg>
                 }
               </button>
               <button onClick={doLogout} title="Salir"
