@@ -276,6 +276,7 @@ export default function App() {
     <div style={{ background: DARK.bg, minHeight: '100vh', color: DARK.text, fontFamily: 'Geist, system-ui, sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '32px 24px' }}>
       <div style={{ width: '100%', maxWidth: 340 }}>
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
+          <img src="/favicon.png" width="52" height="52" alt="Arreglos" style={{ opacity: 0.85, marginBottom: 16, filter: 'invert(0)' }} />
           <div style={{ fontSize: 30, fontWeight: 300, color: D.text, letterSpacing: -1 }}>Arreglos</div>
           <div style={{ fontSize: 10, color: D.text3, letterSpacing: '.12em', textTransform: 'uppercase', marginTop: 6 }}>de Conferencias · Ypacaraí</div>
         </div>
@@ -303,8 +304,8 @@ export default function App() {
         <div style={{ ...css.topbar, flexDirection: 'column', alignItems: 'stretch', padding: '16px 22px 0', gap: 0 }}>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 14 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <img src="/favicon.png" width="28" height="28" alt="Speaker"
-                style={{ flexShrink: 0, opacity: 0.85, filter: isDark ? 'invert(1)' : 'none' }} />
+              <img src="/favicon.svg" width="28" height="28" alt="Speaker"
+                style={{ flexShrink: 0, opacity: 0.9 }} />
               <div>
                 <div style={{ fontSize: 18, fontWeight: 600, color: D.text, letterSpacing: '-.3px', lineHeight: 1.15 }}>Arreglos de Conferencias</div>
                 <div style={{ fontSize: 12, color: D.text3, letterSpacing: '.03em', marginTop: 3 }}>Ypacaraí · {role === 'admin' ? 'Administrador' : 'Colaborador'}</div>
@@ -329,9 +330,9 @@ export default function App() {
             </div>
           </div>
           <div style={{ display: 'flex', gap: 0 }}>
-            {['bosquejos', 'agenda', 'historial'].map(v => {
+            {['agenda', 'bosquejos', 'historial'].map(v => {
               const active = view === v;
-              const labels = { bosquejos: 'Bosquejos', agenda: 'Agenda', historial: 'Historial' };
+              const labels = { agenda: 'Agenda', bosquejos: 'Bosquejos', historial: 'Historial' };
               const icons = {
                 bosquejos: <path d="M4 5h12M4 10h12M4 15h7" />,
                 agenda: <><rect x="3" y="4" width="14" height="13" rx="2" /><path d="M7 2v4M13 2v4M3 9h14" /></>,
