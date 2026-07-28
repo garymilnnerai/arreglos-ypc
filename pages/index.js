@@ -193,7 +193,7 @@ export default function App() {
   const [bqSelSearch, setBqSelSearch] = useState('');
   const [sunBQNum, setSunBQNum] = useState(null);
   const [form, setForm] = useState({});
-  const [isDark, setIsDark] = useState(true);
+  const [isDark, setIsDark] = useState(false);
   // Date selector state for BQ modal
   const [selMonthOpt, setSelMonthOpt] = useState('');
   const [selSunday, setSelSunday] = useState('');
