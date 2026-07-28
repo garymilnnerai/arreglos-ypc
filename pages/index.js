@@ -508,19 +508,34 @@ export default function App() {
                 style={{ ...css.input, paddingLeft: 36 }} />
             </div>
             <div style={{ overflowY: 'auto', flex: 1 }}>
-              {BOSQUEJOS.filter(b => !bqSelSearch || b.n.toString().includes(bqSelSearch) || b.t.toLowerCase().includes(bqSelSearch.toLowerCase())).map(b => {
-                const rec = isRecent(b.n);
-                return (
-                  <div key={b.n} onClick={() => { setSunBQNum(b.n); setModalBQSel(false); }}
-                    style={{ display: 'flex', gap: 12, padding: '10px 4px', borderBottom: `1px solid ${D.border}`, cursor: 'pointer', borderLeft: rec ? `3px solid ${D.amber}` : 'none', paddingLeft: rec ? 8 : 4 }}>
-                    <div style={{ fontSize: 18, fontWeight: 300, color: D.text3, width: 34, flexShrink: 0 }}>{b.n}</div>
-                    <div>
-                      <div style={{ fontSize: 12, color: D.text, lineHeight: 1.3 }}>{b.t}</div>
-                      {rec && <div style={{ fontSize: 10, color: D.amber, marginTop: 2 }}>⚠ Presentado recientemente</div>}
-                    </div>
+              {(() => {
+                const q = bqSelSearch.trim();
+                const numQ = parseInt(q);
+                const isExcluded = numQ && EXCL.has(numQ);
+                if (isExcluded) return (
+                  <div style={{ background: 'rgba(224,92,92,0.1)', border: '1px solid rgba(224,92,92,0.25)', borderRadius: 10, padding: '14px 16px', margin: '8px 0' }}>
+                    <div style={{ fontSize: 15, fontWeight: 500, color: '#E05C5C', marginBottom: 6 }}>Bosquejo {numQ} no disponible</div>
+                    <div style={{ fontSize: 13, color: '#9A9AA8', lineHeight: 1.5 }}>Este bosquejo ya no está disponible desde Septiembre 2026. Por favor seleccioná otro.</div>
                   </div>
                 );
-              })}
+                const filtered = BOSQUEJOS.filter(b => !q || b.n.toString().includes(q) || b.t.toLowerCase().includes(q.toLowerCase()));
+                if (filtered.length === 0 && q) return (
+                  <div style={{ padding: '20px 0', textAlign: 'center', color: '#5A5A68', fontSize: 13 }}>Sin resultados</div>
+                );
+                return filtered.map(b => {
+                  const rec = isRecent(b.n);
+                  return (
+                    <div key={b.n} onClick={() => { setSunBQNum(b.n); setModalBQSel(false); }}
+                      style={{ display: 'flex', gap: 12, padding: '10px 4px', borderBottom: `1px solid ${D.border}`, cursor: 'pointer', borderLeft: rec ? `3px solid ${D.amber}` : 'none', paddingLeft: rec ? 8 : 4 }}>
+                      <div style={{ fontSize: 18, fontWeight: 300, color: D.text3, width: 34, flexShrink: 0 }}>{b.n}</div>
+                      <div>
+                        <div style={{ fontSize: 15, color: D.text, lineHeight: 1.3 }}>{b.t}</div>
+                        {rec && <div style={{ fontSize: 12, color: D.amber, marginTop: 2 }}>⚠ Presentado recientemente</div>}
+                      </div>
+                    </div>
+                  );
+                });
+              })()}
             </div>
             <button onClick={() => setModalBQSel(false)}
               style={{ marginTop: 12, width: '100%', padding: '11px 0', borderRadius: 100, border: `1px solid ${D.border2}`, background: 'transparent', color: D.text3, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'Geist, system-ui, sans-serif' }}>Cancelar</button>
