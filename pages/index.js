@@ -672,8 +672,8 @@ export default function App() {
                     </div>
                   </div>
                 )}
-                <FField label="Conferenciante" placeholder="Nombre y apellido" value={form.name || ''} onChange={v => { const nf = { ...form, name: v }; setForm(nf); autoSaveSundayIfComplete(nf, sunBQNum); }} D={D} />
-                <FField label="Congregación" placeholder="De dónde proviene" value={form.cong || ''} onChange={v => { const nf = { ...form, cong: v }; setForm(nf); autoSaveSundayIfComplete(nf, sunBQNum); }} D={D} />
+                <FField label="Conferenciante" placeholder="Nombre y apellido" value={form.name || ''} onChange={v => setForm(f => ({ ...f, name: v }))} onBlur={() => autoSaveSundayIfComplete(form, sunBQNum)} D={D} />
+                <FField label="Congregación" placeholder="De dónde proviene" value={form.cong || ''} onChange={v => setForm(f => ({ ...f, cong: v }))} onBlur={() => autoSaveSundayIfComplete(form, sunBQNum)} D={D} />
                 <FField label="Teléfono" placeholder="09xx xxx xxx" value={form.tel || ''} onChange={v => setForm(f => ({ ...f, tel: v }))} D={D} />
               </>
             )}
@@ -726,8 +726,8 @@ export default function App() {
                     {sunBQNum ? `${sunBQNum} — ${ALL_B[sunBQNum]}` : 'Seleccionar bosquejo →'}
                   </div>
                 </div>
-                <FField label="Conferenciante" placeholder="Nombre y apellido" value={form.name || ''} onChange={v => { const nf = { ...form, name: v }; setForm(nf); autoSaveSundayIfComplete(nf, sunBQNum); }} D={D} />
-                <FField label="Congregación" placeholder="De dónde proviene" value={form.cong || ''} onChange={v => { const nf = { ...form, cong: v }; setForm(nf); autoSaveSundayIfComplete(nf, sunBQNum); }} D={D} />
+                <FField label="Conferenciante" placeholder="Nombre y apellido" value={form.name || ''} onChange={v => setForm(f => ({ ...f, name: v }))} onBlur={() => autoSaveSundayIfComplete(form, sunBQNum)} D={D} />
+                <FField label="Congregación" placeholder="De dónde proviene" value={form.cong || ''} onChange={v => setForm(f => ({ ...f, cong: v }))} onBlur={() => autoSaveSundayIfComplete(form, sunBQNum)} D={D} />
                 <FField label="Teléfono" placeholder="09xx xxx xxx" value={form.tel || ''} onChange={v => setForm(f => ({ ...f, tel: v }))} D={D} />
               </>
             )}
@@ -816,7 +816,7 @@ function FField({ label, placeholder, value, onChange, type = 'text' }) {
   return (
     <div style={{ marginBottom: 13 }}>
       <div style={{ fontSize: 10, fontWeight: 500, color: D2.text3, letterSpacing: '.1em', textTransform: 'uppercase', marginBottom: 6 }}>{label}</div>
-      <input type={type} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder}
+      <input type={type} value={value} onChange={e => onChange(e.target.value)} onBlur={onBlur} placeholder={placeholder}
         style={{ width: '100%', background: value ? 'rgba(123,140,222,0.08)' : '#242428', border: `1px solid ${value ? 'rgba(123,140,222,0.3)' : 'rgba(255,255,255,0.12)'}`, borderRadius: 8, padding: "13px 14px", fontSize: 14, fontWeight: 300, color: value ? D2.accent : D2.text, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none' }} />
     </div>
   );
