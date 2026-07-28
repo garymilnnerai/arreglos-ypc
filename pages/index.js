@@ -266,6 +266,7 @@ export default function App() {
               ))}
             </div>
             {MONTHS.map((mn, m) => {
+              if (curYear === 2026 && m < 6) return null;
               const sundays = getSundays(curYear).filter(s => s.getMonth() === m);
               const filled = sundays.filter(s => assignments[dateStr(s)]).length;
               const cls = filled === sundays.length ? 'complete' : filled > 0 ? 'partial' : 'empty';
