@@ -735,41 +735,70 @@ export default function App() {
                         )}
                         {entries.map((e, idx) => {
                           const bqs = speakerBqs(e.speaker);
+                          const editKey = `${mcKey}-${idx}`;
+                          const isEditing = outgoingOpen[editKey] || false;
+                          const toggleEdit = () => setOutgoingOpen(o => ({ ...o, [editKey]: !o[editKey] }));
+                          const isComplete = e.speaker && e.bqNum && e.cong && e.time;
                           return (
-                            <div key={idx} style={{ marginBottom: 12, paddingBottom: 12, borderBottom: idx < entries.length - 1 ? `1px solid ${VBorder}` : 'none' }}>
-                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                                <span style={{ fontSize: 11, color: VC, fontWeight: 500 }}>Salida {idx + 1}</span>
-                                <button onClick={() => removeEntry(idx)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: D.text3, fontSize: 16, lineHeight: 1 }}>×</button>
-                              </div>
-                              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 8 }}>
-                                <select value={e.speaker} onChange={ev => updateEntry(idx, 'speaker', ev.target.value)}
-                                  style={{ background: D.bg3, border: `1px solid ${e.speaker ? VC+'55' : D.border2}`, borderRadius: 8, padding: '8px 10px', fontSize: 13, color: e.speaker ? VC : D.text3, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none', width: '100%' }}>
-                                  <option value="">Conferenciante...</option>
-                                  {SPEAKERS.map(s => {
-                                    const count = speakerCount(s.name);
-                                    const disabled = s.name !== e.speaker && count >= 2;
-                                    return <option key={s.name} value={s.name} disabled={disabled}>{s.name}{disabled ? ' (límite)' : ''}</option>;
-                                  })}
-                                </select>
-                                <select value={e.bqNum} onChange={ev => updateEntry(idx, 'bqNum', ev.target.value)} disabled={!e.speaker}
-                                  style={{ background: D.bg3, border: `1px solid ${e.bqNum ? VC+'55' : D.border2}`, borderRadius: 8, padding: '8px 10px', fontSize: 13, color: e.bqNum ? VC : D.text3, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none', width: '100%', opacity: e.speaker ? 1 : 0.5 }}>
-                                  <option value="">Bosquejo...</option>
-                                  {bqs.map(n => <option key={n} value={n}>{n} — {ALL_B[n] || ''}</option>)}
-                                </select>
-                              </div>
-                              <input value={e.cong || ''} onChange={ev => updateEntry(idx, 'cong', ev.target.value)}
-                                placeholder="Congregación destino"
-                                style={{ background: D.bg3, border: `1px solid ${e.cong ? VC+'55' : D.border2}`, borderRadius: 8, padding: '8px 10px', fontSize: 13, color: e.cong ? VC : D.text, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none', width: '100%', marginBottom: 8 }} />
-                              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                                <select value={e.day} onChange={ev => updateEntry(idx, 'day', ev.target.value)}
-                                  style={{ background: D.bg3, border: `1px solid ${D.border2}`, borderRadius: 8, padding: '8px 10px', fontSize: 13, color: D.text, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none' }}>
-                                  <option value="dom">Domingo</option>
-                                  <option value="sab">Sábado</option>
-                                </select>
-                                <input value={e.time || ''} onChange={ev => updateEntry(idx, 'time', ev.target.value)}
-                                  placeholder="Horario (ej: 09:30)"
-                                  style={{ background: D.bg3, border: `1px solid ${e.time ? VC+'55' : D.border2}`, borderRadius: 8, padding: '8px 10px', fontSize: 13, color: e.time ? VC : D.text, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none' }} />
-                              </div>
+                            <div key={idx} style={{ marginBottom: 8, paddingBottom: 8, borderBottom: idx < entries.length - 1 ? `1px solid ${VBorder}` : 'none' }}>
+                              {!isEditing ? (
+                                /* VISTA */
+                                <div onClick={toggleEdit} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', padding: '4px 0' }}>
+                                  <div>
+                                    {isComplete ? (
+                                      <>
+                                        <div style={{ fontSize: 14, fontWeight: 500, color: VC }}>{e.speaker}</div>
+                                        <div style={{ fontSize: 12, color: D.text2, marginTop: 2 }}>{e.cong} · {e.day === 'sab' ? 'Sáb' : 'Dom'} {e.time} · Bq. {e.bqNum}</div>
+                                      </>
+                                    ) : (
+                                      <div style={{ fontSize: 12, color: D.text3, fontStyle: 'italic' }}>Salida incompleta · tocar para editar</div>
+                                    )}
+                                  </div>
+                                  <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke={VC} strokeWidth="1.2" style={{ flexShrink: 0, marginLeft: 8, opacity: 0.7 }}>
+                                    <path d="M8.5 1.5l3 3-7 7H1.5v-3l7-7z"/>
+                                  </svg>
+                                </div>
+                              ) : (
+                                /* EDICIÓN */
+                                <div>
+                                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                                    <span style={{ fontSize: 11, color: VC, fontWeight: 500 }}>Editando</span>
+                                    <div style={{ display: 'flex', gap: 12 }}>
+                                      <button onClick={() => removeEntry(idx)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: D.red, fontSize: 12, fontFamily: 'Geist, system-ui, sans-serif' }}>Eliminar</button>
+                                      <button onClick={toggleEdit} style={{ background: 'none', border: 'none', cursor: 'pointer', color: VC, fontSize: 12, fontFamily: 'Geist, system-ui, sans-serif', fontWeight: 500 }}>✓ Listo</button>
+                                    </div>
+                                  </div>
+                                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 8 }}>
+                                    <select value={e.speaker} onChange={ev => updateEntry(idx, 'speaker', ev.target.value)}
+                                      style={{ background: D.bg3, border: `1px solid ${e.speaker ? VC+'55' : D.border2}`, borderRadius: 8, padding: '8px 10px', fontSize: 13, color: e.speaker ? VC : D.text3, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none', width: '100%' }}>
+                                      <option value="">Conferenciante...</option>
+                                      {SPEAKERS.map(s => {
+                                        const count = speakerCount(s.name);
+                                        const disabled = s.name !== e.speaker && count >= 2;
+                                        return <option key={s.name} value={s.name} disabled={disabled}>{s.name}{disabled ? ' (límite)' : ''}</option>;
+                                      })}
+                                    </select>
+                                    <select value={e.bqNum} onChange={ev => updateEntry(idx, 'bqNum', ev.target.value)} disabled={!e.speaker}
+                                      style={{ background: D.bg3, border: `1px solid ${e.bqNum ? VC+'55' : D.border2}`, borderRadius: 8, padding: '8px 10px', fontSize: 13, color: e.bqNum ? VC : D.text3, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none', width: '100%', opacity: e.speaker ? 1 : 0.5 }}>
+                                      <option value="">Bosquejo...</option>
+                                      {bqs.map(n => <option key={n} value={n}>{n} — {ALL_B[n] || ''}</option>)}
+                                    </select>
+                                  </div>
+                                  <input value={e.cong || ''} onChange={ev => updateEntry(idx, 'cong', ev.target.value)}
+                                    placeholder="Congregación destino"
+                                    style={{ background: D.bg3, border: `1px solid ${e.cong ? VC+'55' : D.border2}`, borderRadius: 8, padding: '8px 10px', fontSize: 13, color: e.cong ? VC : D.text, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none', width: '100%', marginBottom: 8 }} />
+                                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                                    <select value={e.day} onChange={ev => updateEntry(idx, 'day', ev.target.value)}
+                                      style={{ background: D.bg3, border: `1px solid ${D.border2}`, borderRadius: 8, padding: '8px 10px', fontSize: 13, color: D.text, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none' }}>
+                                      <option value="dom">Domingo</option>
+                                      <option value="sab">Sábado</option>
+                                    </select>
+                                    <input value={e.time || ''} onChange={ev => updateEntry(idx, 'time', ev.target.value)}
+                                      placeholder="Horario (ej: 09:30)"
+                                      style={{ background: D.bg3, border: `1px solid ${e.time ? VC+'55' : D.border2}`, borderRadius: 8, padding: '8px 10px', fontSize: 13, color: e.time ? VC : D.text, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none' }} />
+                                  </div>
+                                </div>
+                              )}
                             </div>
                           );
                         })}
