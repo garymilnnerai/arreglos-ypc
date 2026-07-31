@@ -531,6 +531,23 @@ export default function App() {
                         <span style={{ fontSize: 13, fontWeight: 400, color: D.text2 }}>{congs.join(' · ')}</span>
                       </div>
                     )}
+                    {(() => {
+                      const salidas = (outgoing[mcKey] || []).filter(e => e.speaker && e.cong);
+                      if (salidas.length === 0) return null;
+                      const VC2 = isDark ? '#A991D4' : '#6B4FA0';
+                      return (
+                        <div style={{ marginTop: 8, paddingTop: 8, borderTop: `1px solid ${isDark ? 'rgba(169,145,212,0.15)' : 'rgba(107,79,160,0.12)'}` }}>
+                          <span style={{ fontSize: 11, fontWeight: 500, color: VC2, letterSpacing: '.06em', textTransform: 'uppercase', display: 'block', marginBottom: 5 }}>Salen:</span>
+                          {salidas.map((e, i) => (
+                            <div key={i} style={{ fontSize: 12, color: D.text2, marginBottom: 2 }}>
+                              <span style={{ fontWeight: 500, color: VC2 }}>{e.speaker}</span>
+                              {e.time ? ` · ${e.day === 'sab' ? 'Sab' : 'Dom'} ${e.time}` : ''}
+                              {e.bqNum ? ` · Bq. ${e.bqNum}` : ''}
+                            </div>
+                          ))}
+                        </div>
+                      );
+                    })()}
                   </div>
                 );
               })}
