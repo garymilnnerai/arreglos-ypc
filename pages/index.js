@@ -70,6 +70,39 @@ const PRESIDENTES = ['Agustín Egusquiza','Bernardo Roa','Celso Roa','Claudelino
 const LECTORES = ['Agustín Egusquiza','Bernardo Roa','Celso Roa','Claudelino Rojas','Gary Martínez','Rafael Minesi','Isidro Benítez','Agustín Martínez','Jahaziel Roa'];
 const CONDUCTOR_PERMANENTE = 'Osvaldo Díaz';
 const SUPLENTE_CONDUCTOR = 'Agustín Egusquiza';
+
+function autoAssignRoles(sundays, assignments, outgoing, existingRoles, mcKey) {
+  const newRoles = { ...existingRoles };
+  const salenNames = (outgoing[mcKey] || []).map(e => e.speaker);
+  const osvaldoSale = salenNames.includes(CONDUCTOR_PERMANENTE);
+
+  const presPool = PRESIDENTES.filter(p => !salenNames.includes(p) && !(osvaldoSale && p === SUPLENTE_CONDUCTOR));
+  const lecPool = LECTORES.filter(l => !salenNames.includes(l) && !(osvaldoSale && l === SUPLENTE_CONDUCTOR));
+
+  const presUsed = {};
+  const lecUsed = {};
+
+  sundays.forEach(s => {
+    const ds = s.toISOString().split('T')[0];
+    const a = assignments[ds];
+    if (!a || a.asamblea) return;
+    if (newRoles[ds]?.presidente && newRoles[ds]?.lector) return; // ya asignado
+
+    // Pick presidente not used this month yet
+    const presAvail = presPool.filter(p => !presUsed[p]);
+    const pres = presAvail[0] || presPool.filter(p => presUsed[p] < 2)[0] || presPool[0];
+    if (pres) presUsed[pres] = (presUsed[pres] || 0) + 1;
+
+    // Pick lector not same as presidente and not used this month
+    const lecAvail = lecPool.filter(l => l !== pres && !lecUsed[l]);
+    const lec = lecAvail[0] || lecPool.filter(l => l !== pres && lecUsed[l] < 2)[0] || lecPool.find(l => l !== pres);
+    if (lec) lecUsed[lec] = (lecUsed[lec] || 0) + 1;
+
+    newRoles[ds] = { presidente: pres || '', lector: lec || '' };
+  });
+
+  return newRoles;
+}
 const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
 // Paletas
@@ -210,6 +243,7 @@ export default function App() {
   // roles: { 'YYYY-MM-DD': { presidente, lector } }
   const [roles, setRoles] = useState({});
   const [showPrograma, setShowPrograma] = useState(false);
+  const [adjustRoles, setAdjustRoles] = useState(false);
   const [editingContact, setEditingContact] = useState({});
   const [savedFlash, setSavedFlash] = useState(false);
   const [sundayFlash, setSundayFlash] = useState(null);
@@ -679,7 +713,23 @@ export default function App() {
               <div style={{ height: '.5px', background: D.border, margin: '16px 0' }} />
 
               {/* BLOQUE 1: CONFERENCIANTES QUE VIENEN */}
-              <div style={{ fontSize: 11, fontWeight: 600, color: D.text3, letterSpacing: '.1em', textTransform: 'uppercase', marginBottom: 10 }}>Conferenciantes que vienen a Ypacaraí</div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                <div style={{ fontSize: 11, fontWeight: 600, color: D.text3, letterSpacing: '.1em', textTransform: 'uppercase' }}>Conferenciantes que vienen a Ypacaraí</div>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button onClick={() => {
+                    const mcKeyA = `${curYear}-${detailMonth}`;
+                    const sundays = getSundaysOfMonth(curYear, detailMonth);
+                    const newRoles = autoAssignRoles(sundays, assignments, outgoing, roles, mcKeyA);
+                    setRoles(newRoles); setPending(true);
+                  }} style={{ fontSize: 11, color: D.accent, background: D.accentDim, border: `1px solid ${D.accent}44`, borderRadius: 20, padding: '4px 10px', cursor: 'pointer', fontFamily: 'Geist, system-ui, sans-serif' }}>
+                    ✦ Auto asignar
+                  </button>
+                  <button onClick={() => setAdjustRoles(a => !a)}
+                    style={{ fontSize: 11, color: adjustRoles ? D.accent : D.text3, background: 'transparent', border: `1px solid ${adjustRoles ? D.accent : D.border2}`, borderRadius: 20, padding: '4px 10px', cursor: 'pointer', fontFamily: 'Geist, system-ui, sans-serif' }}>
+                    {adjustRoles ? '✓ Listo' : 'Ajustar'}
+                  </button>
+                </div>
+              </div>
               {getSundaysOfMonth(curYear, detailMonth).map(s => {
                 const ds = dateStr(s); const a = assignments[ds];
                 const lbl = s.toLocaleDateString('es-PY', { day: 'numeric', month: 'long' });
@@ -696,51 +746,43 @@ export default function App() {
                       {a?.bqNum && <><div style={{ fontSize: 14, color: D.text2 }}>{a.name || '—'} · {a.cong || '—'}{a.tel ? ' · ' + a.tel : ''}</div><div style={{ fontSize: 13, color: D.text3, marginTop: 2 }}>{a.bqNum} — {ALL_B[a.bqNum] || ''}</div></>}
                       {!a && <div style={{ fontSize: 12, color: D.text3, fontStyle: 'italic' }}>Sin asignar · tocar para asignar</div>}
                     </div>
-                    {/* Presidente y Lector — solo si hay conferencia y no es asamblea */}
+                    {/* Presidente y Lector — vista o edición según adjustRoles */}
                     {a && !a.asamblea && (() => {
                       const r = roles[ds] || {};
-                      // Quiénes salen ese domingo
-                      const mcKey = `${curYear}-${detailMonth}`;
-                      const salenHoy = (outgoing[mcKey] || []).filter(e => e.day === 'dom' && getSundaysOfMonth(curYear, detailMonth).findIndex(s2 => dateStr(s2) === ds) >= 0);
-                      // Simplification: check all outgoing entries for this month's sundays
-                      const allSalenNames = (outgoing[mcKey] || []).map(e => e.speaker);
-                      // Osvaldo sale? check assignments
+                      const mcKeyR = `${curYear}-${detailMonth}`;
+                      const allSalenNames = (outgoing[mcKeyR] || []).map(e => e.speaker);
                       const osvaldoSale = allSalenNames.includes(CONDUCTOR_PERMANENTE);
-                      const presidentesDisp = PRESIDENTES.filter(p => {
-                        if (allSalenNames.includes(p)) return false;
-                        if (osvaldoSale && p === SUPLENTE_CONDUCTOR) return false;
-                        return true;
-                      });
-                      const lectoresDisp = LECTORES.filter(l => {
-                        if (allSalenNames.includes(l)) return false;
-                        if (osvaldoSale && l === SUPLENTE_CONDUCTOR) return false;
-                        if (l === r.presidente) return false; // no mismo rol doble
-                        return true;
-                      });
-                      const updateRole = (field, val) => {
-                        setRoles(prev => ({ ...prev, [ds]: { ...prev[ds], [field]: val } }));
-                        setPending(true);
-                      };
+                      const presidentesDisp = PRESIDENTES.filter(p => !allSalenNames.includes(p) && !(osvaldoSale && p === SUPLENTE_CONDUCTOR));
+                      const lectoresDisp = LECTORES.filter(l => !allSalenNames.includes(l) && !(osvaldoSale && l === SUPLENTE_CONDUCTOR) && l !== r.presidente);
+                      const updateRole = (field, val) => { setRoles(prev => ({ ...prev, [ds]: { ...prev[ds], [field]: val } })); setPending(true); };
                       return (
                         <div style={{ borderTop: `1px solid ${D.border}`, paddingTop: 8 }} onClick={e => e.stopPropagation()}>
-                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                            <div>
-                              <div style={{ fontSize: 10, fontWeight: 500, color: D.text3, letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 4 }}>Presidente</div>
-                              <select value={r.presidente || ''} onChange={e => updateRole('presidente', e.target.value)}
-                                style={{ width: '100%', background: r.presidente ? D.accentDim2 : D.bg3, border: `1px solid ${r.presidente ? D.accent+'44' : D.border2}`, borderRadius: 7, padding: '7px 8px', fontSize: 12, color: r.presidente ? D.accent : D.text3, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none' }}>
-                                <option value="">Seleccionar...</option>
-                                {presidentesDisp.map(p => <option key={p} value={p}>{p}</option>)}
-                              </select>
+                          {adjustRoles ? (
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                              <div>
+                                <div style={{ fontSize: 10, color: D.text3, textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 4 }}>Presidente</div>
+                                <select value={r.presidente || ''} onChange={e => updateRole('presidente', e.target.value)}
+                                  style={{ width: '100%', background: D.bg3, border: `1px solid ${D.border2}`, borderRadius: 7, padding: '7px 8px', fontSize: 12, color: D.text, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none' }}>
+                                  <option value="">—</option>
+                                  {presidentesDisp.map(p => <option key={p} value={p}>{p}</option>)}
+                                </select>
+                              </div>
+                              <div>
+                                <div style={{ fontSize: 10, color: D.text3, textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 4 }}>Lector</div>
+                                <select value={r.lector || ''} onChange={e => updateRole('lector', e.target.value)}
+                                  style={{ width: '100%', background: D.bg3, border: `1px solid ${D.border2}`, borderRadius: 7, padding: '7px 8px', fontSize: 12, color: D.text, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none' }}>
+                                  <option value="">—</option>
+                                  {lectoresDisp.map(l => <option key={l} value={l}>{l}</option>)}
+                                </select>
+                              </div>
                             </div>
-                            <div>
-                              <div style={{ fontSize: 10, fontWeight: 500, color: D.text3, letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 4 }}>Lector</div>
-                              <select value={r.lector || ''} onChange={e => updateRole('lector', e.target.value)}
-                                style={{ width: '100%', background: r.lector ? D.accentDim2 : D.bg3, border: `1px solid ${r.lector ? D.accent+'44' : D.border2}`, borderRadius: 7, padding: '7px 8px', fontSize: 12, color: r.lector ? D.accent : D.text3, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none' }}>
-                                <option value="">Seleccionar...</option>
-                                {lectoresDisp.map(l => <option key={l} value={l}>{l}</option>)}
-                              </select>
+                          ) : (
+                            <div style={{ display: 'flex', gap: 16, fontSize: 12, color: D.text2 }}>
+                              {r.presidente && <span>Pres: <span style={{ color: D.text, fontWeight: 500 }}>{r.presidente}</span></span>}
+                              {r.lector && <span>Lector: <span style={{ color: D.text, fontWeight: 500 }}>{r.lector}</span></span>}
+                              {!r.presidente && !r.lector && <span style={{ color: D.text3, fontStyle: 'italic', fontSize: 11 }}>Sin asignaciones aún</span>}
                             </div>
-                          </div>
+                          )}
                         </div>
                       );
                     })()}
@@ -895,6 +937,19 @@ export default function App() {
                   </div>
                 );
               })()}
+
+              {/* DIVISOR */}
+              <div style={{ height: '.5px', background: D.border, margin: '16px 0' }} />
+
+              {/* BLOQUE 3: VER PROGRAMA */}
+              <button onClick={() => setShowPrograma(true)}
+                style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, padding: '14px 0', borderRadius: 12, border: `1px solid ${D.accent}55`, background: D.accentDim, cursor: 'pointer', fontFamily: 'Geist, system-ui, sans-serif', marginBottom: 8 }}>
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke={D.accent} strokeWidth="1.4">
+                  <rect x="2" y="2" width="14" height="14" rx="2"/>
+                  <path d="M5 6h8M5 9h8M5 12h5"/>
+                </svg>
+                <span style={{ fontSize: 14, fontWeight: 500, color: D.accent }}>Ver programa del mes</span>
+              </button>
 
             </div>
           )}
