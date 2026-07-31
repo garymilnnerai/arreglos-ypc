@@ -71,7 +71,7 @@ const LECTORES = ['Agustín Egusquiza','Bernardo Roa','Celso Roa','Claudelino Ro
 const CONDUCTOR_PERMANENTE = 'Osvaldo Díaz';
 const SUPLENTE_CONDUCTOR = 'Agustín Egusquiza';
 
-function autoAssignRoles(sundays, assignments, outgoing, existingRoles, mcKey) {
+function autoAssignRoles(sundays, assignments, outgoing, existingRoles, mcKey, allRoles) {
   const newRoles = { ...existingRoles };
   const salenNames = (outgoing[mcKey] || []).map(e => e.speaker);
   const osvaldoSale = salenNames.includes(CONDUCTOR_PERMANENTE);
@@ -79,24 +79,40 @@ function autoAssignRoles(sundays, assignments, outgoing, existingRoles, mcKey) {
   const presPool = PRESIDENTES.filter(p => !salenNames.includes(p) && !(osvaldoSale && p === SUPLENTE_CONDUCTOR));
   const lecPool = LECTORES.filter(l => !salenNames.includes(l) && !(osvaldoSale && l === SUPLENTE_CONDUCTOR));
 
-  const presUsed = {};
-  const lecUsed = {};
+  // Get last assignment date for each person across all roles
+  const lastAssigned = {};
+  Object.entries(allRoles || {}).forEach(([ds, r]) => {
+    if (r.presidente) {
+      if (!lastAssigned[r.presidente] || ds > lastAssigned[r.presidente]) lastAssigned[r.presidente] = ds;
+    }
+    if (r.lector) {
+      if (!lastAssigned[r.lector] || ds > lastAssigned[r.lector]) lastAssigned[r.lector] = ds;
+    }
+  });
+
+  // Sort pool by last assigned date ascending (least recently used first)
+  const sortByLRU = (pool) => [...pool].sort((a, b) => {
+    const da = lastAssigned[a] || '0000-00-00';
+    const db = lastAssigned[b] || '0000-00-00';
+    return da.localeCompare(db);
+  });
+
+  const presUsedThisMonth = {};
+  const lecUsedThisMonth = {};
 
   sundays.forEach(s => {
     const ds = s.toISOString().split('T')[0];
     const a = assignments[ds];
     if (!a || a.asamblea) return;
-    if (newRoles[ds]?.presidente && newRoles[ds]?.lector) return; // ya asignado
 
-    // Pick presidente not used this month yet
-    const presAvail = presPool.filter(p => !presUsed[p]);
-    const pres = presAvail[0] || presPool.filter(p => presUsed[p] < 2)[0] || presPool[0];
-    if (pres) presUsed[pres] = (presUsed[pres] || 0) + 1;
+    // Sort by LRU, prioritize not used this month
+    const presSorted = sortByLRU(presPool).filter(p => !presUsedThisMonth[p]);
+    const pres = presSorted[0] || sortByLRU(presPool)[0];
+    if (pres) { presUsedThisMonth[pres] = true; lastAssigned[pres] = ds; }
 
-    // Pick lector not same as presidente and not used this month
-    const lecAvail = lecPool.filter(l => l !== pres && !lecUsed[l]);
-    const lec = lecAvail[0] || lecPool.filter(l => l !== pres && lecUsed[l] < 2)[0] || lecPool.find(l => l !== pres);
-    if (lec) lecUsed[lec] = (lecUsed[lec] || 0) + 1;
+    const lecSorted = sortByLRU(lecPool).filter(l => l !== pres && !lecUsedThisMonth[l]);
+    const lec = lecSorted[0] || sortByLRU(lecPool).find(l => l !== pres);
+    if (lec) { lecUsedThisMonth[lec] = true; lastAssigned[lec] = ds; }
 
     newRoles[ds] = { presidente: pres || '', lector: lec || '' };
   });
@@ -719,7 +735,7 @@ export default function App() {
                   <button onClick={() => {
                     const mcKeyA = `${curYear}-${detailMonth}`;
                     const sundays = getSundaysOfMonth(curYear, detailMonth);
-                    const newRoles = autoAssignRoles(sundays, assignments, outgoing, roles, mcKeyA);
+                    const newRoles = autoAssignRoles(sundays, assignments, outgoing, {}, mcKeyA, roles);
                     setRoles(newRoles); setPending(true);
                   }} style={{ fontSize: 11, color: D.accent, background: D.accentDim, border: `1px solid ${D.accent}44`, borderRadius: 20, padding: '4px 10px', cursor: 'pointer', fontFamily: 'Geist, system-ui, sans-serif' }}>
                     ✦ Auto asignar
@@ -993,14 +1009,6 @@ export default function App() {
           const contactos = (monthContacts[mcKey] || []).filter(c => c.name);
           const VC = '#6B4FA0';
 
-          const handleShare = () => {
-            if (navigator.share) {
-              navigator.share({ title: `Programa ${monthName} ${curYear}`, text: `Arreglos de Conferencias - ${monthName} ${curYear}` });
-            } else {
-              window.print();
-            }
-          };
-
           return (
             <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 200, display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
               {/* Toolbar */}
@@ -1011,14 +1019,26 @@ export default function App() {
                   Cerrar
                 </button>
                 <div style={{ fontSize: 13, fontWeight: 500, color: D.text }}>{monthName} {curYear}</div>
-                <button onClick={handleShare}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: D.accent, display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontFamily: 'Geist, system-ui, sans-serif' }}>
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4">
-                    <circle cx="12" cy="3" r="1.5"/><circle cx="4" cy="8" r="1.5"/><circle cx="12" cy="13" r="1.5"/>
-                    <path d="M5.5 7L10.5 4M5.5 9L10.5 12"/>
-                  </svg>
-                  Compartir
-                </button>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button onClick={() => {
+                    if (navigator.share) {
+                      navigator.share({ title: `Programa ${monthName} ${curYear}`, url: window.location.href });
+                    }
+                  }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: D.accent, display: 'flex', alignItems: 'center', gap: 4, fontSize: 13, fontFamily: 'Geist, system-ui, sans-serif' }}>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4">
+                      <circle cx="12" cy="3" r="1.5"/><circle cx="4" cy="8" r="1.5"/><circle cx="12" cy="13" r="1.5"/>
+                      <path d="M5.5 7L10.5 4M5.5 9L10.5 12"/>
+                    </svg>
+                    Compartir
+                  </button>
+                  <button onClick={() => window.print()}
+                    style={{ background: 'none', border: `1px solid ${D.accent}44`, borderRadius: 8, cursor: 'pointer', color: D.accent, display: 'flex', alignItems: 'center', gap: 4, fontSize: 13, fontFamily: 'Geist, system-ui, sans-serif', padding: '4px 10px' }}>
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.3">
+                      <rect x="2" y="5" width="10" height="7" rx="1"/><path d="M4 5V2h6v3"/><path d="M4 9h6"/>
+                    </svg>
+                    Imprimir / PDF
+                  </button>
+                </div>
               </div>
 
               {/* Documento */}
