@@ -65,6 +65,11 @@ const SPEAKERS = [
   { name: 'Osvaldo Díaz',      bqs: [2,7,176,183] },
   { name: 'Rafael Minesi',     bqs: [3,9,10,48,77] },
 ];
+
+const PRESIDENTES = ['Agustín Egusquiza','Bernardo Roa','Celso Roa','Claudelino Rojas','Gary Martínez','Rafael Minesi','Francisco Jara','Isidro Benítez'];
+const LECTORES = ['Agustín Egusquiza','Bernardo Roa','Celso Roa','Claudelino Rojas','Gary Martínez','Rafael Minesi','Isidro Benítez','Agustín Martínez','Jahaziel Roa'];
+const CONDUCTOR_PERMANENTE = 'Osvaldo Díaz';
+const SUPLENTE_CONDUCTOR = 'Agustín Egusquiza';
 const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
 // Paletas
@@ -202,6 +207,8 @@ export default function App() {
   // outgoing: { 'YYYY-M': [{speaker, bqNum, cong, day, time}] }
   const [outgoing, setOutgoing] = useState({});
   const [outgoingOpen, setOutgoingOpen] = useState({});
+  // roles: { 'YYYY-MM-DD': { presidente, lector } }
+  const [roles, setRoles] = useState({});
   const [editingContact, setEditingContact] = useState({});
   const [savedFlash, setSavedFlash] = useState(false);
   const [sundayFlash, setSundayFlash] = useState(null);
@@ -224,6 +231,7 @@ export default function App() {
       const data = await res.json();
       setAssignments(data.assignments || {});
       setOutgoing(data.outgoing || {});
+      setRoles(data.roles || {});
       // Auto-confirm contacts that have all fields
       const mc = data.monthContacts || {};
       Object.keys(mc).forEach(k => {
@@ -246,8 +254,8 @@ export default function App() {
   async function saveToSheet() {
     setSaving(true);
     try {
-      await fetch('/api/assignments', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-password': pwd }, body: JSON.stringify({ assignments, monthContacts, outgoing }) });
-      setSavedSnap(JSON.stringify({ assignments, monthContacts, outgoing }));
+      await fetch('/api/assignments', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-password': pwd }, body: JSON.stringify({ assignments, monthContacts, outgoing, roles }) });
+      setSavedSnap(JSON.stringify({ assignments, monthContacts, outgoing, roles }));
       setPending(false);
       playSound('save');
       setSavedFlash(true);
@@ -261,6 +269,7 @@ export default function App() {
     setAssignments(snap.assignments || snap);
     setMonthContacts(snap.monthContacts || {});
     setOutgoing(snap.outgoing || {});
+    setRoles(snap.roles || {});
     setPending(false);
   }
 
@@ -675,12 +684,64 @@ export default function App() {
                 const bgC = a ? a.asamblea ? D.accentDim : D.greenDim : 'transparent';
                 const bdC = a ? a.asamblea ? `rgba(123,140,222,0.25)` : `rgba(76,175,125,0.25)` : D.border;
                 return (
-                  <div key={ds} onClick={() => { setModalSunday({ date: ds, assignment: a }); setSunBQNum(a?.bqNum || null); setForm({ asamblea: a?.asamblea || false, name: a?.name || '', cong: a?.cong || '', tel: a?.tel || '' }); }}
-                    style={{ background: sundayFlash === ds ? D.greenDim : bgC, border: `1px solid ${sundayFlash === ds ? 'rgba(76,175,125,0.4)' : bdC}`, borderRadius: 12, padding: '14px 16px', marginBottom: 8, cursor: 'pointer', transition: 'background 0.4s ease, border-color 0.4s ease', transform: sundayFlash === ds ? 'scale(1.01)' : 'scale(1)' }}>
-                    <div style={{ fontSize: 16, fontWeight: 500, color: D.text, marginBottom: 4 }}>Domingo {lbl}</div>
-                    {a?.asamblea && <div style={{ fontSize: 14, color: D.accent }}>🏛 Fin de semana de asamblea</div>}
-                    {a?.bqNum && <><div style={{ fontSize: 14, color: D.text2 }}>{a.name || '—'} · {a.cong || '—'}{a.tel ? ' · ' + a.tel : ''}</div><div style={{ fontSize: 13, color: D.text3, marginTop: 3 }}>{a.bqNum} — {ALL_B[a.bqNum] || ''}</div></>}
-                    {!a && <div style={{ fontSize: 12, color: D.text3, fontStyle: 'italic' }}>Sin asignar</div>}
+                  <div key={ds}
+                    style={{ background: sundayFlash === ds ? D.greenDim : bgC, border: `1px solid ${sundayFlash === ds ? 'rgba(76,175,125,0.4)' : bdC}`, borderRadius: 12, padding: '14px 16px', marginBottom: 8, transition: 'background 0.4s ease', transform: sundayFlash === ds ? 'scale(1.01)' : 'scale(1)' }}>
+                    {/* Conferencia */}
+                    <div onClick={() => { setModalSunday({ date: ds, assignment: a }); setSunBQNum(a?.bqNum || null); setForm({ asamblea: a?.asamblea || false, name: a?.name || '', cong: a?.cong || '', tel: a?.tel || '' }); }}
+                      style={{ cursor: 'pointer', marginBottom: a && !a.asamblea ? 10 : 0 }}>
+                      <div style={{ fontSize: 16, fontWeight: 500, color: D.text, marginBottom: 4 }}>Domingo {lbl}</div>
+                      {a?.asamblea && <div style={{ fontSize: 14, color: D.accent }}>🏛 Fin de semana de asamblea</div>}
+                      {a?.bqNum && <><div style={{ fontSize: 14, color: D.text2 }}>{a.name || '—'} · {a.cong || '—'}{a.tel ? ' · ' + a.tel : ''}</div><div style={{ fontSize: 13, color: D.text3, marginTop: 2 }}>{a.bqNum} — {ALL_B[a.bqNum] || ''}</div></>}
+                      {!a && <div style={{ fontSize: 12, color: D.text3, fontStyle: 'italic' }}>Sin asignar · tocar para asignar</div>}
+                    </div>
+                    {/* Presidente y Lector — solo si hay conferencia y no es asamblea */}
+                    {a && !a.asamblea && (() => {
+                      const r = roles[ds] || {};
+                      // Quiénes salen ese domingo
+                      const mcKey = `${curYear}-${detailMonth}`;
+                      const salenHoy = (outgoing[mcKey] || []).filter(e => e.day === 'dom' && getSundaysOfMonth(curYear, detailMonth).findIndex(s2 => dateStr(s2) === ds) >= 0);
+                      // Simplification: check all outgoing entries for this month's sundays
+                      const allSalenNames = (outgoing[mcKey] || []).map(e => e.speaker);
+                      // Osvaldo sale? check assignments
+                      const osvaldoSale = allSalenNames.includes(CONDUCTOR_PERMANENTE);
+                      const presidentesDisp = PRESIDENTES.filter(p => {
+                        if (allSalenNames.includes(p)) return false;
+                        if (osvaldoSale && p === SUPLENTE_CONDUCTOR) return false;
+                        return true;
+                      });
+                      const lectoresDisp = LECTORES.filter(l => {
+                        if (allSalenNames.includes(l)) return false;
+                        if (osvaldoSale && l === SUPLENTE_CONDUCTOR) return false;
+                        if (l === r.presidente) return false; // no mismo rol doble
+                        return true;
+                      });
+                      const updateRole = (field, val) => {
+                        setRoles(prev => ({ ...prev, [ds]: { ...prev[ds], [field]: val } }));
+                        setPending(true);
+                      };
+                      return (
+                        <div style={{ borderTop: `1px solid ${D.border}`, paddingTop: 8 }} onClick={e => e.stopPropagation()}>
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                            <div>
+                              <div style={{ fontSize: 10, fontWeight: 500, color: D.text3, letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 4 }}>Presidente</div>
+                              <select value={r.presidente || ''} onChange={e => updateRole('presidente', e.target.value)}
+                                style={{ width: '100%', background: r.presidente ? D.accentDim2 : D.bg3, border: `1px solid ${r.presidente ? D.accent+'44' : D.border2}`, borderRadius: 7, padding: '7px 8px', fontSize: 12, color: r.presidente ? D.accent : D.text3, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none' }}>
+                                <option value="">Seleccionar...</option>
+                                {presidentesDisp.map(p => <option key={p} value={p}>{p}</option>)}
+                              </select>
+                            </div>
+                            <div>
+                              <div style={{ fontSize: 10, fontWeight: 500, color: D.text3, letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 4 }}>Lector</div>
+                              <select value={r.lector || ''} onChange={e => updateRole('lector', e.target.value)}
+                                style={{ width: '100%', background: r.lector ? D.accentDim2 : D.bg3, border: `1px solid ${r.lector ? D.accent+'44' : D.border2}`, borderRadius: 7, padding: '7px 8px', fontSize: 12, color: r.lector ? D.accent : D.text3, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none' }}>
+                                <option value="">Seleccionar...</option>
+                                {lectoresDisp.map(l => <option key={l} value={l}>{l}</option>)}
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </div>
                 );
               })}
