@@ -209,6 +209,7 @@ export default function App() {
   const [outgoingOpen, setOutgoingOpen] = useState({});
   // roles: { 'YYYY-MM-DD': { presidente, lector } }
   const [roles, setRoles] = useState({});
+  const [showPrograma, setShowPrograma] = useState(false);
   const [editingContact, setEditingContact] = useState({});
   const [savedFlash, setSavedFlash] = useState(false);
   const [sundayFlash, setSundayFlash] = useState(null);
@@ -677,7 +678,8 @@ export default function App() {
               {/* DIVISOR */}
               <div style={{ height: '.5px', background: D.border, margin: '16px 0' }} />
 
-              {/* DOMINGOS */}
+              {/* BLOQUE 1: CONFERENCIANTES QUE VIENEN */}
+              <div style={{ fontSize: 11, fontWeight: 600, color: D.text3, letterSpacing: '.1em', textTransform: 'uppercase', marginBottom: 10 }}>Conferenciantes que vienen a Ypacaraí</div>
               {getSundaysOfMonth(curYear, detailMonth).map(s => {
                 const ds = dateStr(s); const a = assignments[ds];
                 const lbl = s.toLocaleDateString('es-PY', { day: 'numeric', month: 'long' });
@@ -750,7 +752,10 @@ export default function App() {
               {/* DIVISOR */}
               <div style={{ height: '.5px', background: D.border, margin: '16px 0' }} />
 
-                            {/* CONFERENCIANTES QUE SALEN */}
+              {/* BLOQUE 2: CONFERENCIANTES QUE SALEN */}
+              <div style={{ fontSize: 11, fontWeight: 600, color: D.text3, letterSpacing: '.1em', textTransform: 'uppercase', marginBottom: 10 }}>Conferenciantes que salen de la congregación Ypacaraí</div>
+
+              {/* CONFERENCIANTES QUE SALEN */}
               {(() => {
                 const mcKey = `${curYear}-${detailMonth}`;
                 const entries = outgoing[mcKey] || [];
@@ -923,6 +928,119 @@ export default function App() {
             </div>
           </div>
         )}
+
+        {/* MODAL: PROGRAMA DEL MES */}
+        {showPrograma && detailMonth !== null && (() => {
+          const mcKey = `${curYear}-${detailMonth}`;
+          const sundays = getSundaysOfMonth(curYear, detailMonth);
+          const salidas = (outgoing[mcKey] || []);
+          const monthName = MONTHS[detailMonth];
+          const contactos = (monthContacts[mcKey] || []).filter(c => c.name);
+          const VC = '#6B4FA0';
+
+          const handleShare = () => {
+            if (navigator.share) {
+              navigator.share({ title: `Programa ${monthName} ${curYear}`, text: `Arreglos de Conferencias - ${monthName} ${curYear}` });
+            } else {
+              window.print();
+            }
+          };
+
+          return (
+            <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 200, display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
+              {/* Toolbar */}
+              <div style={{ position: 'sticky', top: 0, background: isDark ? '#1C1C1F' : '#FAF7F2', padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid ${D.border}`, zIndex: 10, flexShrink: 0 }}>
+                <button onClick={() => setShowPrograma(false)}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: D.text3, fontSize: 13, fontFamily: 'Geist, system-ui, sans-serif', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.3"><path d="M9 2L4 7l5 5"/></svg>
+                  Cerrar
+                </button>
+                <div style={{ fontSize: 13, fontWeight: 500, color: D.text }}>{monthName} {curYear}</div>
+                <button onClick={handleShare}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: D.accent, display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontFamily: 'Geist, system-ui, sans-serif' }}>
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4">
+                    <circle cx="12" cy="3" r="1.5"/><circle cx="4" cy="8" r="1.5"/><circle cx="12" cy="13" r="1.5"/>
+                    <path d="M5.5 7L10.5 4M5.5 9L10.5 12"/>
+                  </svg>
+                  Compartir
+                </button>
+              </div>
+
+              {/* Documento */}
+              <div id="programa-doc" style={{ background: '#FFFFFF', maxWidth: 600, margin: '16px auto', width: '100%', padding: '32px 28px', fontFamily: 'Georgia, serif', color: '#1A1A1A' }}>
+                {/* Header */}
+                <div style={{ textAlign: 'center', marginBottom: 24, borderBottom: '2px solid #1A1A1A', paddingBottom: 16 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>Congregación Ypacaraí Guaraní</div>
+                  <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 2 }}>Programa de Conferencias Públicas</div>
+                  <div style={{ fontSize: 14, color: '#444' }}>{monthName} {curYear} · Domingo 09:00 hs.</div>
+                </div>
+
+                {/* SECCIÓN 1: Los que vienen */}
+                <div style={{ marginBottom: 24 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', color: '#444', marginBottom: 12, borderBottom: '1px solid #DDD', paddingBottom: 4 }}>
+                    Conferenciantes que visitan Ypacaraí
+                  </div>
+                  {sundays.map(s => {
+                    const ds = dateStr(s);
+                    const a = assignments[ds];
+                    const r = roles[ds] || {};
+                    const lbl = s.toLocaleDateString('es-PY', { weekday: 'long', day: 'numeric', month: 'long' });
+                    if (!a || a.asamblea) return (
+                      <div key={ds} style={{ padding: '10px 0', borderBottom: '1px solid #EEE', display: 'flex', gap: 12 }}>
+                        <div style={{ width: 110, fontSize: 12, fontWeight: 700, color: '#555', textTransform: 'capitalize' }}>{lbl}</div>
+                        <div style={{ fontSize: 12, color: '#888', fontStyle: 'italic' }}>{a?.asamblea ? '🏛 Fin de semana de asamblea' : 'Sin asignar'}</div>
+                      </div>
+                    );
+                    return (
+                      <div key={ds} style={{ padding: '10px 0', borderBottom: '1px solid #EEE' }}>
+                        <div style={{ display: 'flex', gap: 12, marginBottom: 5 }}>
+                          <div style={{ width: 110, fontSize: 12, fontWeight: 700, color: '#333', textTransform: 'capitalize', flexShrink: 0 }}>{lbl}</div>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ fontSize: 13, fontWeight: 700 }}>{a.name}</div>
+                            <div style={{ fontSize: 11, color: '#555' }}>{a.cong}{a.tel ? ` · ${a.tel}` : ''}</div>
+                            <div style={{ fontSize: 11, color: '#333', marginTop: 2, fontStyle: 'italic' }}>Bq. {a.bqNum} — {ALL_B[a.bqNum] || ''}</div>
+                          </div>
+                        </div>
+                        <div style={{ display: 'flex', gap: 16, paddingLeft: 122, fontSize: 11, color: '#555' }}>
+                          {r.presidente && <span>Presidente: <strong>{r.presidente}</strong></span>}
+                          {r.lector && <span>Lector: <strong>{r.lector}</strong></span>}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* SECCIÓN 2: Los que salen */}
+                {salidas.length > 0 && (
+                  <div style={{ marginBottom: 24 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', color: '#444', marginBottom: 12, borderBottom: '1px solid #DDD', paddingBottom: 4 }}>
+                      Conferenciantes que salen de Ypacaraí
+                    </div>
+                    {salidas.map((e, i) => (
+                      <div key={i} style={{ padding: '10px 0', borderBottom: '1px solid #EEE', display: 'flex', gap: 12 }}>
+                        <div style={{ width: 110, fontSize: 12, fontWeight: 700, color: '#555', flexShrink: 0 }}>
+                          {e.day === 'sab' ? 'Sábado' : 'Domingo'}{e.time ? ` ${e.time}` : ''}
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontSize: 13, fontWeight: 700 }}>{e.speaker}</div>
+                          <div style={{ fontSize: 11, color: '#555' }}>a la congregación {e.cong}</div>
+                          {e.bqNum && <div style={{ fontSize: 11, color: '#333', fontStyle: 'italic', marginTop: 2 }}>Bq. {e.bqNum} — {ALL_B[e.bqNum] || ''}</div>}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Contacto */}
+                <div style={{ marginTop: 20, padding: '12px 16px', background: '#F5F5F5', borderRadius: 6, fontSize: 11, color: '#555', lineHeight: 1.7 }}>
+                  <div style={{ fontWeight: 700, marginBottom: 4, textTransform: 'uppercase', letterSpacing: 0.5, fontSize: 10 }}>Contacto en la congregación Ypacaraí Guaraní</div>
+                  <div>Hno. Gary Martínez — WhatsApp: 0981 133425</div>
+                  <div>Hno. Agustín Egusquiza — WhatsApp: 0984 623206</div>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
 
         {/* MODAL: BQ — con selector de mes y domingos */}
         {modalBQ && (
