@@ -86,11 +86,26 @@ function autoAssignRoles(sundays, assignments, outgoing, existingRoles, mcKey, a
   const salenNames = salenEntries.map(e => e.speaker);
   const osvaldoSale = salenNames.includes(CONDUCTOR_PERMANENTE);
 
-  // Get which sunday each person is leaving (by index)
-  // For now treat all who sale this month as unavailable (conservative)
-  // but allow those not actually leaving on that specific sunday
-  
-  // Base pools: full lists minus permanent rules
+  // Active sundays with conferences
+  const activeSundays = sundays
+    .map(s => s.toISOString().split('T')[0])
+    .filter(ds => assignments[ds] && !assignments[ds].asamblea);
+  const n = activeSundays.length;
+  if (n === 0) return existingRoles;
+
+  // Map salidas to specific sunday dates (match by position in month)
+  // Each salida entry maps to a specific sunday based on the day field
+  const activeDom = activeSundays; // dom sundays
+  const salenPorFecha = {}; // name -> Set of dates when they are out
+  salenEntries.forEach((e, i) => {
+    if (!e.speaker) return;
+    if (!salenPorFecha[e.speaker]) salenPorFecha[e.speaker] = new Set();
+    // Match to specific sunday: use index if available, otherwise mark first sunday
+    const targetDate = activeDom[i] || activeDom[0];
+    if (targetDate) salenPorFecha[e.speaker].add(targetDate);
+  });
+
+  // Base pools — strict rules
   const basePres = PRESIDENTES.filter(p =>
     !SOLO_LECTOR.includes(p) &&
     !(osvaldoSale && p === SUPLENTE_CONDUCTOR)
@@ -100,78 +115,50 @@ function autoAssignRoles(sundays, assignments, outgoing, existingRoles, mcKey, a
     !(osvaldoSale && l === SUPLENTE_CONDUCTOR)
   );
 
-  // Map each person to which sundays they are leaving (by date string)
-  // so we can exclude them only on THAT sunday, not the whole month
-  const salenPorFecha = {}; // { 'name': Set of dateStrings when they are out }
-  salenEntries.forEach(e => {
-    if (!e.speaker) return;
-    if (!salenPorFecha[e.speaker]) salenPorFecha[e.speaker] = new Set();
-    // We don't have exact date per entry yet — use all sundays as proxy
-    // For now mark them as out for all sundays (conservative, will improve)
-    sundays.forEach(s => salenPorFecha[e.speaker].add(s.toISOString().split('T')[0]));
-  });
-
-  // Full pools (no month-wide exclusion — exclusion happens per sunday)
-  const presPool = basePres;
-  const lecPool = baseLec;
-
-  // Last date each person had ANY role (presidente or lector) across ALL months
+  // Last time each person had ANY role (for LRU ordering across months)
   const lastDate = {};
   Object.entries(allRoles || {}).forEach(([ds, r]) => {
     if (r.presidente && (!lastDate[r.presidente] || ds > lastDate[r.presidente])) lastDate[r.presidente] = ds;
     if (r.lector && (!lastDate[r.lector] || ds > lastDate[r.lector])) lastDate[r.lector] = ds;
   });
 
-  // Sort by least recently used (LRU) — those never used come first
-  const lru = (pool) => [...pool].sort((a, b) => {
-    const da = lastDate[a] || '0000-00-00';
-    const db = lastDate[b] || '0000-00-00';
-    return da.localeCompare(db);
-  });
+  // LRU sort: least recently used first (never used = highest priority)
+  const lru = (pool) => [...pool].sort((a, b) =>
+    (lastDate[a] || '0000-00-00').localeCompare(lastDate[b] || '0000-00-00')
+  );
 
-  // Active sundays (those with a conference assigned, not asamblea)
-  const activeSundays = sundays
-    .map(s => s.toISOString().split('T')[0])
-    .filter(ds => assignments[ds] && !assignments[ds].asamblea);
-
-  const n = activeSundays.length;
-  if (n === 0) return existingRoles;
-
-  const presOrdered = lru(presPool);
-  const lecOrdered = lru(lecPool);
+  const presOrdered = lru(basePres);
+  const lecOrdered = lru(baseLec);
 
   const usedPres = new Set();
   const usedLec = new Set();
-  const presAssigned = [];
-  const lecAssigned = [];
+  const result = {};
 
   activeSundays.forEach(ds => {
-    // Exclude anyone leaving THIS specific sunday
-    const outThisSunday = new Set(
+    // Who is out this specific sunday
+    const outToday = new Set(
       Object.entries(salenPorFecha)
         .filter(([, dates]) => dates.has(ds))
         .map(([name]) => name)
     );
 
-    // Pick president: LRU, not used this month, not out this sunday
-    const presAvail = presOrdered.filter(p => !usedPres.has(p) && !outThisSunday.has(p));
-    const pres = presAvail[0] || presOrdered.filter(p => !outThisSunday.has(p))[0] || presOrdered[0];
-    presAssigned.push(pres || '');
+    // President: LRU order, not used this month, not out today
+    const presAvail = presOrdered.filter(p => !usedPres.has(p) && !outToday.has(p));
+    // If all used, allow reuse but still avoid out today
+    const presFallback = presOrdered.filter(p => !outToday.has(p));
+    const pres = presAvail[0] || presFallback[0] || presOrdered[0];
     if (pres) usedPres.add(pres);
 
-    // Pick lector: LRU, not used this month, not same as president, not out this sunday
-    const lecAvail = lecOrdered.filter(l => !usedLec.has(l) && l !== pres && !outThisSunday.has(l));
-    const lec = lecAvail[0] || lecOrdered.filter(l => l !== pres && !outThisSunday.has(l))[0] || lecOrdered.find(l => l !== pres) || '';
-    lecAssigned.push(lec || '');
+    // Lector: LRU order, not used this month, not same as pres, not out today
+    const lecAvail = lecOrdered.filter(l => !usedLec.has(l) && l !== pres && !outToday.has(l));
+    const lecFallback = lecOrdered.filter(l => l !== pres && !outToday.has(l));
+    const lec = lecAvail[0] || lecFallback[0] || lecOrdered.find(l => l !== pres) || '';
     if (lec) usedLec.add(lec);
+
+    result[ds] = { presidente: pres || '', lector: lec || '' };
   });
 
-  const newRoles = { ...existingRoles };
-  activeSundays.forEach((ds, i) => {
-    newRoles[ds] = { presidente: presAssigned[i], lector: lecAssigned[i] };
-  });
-
-  return newRoles;
+  return { ...existingRoles, ...result };
 }
 const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
@@ -829,18 +816,24 @@ export default function App() {
                       // For adjustment: show all valid options (not the ones who are actually out THIS sunday)
                       // salenHoy = people leaving on this specific sunday
                       const mcKeyR2 = `${curYear}-${detailMonth}`;
-                      // Exclude from dropdowns only those actually leaving on any sunday this month
-                      // (conservative: if they have a salida entry, exclude from this sunday too)
-                      const salenEstedomingo = (outgoing[mcKeyR2] || []).map(e => e.speaker);
+                      const osvaldoSaleR = (outgoing[mcKeyR2] || []).some(e => e.speaker === CONDUCTOR_PERMANENTE);
+                      // Only exclude who is actually leaving on THIS specific sunday
+                      // Match by position: find which salida corresponds to this sunday
+                      const activeDomR = getSundaysOfMonth(curYear, detailMonth)
+                        .map(s2 => dateStr(s2))
+                        .filter(d2 => assignments[d2] && !assignments[d2].asamblea);
+                      const idxThisSunday = activeDomR.indexOf(ds);
+                      const salidaHoy = (outgoing[mcKeyR2] || [])[idxThisSunday];
+                      const salenHoyNames = salidaHoy?.speaker ? [salidaHoy.speaker] : [];
                       const presidentesDisp = PRESIDENTES.filter(p =>
                         !SOLO_LECTOR.includes(p) &&
-                        !salenEstedomingo.includes(p) &&
-                        !(osvaldoSale && p === SUPLENTE_CONDUCTOR)
+                        !salenHoyNames.includes(p) &&
+                        !(osvaldoSaleR && p === SUPLENTE_CONDUCTOR)
                       );
                       const lectoresDisp = LECTORES.filter(l =>
                         !SOLO_PRESIDENTE.includes(l) &&
-                        !salenEstedomingo.includes(l) &&
-                        !(osvaldoSale && l === SUPLENTE_CONDUCTOR) &&
+                        !salenHoyNames.includes(l) &&
+                        !(osvaldoSaleR && l === SUPLENTE_CONDUCTOR) &&
                         l !== r.presidente
                       );
                       const updateRole = (field, val) => { setRoles(prev => ({ ...prev, [ds]: { ...prev[ds], [field]: val } })); setPending(true); };
