@@ -1047,9 +1047,9 @@ export default function App() {
                     const w = window.open('', '_blank');
                     w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Programa ${monthName} ${curYear}</title><style>
                       *{box-sizing:border-box;margin:0;padding:0;}
-                      body{font-family:Georgia,serif;color:#1a1a1a;background:#fff;padding:18mm;}
-                      @page{size:A4 portrait;margin:18mm;}
-                      @media print{body{padding:0;}}
+                      body{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;color:#111;background:#fff;padding:14mm 16mm;}
+                      @page{size:A4 portrait;margin:0;}
+                      @media print{body{padding:12mm 14mm;}}
                     </style></head><body>${doc.innerHTML}</body></html>`);
                     w.document.close();
                     setTimeout(() => { w.print(); }, 400);
@@ -1064,75 +1064,93 @@ export default function App() {
               </div>
 
               {/* Documento */}
-              <div id="programa-doc" style={{ background: '#FFFFFF', maxWidth: 600, margin: '16px auto', width: '100%', padding: '32px 28px', fontFamily: 'Georgia, serif', color: '#1A1A1A', boxSizing: 'border-box' }}>
-                {/* Header */}
-                <div style={{ textAlign: 'center', marginBottom: 24, borderBottom: '2px solid #1A1A1A', paddingBottom: 16 }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>Congregación Ypacaraí Guaraní</div>
-                  <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 2 }}>Programa de Conferencias Públicas</div>
-                  <div style={{ fontSize: 14, color: '#444' }}>{monthName} {curYear} · Domingo 09:00 hs.</div>
+              <div id="programa-doc" style={{ background: '#FFFFFF', maxWidth: 600, margin: '16px auto', width: '100%', padding: '36px 40px', fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif', color: '#111', boxSizing: 'border-box', lineHeight: 1.5 }}>
+
+                {/* HEADER */}
+                <div style={{ marginBottom: 32 }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 20 }}>
+                    <div>
+                      <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#888', marginBottom: 6 }}>Congregación Ypacaraí Guaraní</div>
+                      <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.5px', color: '#111', lineHeight: 1.2 }}>Conferencias Públicas</div>
+                      <div style={{ fontSize: 14, color: '#555', marginTop: 4, fontWeight: 400 }}>{monthName} {curYear}</div>
+                    </div>
+                    <div style={{ textAlign: 'right', fontSize: 11, color: '#888', lineHeight: 1.8 }}>
+                      <div style={{ fontWeight: 500, color: '#555' }}>Domingo · 09:00 hs.</div>
+                    </div>
+                  </div>
+                  <div style={{ height: 1, background: '#E5E5E5' }} />
                 </div>
 
-                {/* SECCIÓN 1: Los que vienen */}
-                <div style={{ marginBottom: 24 }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', color: '#444', marginBottom: 12, borderBottom: '1px solid #DDD', paddingBottom: 4 }}>
-                    Conferenciantes que visitan Ypacaraí
-                  </div>
-                  {sundays.map(s => {
+                {/* SECCIÓN 1 */}
+                <div style={{ marginBottom: 28 }}>
+                  <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#999', marginBottom: 14 }}>Conferenciantes que visitan Ypacaraí</div>
+                  {sundays.map((s, si) => {
                     const ds = dateStr(s);
                     const a = assignments[ds];
                     const r = roles[ds] || {};
-                    const lbl = s.toLocaleDateString('es-PY', { weekday: 'long', day: 'numeric', month: 'long' });
-                    if (!a || a.asamblea) return (
-                      <div key={ds} style={{ padding: '10px 0', borderBottom: '1px solid #EEE', display: 'flex', gap: 12 }}>
-                        <div style={{ width: 110, fontSize: 12, fontWeight: 700, color: '#555', textTransform: 'capitalize' }}>{lbl}</div>
-                        <div style={{ fontSize: 12, color: '#888', fontStyle: 'italic' }}>{a?.asamblea ? '🏛 Fin de semana de asamblea' : 'Sin asignar'}</div>
-                      </div>
-                    );
+                    const lbl = s.toLocaleDateString('es-PY', { day: 'numeric', month: 'long' });
+                    const dow = s.toLocaleDateString('es-PY', { weekday: 'short' });
                     return (
-                      <div key={ds} style={{ padding: '10px 0', borderBottom: '1px solid #EEE' }}>
-                        <div style={{ display: 'flex', gap: 12, marginBottom: 5 }}>
-                          <div style={{ width: 110, fontSize: 12, fontWeight: 700, color: '#333', textTransform: 'capitalize', flexShrink: 0 }}>{lbl}</div>
-                          <div style={{ flex: 1 }}>
-                            <div style={{ fontSize: 13, fontWeight: 700 }}>{a.name}</div>
-                            <div style={{ fontSize: 11, color: '#555' }}>{a.cong}{a.tel ? ` · ${a.tel}` : ''}</div>
-                            <div style={{ fontSize: 11, color: '#333', marginTop: 2, fontStyle: 'italic' }}>Bq. {a.bqNum} — {ALL_B[a.bqNum] || ''}</div>
-                          </div>
+                      <div key={ds} style={{ display: 'flex', gap: 16, paddingBottom: 12, marginBottom: 12, borderBottom: '1px solid #F0F0F0' }}>
+                        <div style={{ width: 52, flexShrink: 0, textAlign: 'center', background: '#F7F7F7', borderRadius: 8, padding: '6px 4px' }}>
+                          <div style={{ fontSize: 9, fontWeight: 600, color: '#999', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{dow}</div>
+                          <div style={{ fontSize: 16, fontWeight: 700, color: '#111', lineHeight: 1 }}>{s.getDate()}</div>
                         </div>
-                        <div style={{ display: 'flex', gap: 16, paddingLeft: 122, fontSize: 11, color: '#555' }}>
-                          {r.presidente && <span>Presidente: <strong>{r.presidente}</strong></span>}
-                          {r.lector && <span>Lector: <strong>{r.lector}</strong></span>}
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          {!a || a.asamblea ? (
+                            <div style={{ fontSize: 12, color: '#999', fontStyle: 'italic', paddingTop: 8 }}>{a?.asamblea ? 'Fin de semana de asamblea' : 'Sin asignar'}</div>
+                          ) : (
+                            <>
+                              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 2 }}>
+                                <span style={{ fontSize: 14, fontWeight: 600, color: '#111' }}>{a.name}</span>
+                                <span style={{ fontSize: 11, color: '#888' }}>{a.cong}</span>
+                                {a.tel && <span style={{ fontSize: 11, color: '#AAA' }}>{a.tel}</span>}
+                              </div>
+                              <div style={{ fontSize: 11, color: '#666', marginBottom: 5 }}>Bq. {a.bqNum} — {ALL_B[a.bqNum] || ''}</div>
+                              <div style={{ display: 'flex', gap: 14, fontSize: 10.5, color: '#888' }}>
+                                {r.presidente && <span>Pres. <span style={{ fontWeight: 600, color: '#555' }}>{r.presidente}</span></span>}
+                                {r.lector && <span>Lector <span style={{ fontWeight: 600, color: '#555' }}>{r.lector}</span></span>}
+                              </div>
+                            </>
+                          )}
                         </div>
                       </div>
                     );
                   })}
                 </div>
 
-                {/* SECCIÓN 2: Los que salen */}
+                {/* SECCIÓN 2 */}
                 {salidas.length > 0 && (
-                  <div style={{ marginBottom: 24 }}>
-                    <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', color: '#444', marginBottom: 12, borderBottom: '1px solid #DDD', paddingBottom: 4 }}>
-                      Conferenciantes que salen de Ypacaraí
-                    </div>
+                  <div style={{ marginBottom: 28 }}>
+                    <div style={{ height: 1, background: '#E5E5E5', marginBottom: 14 }} />
+                    <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#999', marginBottom: 14 }}>Conferenciantes que salen de Ypacaraí</div>
                     {salidas.map((e, i) => (
-                      <div key={i} style={{ padding: '10px 0', borderBottom: '1px solid #EEE', display: 'flex', gap: 12 }}>
-                        <div style={{ width: 110, fontSize: 12, fontWeight: 700, color: '#555', flexShrink: 0 }}>
-                          {e.day === 'sab' ? 'Sábado' : 'Domingo'}{e.time ? ` ${e.time}` : ''}
+                      <div key={i} style={{ display: 'flex', gap: 16, paddingBottom: 12, marginBottom: 12, borderBottom: '1px solid #F0F0F0' }}>
+                        <div style={{ width: 52, flexShrink: 0, textAlign: 'center', background: '#F7F7F7', borderRadius: 8, padding: '6px 4px' }}>
+                          <div style={{ fontSize: 9, fontWeight: 600, color: '#999', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{e.day === 'sab' ? 'Sáb' : 'Dom'}</div>
+                          <div style={{ fontSize: 12, fontWeight: 700, color: '#111', lineHeight: 1.2 }}>{e.time || '—'}</div>
                         </div>
                         <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: 13, fontWeight: 700 }}>{e.speaker}</div>
-                          <div style={{ fontSize: 11, color: '#555' }}>a la congregación {e.cong}</div>
-                          {e.bqNum && <div style={{ fontSize: 11, color: '#333', fontStyle: 'italic', marginTop: 2 }}>Bq. {e.bqNum} — {ALL_B[e.bqNum] || ''}</div>}
+                          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 2 }}>
+                            <span style={{ fontSize: 14, fontWeight: 600, color: '#111' }}>{e.speaker}</span>
+                            <span style={{ fontSize: 11, color: '#888' }}>→ {e.cong}</span>
+                          </div>
+                          {e.bqNum && <div style={{ fontSize: 11, color: '#666' }}>Bq. {e.bqNum} — {ALL_B[e.bqNum] || ''}</div>}
                         </div>
                       </div>
                     ))}
                   </div>
                 )}
 
-                {/* Contacto */}
-                <div style={{ marginTop: 20, padding: '12px 16px', background: '#F5F5F5', borderRadius: 6, fontSize: 11, color: '#555', lineHeight: 1.7 }}>
-                  <div style={{ fontWeight: 700, marginBottom: 4, textTransform: 'uppercase', letterSpacing: 0.5, fontSize: 10 }}>Contacto en la congregación Ypacaraí Guaraní</div>
-                  <div>Hno. Gary Martínez — WhatsApp: 0981 133425</div>
-                  <div>Hno. Agustín Egusquiza — WhatsApp: 0984 623206</div>
+                {/* FOOTER */}
+                <div style={{ height: 1, background: '#E5E5E5', marginBottom: 16 }} />
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10.5, color: '#888', lineHeight: 1.8 }}>
+                  <div>
+                    <div style={{ fontWeight: 600, color: '#555', marginBottom: 2, fontSize: 9, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Contacto</div>
+                    <div>Gary Martínez · 0981 133425</div>
+                    <div>Agustín Egusquiza · 0984 623206</div>
+                  </div>
+                  <div style={{ textAlign: 'right', fontSize: 9, color: '#CCC', alignSelf: 'flex-end' }}>arreglos-ypc.vercel.app</div>
                 </div>
               </div>
             </div>
