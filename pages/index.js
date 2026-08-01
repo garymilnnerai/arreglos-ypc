@@ -489,10 +489,10 @@ export default function App() {
               <div>
                 <div style={{ fontSize: 18, fontWeight: 600, color: D.text, letterSpacing: '-.3px', lineHeight: 1.15 }}>Arreglos de Conferencias</div>
                 <div style={{ fontSize: 12, color: D.text3, letterSpacing: '.03em', marginTop: 2 }}>Ypacaraí · {role === 'admin' ? 'Administrador' : 'Colaborador'}</div>
-            <div style={{ fontSize: 16, fontWeight: 300, color: D.accent, marginTop: 4, letterSpacing: '-0.3px', fontStyle: 'italic',
-              animation: 'greetFadeIn 1.2s cubic-bezier(0.16,1,0.3,1) both' }}>
-              {role === 'admin' ? 'Hola Gary!' : 'Hola Agustín!'}
-            </div>
+                <div style={{ fontSize: 20, fontWeight: 300, color: D.accent, marginTop: 5, letterSpacing: '-0.4px', fontStyle: 'italic',
+                  animation: 'greetFadeIn 1.4s cubic-bezier(0.16,1,0.3,1) both' }}>
+                  {role === 'admin' ? 'Hola Gary!' : 'Hola Agustín!'}
+                </div>
               </div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
