@@ -72,49 +72,78 @@ const CONDUCTOR_PERMANENTE = 'Osvaldo Díaz';
 const SUPLENTE_CONDUCTOR = 'Agustín Egusquiza';
 
 function autoAssignRoles(sundays, assignments, outgoing, existingRoles, mcKey, allRoles) {
-  const newRoles = { ...existingRoles };
   const salenNames = (outgoing[mcKey] || []).map(e => e.speaker);
   const osvaldoSale = salenNames.includes(CONDUCTOR_PERMANENTE);
 
-  const presPool = PRESIDENTES.filter(p => !salenNames.includes(p) && !(osvaldoSale && p === SUPLENTE_CONDUCTOR));
-  const lecPool = LECTORES.filter(l => !salenNames.includes(l) && !(osvaldoSale && l === SUPLENTE_CONDUCTOR));
+  // Available pools (exclude those leaving this month, exclude Agustín if Osvaldo leaves)
+  const presPool = PRESIDENTES.filter(p =>
+    !salenNames.includes(p) && !(osvaldoSale && p === SUPLENTE_CONDUCTOR)
+  );
+  const lecPool = LECTORES.filter(l =>
+    !salenNames.includes(l) && !(osvaldoSale && l === SUPLENTE_CONDUCTOR)
+  );
 
-  // Get last assignment date for each person across all roles
-  const lastAssigned = {};
+  // Last date each person had ANY role (presidente or lector) across ALL months
+  const lastDate = {};
   Object.entries(allRoles || {}).forEach(([ds, r]) => {
-    if (r.presidente) {
-      if (!lastAssigned[r.presidente] || ds > lastAssigned[r.presidente]) lastAssigned[r.presidente] = ds;
-    }
-    if (r.lector) {
-      if (!lastAssigned[r.lector] || ds > lastAssigned[r.lector]) lastAssigned[r.lector] = ds;
-    }
+    if (r.presidente && (!lastDate[r.presidente] || ds > lastDate[r.presidente])) lastDate[r.presidente] = ds;
+    if (r.lector && (!lastDate[r.lector] || ds > lastDate[r.lector])) lastDate[r.lector] = ds;
   });
 
-  // Sort pool by last assigned date ascending (least recently used first)
-  const sortByLRU = (pool) => [...pool].sort((a, b) => {
-    const da = lastAssigned[a] || '0000-00-00';
-    const db = lastAssigned[b] || '0000-00-00';
+  // Sort by least recently used (LRU) — those never used come first
+  const lru = (pool) => [...pool].sort((a, b) => {
+    const da = lastDate[a] || '0000-00-00';
+    const db = lastDate[b] || '0000-00-00';
     return da.localeCompare(db);
   });
 
-  const presUsedThisMonth = {};
-  const lecUsedThisMonth = {};
+  // Active sundays (those with a conference assigned, not asamblea)
+  const activeSundays = sundays
+    .map(s => s.toISOString().split('T')[0])
+    .filter(ds => assignments[ds] && !assignments[ds].asamblea);
 
-  sundays.forEach(s => {
-    const ds = s.toISOString().split('T')[0];
-    const a = assignments[ds];
-    if (!a || a.asamblea) return;
+  const n = activeSundays.length;
+  if (n === 0) return existingRoles;
 
-    // Sort by LRU, prioritize not used this month
-    const presSorted = sortByLRU(presPool).filter(p => !presUsedThisMonth[p]);
-    const pres = presSorted[0] || sortByLRU(presPool)[0];
-    if (pres) { presUsedThisMonth[pres] = true; lastAssigned[pres] = ds; }
+  // Assign presidents: cycle through LRU pool, no repeats in month if possible
+  const presOrdered = lru(presPool);
+  const lecOrdered = lru(lecPool);
 
-    const lecSorted = sortByLRU(lecPool).filter(l => l !== pres && !lecUsedThisMonth[l]);
-    const lec = lecSorted[0] || sortByLRU(lecPool).find(l => l !== pres);
-    if (lec) { lecUsedThisMonth[lec] = true; lastAssigned[lec] = ds; }
+  // Build assignment arrays — strict no-repeat within month
+  const presAssigned = [];
+  const usedPres = new Set();
+  for (let i = 0; i < n; i++) {
+    const avail = presOrdered.filter(p => !usedPres.has(p));
+    if (avail.length === 0) {
+      // All used — start second round from LRU again
+      usedPres.clear();
+      presAssigned.push(presOrdered.find(p => !usedPres.has(p)) || presOrdered[0]);
+    } else {
+      presAssigned.push(avail[0]);
+    }
+    usedPres.add(presAssigned[i]);
+  }
 
-    newRoles[ds] = { presidente: pres || '', lector: lec || '' };
+  // Build lector array — no repeat in month, never same as presidente that week
+  const lecAssigned = [];
+  const usedLec = new Set();
+  for (let i = 0; i < n; i++) {
+    const pres = presAssigned[i];
+    // Filter: not same as presidente this sunday, not used this month yet
+    let avail = lecOrdered.filter(l => l !== pres && !usedLec.has(l));
+    if (avail.length === 0) {
+      // Reset and pick best available (just avoid same as presidente)
+      usedLec.clear();
+      avail = lecOrdered.filter(l => l !== pres);
+    }
+    lecAssigned.push(avail[0] || lecOrdered.find(l => l !== pres) || lecOrdered[0]);
+    usedLec.add(lecAssigned[i]);
+  }
+
+  // Build new roles object
+  const newRoles = { ...existingRoles };
+  activeSundays.forEach((ds, i) => {
+    newRoles[ds] = { presidente: presAssigned[i] || '', lector: lecAssigned[i] || '' };
   });
 
   return newRoles;
