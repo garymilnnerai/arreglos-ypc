@@ -66,22 +66,54 @@ const SPEAKERS = [
   { name: 'Rafael Minesi',     bqs: [3,9,10,48,77] },
 ];
 
-const PRESIDENTES = ['Agustín Egusquiza','Bernardo Roa','Celso Roa','Claudelino Rojas','Gary Martínez','Rafael Minesi','Francisco Jara','Isidro Benítez'];
-const LECTORES = ['Agustín Egusquiza','Bernardo Roa','Celso Roa','Claudelino Rojas','Gary Martínez','Rafael Minesi','Isidro Benítez','Agustín Martínez','Jahaziel Roa'];
+const PRESIDENTES = [
+  'Agustín Egusquiza','Bernardo Roa','Celso Roa','Claudelino Rojas',
+  'Gary Martínez','Rafael Minesi','Francisco Jara','Isidro Benítez'
+];
+const LECTORES = [
+  'Agustín Egusquiza','Bernardo Roa','Celso Roa','Claudelino Rojas',
+  'Gary Martínez','Rafael Minesi','Isidro Benítez','Agustín Martínez','Jahaziel Roa'
+];
 const CONDUCTOR_PERMANENTE = 'Osvaldo Díaz';
 const SUPLENTE_CONDUCTOR = 'Agustín Egusquiza';
+// Solo pueden ser presidente (nunca lector)
+const SOLO_PRESIDENTE = ['Francisco Jara'];
+// Solo pueden ser lector (nunca presidente)
+const SOLO_LECTOR = ['Agustín Martínez','Jahaziel Roa'];
 
 function autoAssignRoles(sundays, assignments, outgoing, existingRoles, mcKey, allRoles) {
-  const salenNames = (outgoing[mcKey] || []).map(e => e.speaker);
+  const salenEntries = outgoing[mcKey] || [];
+  const salenNames = salenEntries.map(e => e.speaker);
   const osvaldoSale = salenNames.includes(CONDUCTOR_PERMANENTE);
 
-  // Available pools (exclude those leaving this month, exclude Agustín if Osvaldo leaves)
-  const presPool = PRESIDENTES.filter(p =>
-    !salenNames.includes(p) && !(osvaldoSale && p === SUPLENTE_CONDUCTOR)
+  // Get which sunday each person is leaving (by index)
+  // For now treat all who sale this month as unavailable (conservative)
+  // but allow those not actually leaving on that specific sunday
+  
+  // Base pools: full lists minus permanent rules
+  const basePres = PRESIDENTES.filter(p =>
+    !SOLO_LECTOR.includes(p) &&
+    !(osvaldoSale && p === SUPLENTE_CONDUCTOR)
   );
-  const lecPool = LECTORES.filter(l =>
-    !salenNames.includes(l) && !(osvaldoSale && l === SUPLENTE_CONDUCTOR)
+  const baseLec = LECTORES.filter(l =>
+    !SOLO_PRESIDENTE.includes(l) &&
+    !(osvaldoSale && l === SUPLENTE_CONDUCTOR)
   );
+
+  // Map each person to which sundays they are leaving (by date string)
+  // so we can exclude them only on THAT sunday, not the whole month
+  const salenPorFecha = {}; // { 'name': Set of dateStrings when they are out }
+  salenEntries.forEach(e => {
+    if (!e.speaker) return;
+    if (!salenPorFecha[e.speaker]) salenPorFecha[e.speaker] = new Set();
+    // We don't have exact date per entry yet — use all sundays as proxy
+    // For now mark them as out for all sundays (conservative, will improve)
+    sundays.forEach(s => salenPorFecha[e.speaker].add(s.toISOString().split('T')[0]));
+  });
+
+  // Full pools (no month-wide exclusion — exclusion happens per sunday)
+  const presPool = basePres;
+  const lecPool = baseLec;
 
   // Last date each person had ANY role (presidente or lector) across ALL months
   const lastDate = {};
@@ -105,45 +137,38 @@ function autoAssignRoles(sundays, assignments, outgoing, existingRoles, mcKey, a
   const n = activeSundays.length;
   if (n === 0) return existingRoles;
 
-  // Assign presidents: cycle through LRU pool, no repeats in month if possible
   const presOrdered = lru(presPool);
   const lecOrdered = lru(lecPool);
 
-  // Build assignment arrays — strict no-repeat within month
-  const presAssigned = [];
   const usedPres = new Set();
-  for (let i = 0; i < n; i++) {
-    const avail = presOrdered.filter(p => !usedPres.has(p));
-    if (avail.length === 0) {
-      // All used — start second round from LRU again
-      usedPres.clear();
-      presAssigned.push(presOrdered.find(p => !usedPres.has(p)) || presOrdered[0]);
-    } else {
-      presAssigned.push(avail[0]);
-    }
-    usedPres.add(presAssigned[i]);
-  }
-
-  // Build lector array — no repeat in month, never same as presidente that week
-  const lecAssigned = [];
   const usedLec = new Set();
-  for (let i = 0; i < n; i++) {
-    const pres = presAssigned[i];
-    // Filter: not same as presidente this sunday, not used this month yet
-    let avail = lecOrdered.filter(l => l !== pres && !usedLec.has(l));
-    if (avail.length === 0) {
-      // Reset and pick best available (just avoid same as presidente)
-      usedLec.clear();
-      avail = lecOrdered.filter(l => l !== pres);
-    }
-    lecAssigned.push(avail[0] || lecOrdered.find(l => l !== pres) || lecOrdered[0]);
-    usedLec.add(lecAssigned[i]);
-  }
+  const presAssigned = [];
+  const lecAssigned = [];
 
-  // Build new roles object
+  activeSundays.forEach(ds => {
+    // Exclude anyone leaving THIS specific sunday
+    const outThisSunday = new Set(
+      Object.entries(salenPorFecha)
+        .filter(([, dates]) => dates.has(ds))
+        .map(([name]) => name)
+    );
+
+    // Pick president: LRU, not used this month, not out this sunday
+    const presAvail = presOrdered.filter(p => !usedPres.has(p) && !outThisSunday.has(p));
+    const pres = presAvail[0] || presOrdered.filter(p => !outThisSunday.has(p))[0] || presOrdered[0];
+    presAssigned.push(pres || '');
+    if (pres) usedPres.add(pres);
+
+    // Pick lector: LRU, not used this month, not same as president, not out this sunday
+    const lecAvail = lecOrdered.filter(l => !usedLec.has(l) && l !== pres && !outThisSunday.has(l));
+    const lec = lecAvail[0] || lecOrdered.filter(l => l !== pres && !outThisSunday.has(l))[0] || lecOrdered.find(l => l !== pres) || '';
+    lecAssigned.push(lec || '');
+    if (lec) usedLec.add(lec);
+  });
+
   const newRoles = { ...existingRoles };
   activeSundays.forEach((ds, i) => {
-    newRoles[ds] = { presidente: presAssigned[i] || '', lector: lecAssigned[i] || '' };
+    newRoles[ds] = { presidente: presAssigned[i], lector: lecAssigned[i] };
   });
 
   return newRoles;
@@ -477,7 +502,8 @@ export default function App() {
               <div>
                 <div style={{ fontSize: 18, fontWeight: 600, color: D.text, letterSpacing: '-.3px', lineHeight: 1.15 }}>Arreglos de Conferencias</div>
                 <div style={{ fontSize: 12, color: D.text3, letterSpacing: '.03em', marginTop: 2 }}>Ypacaraí · {role === 'admin' ? 'Administrador' : 'Colaborador'}</div>
-            <div style={{ fontSize: 13, fontWeight: 300, color: D.accent, marginTop: 3, letterSpacing: '-0.2px', fontStyle: 'italic' }}>
+            <div style={{ fontSize: 16, fontWeight: 300, color: D.accent, marginTop: 4, letterSpacing: '-0.3px', fontStyle: 'italic',
+              animation: 'greetFadeIn 1.2s cubic-bezier(0.16,1,0.3,1) both' }}>
               {role === 'admin' ? 'Hola Gary!' : 'Hola Agustín!'}
             </div>
               </div>
@@ -803,15 +829,20 @@ export default function App() {
                       // For adjustment: show all valid options (not the ones who are actually out THIS sunday)
                       // salenHoy = people leaving on this specific sunday
                       const mcKeyR2 = `${curYear}-${detailMonth}`;
-                      const sundayIndex = getSundaysOfMonth(curYear, detailMonth).findIndex(sx => dateStr(sx) === ds);
-                      const salenEstedomingo = (outgoing[mcKeyR2] || []).filter(e => {
-                        const domingosDelMes = getSundaysOfMonth(curYear, detailMonth);
-                        if (e.day === 'sab') return false;
-                        // approximate: if only one entry per person, they go on one sunday
-                        return true; // simplify: exclude all who sale this month
-                      }).map(e => e.speaker);
-                      const presidentesDisp = PRESIDENTES.filter(p => !salenEstedomingo.includes(p) && !(osvaldoSale && p === SUPLENTE_CONDUCTOR));
-                      const lectoresDisp = LECTORES.filter(l => !salenEstedomingo.includes(l) && !(osvaldoSale && l === SUPLENTE_CONDUCTOR) && l !== r.presidente);
+                      // Exclude from dropdowns only those actually leaving on any sunday this month
+                      // (conservative: if they have a salida entry, exclude from this sunday too)
+                      const salenEstedomingo = (outgoing[mcKeyR2] || []).map(e => e.speaker);
+                      const presidentesDisp = PRESIDENTES.filter(p =>
+                        !SOLO_LECTOR.includes(p) &&
+                        !salenEstedomingo.includes(p) &&
+                        !(osvaldoSale && p === SUPLENTE_CONDUCTOR)
+                      );
+                      const lectoresDisp = LECTORES.filter(l =>
+                        !SOLO_PRESIDENTE.includes(l) &&
+                        !salenEstedomingo.includes(l) &&
+                        !(osvaldoSale && l === SUPLENTE_CONDUCTOR) &&
+                        l !== r.presidente
+                      );
                       const updateRole = (field, val) => { setRoles(prev => ({ ...prev, [ds]: { ...prev[ds], [field]: val } })); setPending(true); };
                       return (
                         <div style={{ borderTop: `1px solid ${D.border}`, paddingTop: 8 }} onClick={e => e.stopPropagation()}>
@@ -1158,17 +1189,18 @@ export default function App() {
                     <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#999', marginBottom: 10 }}>Conferenciantes que salen de Ypacaraí</div>
                     {salidas.map((e, i) => (
                       <div key={i} style={{ display: 'flex', gap: 16, paddingBottom: 8, marginBottom: 8, borderBottom: '1px solid #F0F0F0' }}>
-                        <div style={{ width: 52, flexShrink: 0, textAlign: 'center', background: '#F7F7F7', borderRadius: 8, padding: '5px 4px' }}>
-                          <div style={{ fontSize: 9, fontWeight: 600, color: '#999', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{e.day === 'sab' ? 'Sáb' : 'Dom'}</div>
-                          <div style={{ fontSize: 11, fontWeight: 700, color: '#111', lineHeight: 1.2 }}>{e.time || '—'}</div>
-                          {(() => {
+                        <div style={{ width: 56, flexShrink: 0, textAlign: 'center', background: '#F7F7F7', borderRadius: 8, padding: '5px 4px' }}>
+                          <div style={{ fontSize: 9, fontWeight: 600, color: '#888', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{e.day === 'sab' ? 'Sáb' : 'Dom'}</div>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: '#111', lineHeight: 1.1, marginTop: 1 }}>{(() => {
                             const domingosM = getSundaysOfMonth(curYear, detailMonth);
-                            const salidaDate = domingosM.find(s2 => {
+                            const idx = salenEntries ? salenEntries.indexOf(e) : -1;
+                            const match = domingosM.find((s2, si) => {
                               const a2 = assignments[dateStr(s2)];
                               return a2 && !a2.asamblea;
                             });
-                            return <div style={{ fontSize: 9, color: '#BBB', marginTop: 1 }}>{salidaDate ? salidaDate.getDate() + ' ' + MONTHS[detailMonth].slice(0,3) : ''}</div>;
-                          })()}
+                            return match ? match.getDate() : '—';
+                          })()}</div>
+                          {e.time && <div style={{ fontSize: 9, color: '#AAA', marginTop: 2, fontWeight: 400 }}>{e.time}</div>}
                         </div>
                         <div style={{ flex: 1 }}>
                           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 2 }}>

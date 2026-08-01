@@ -20,9 +20,14 @@ select option { background: #1C1C1F; color: #E8E8EC; }
   0% { transform: translateY(-8px); opacity: 0; }
   100% { transform: translateY(0); opacity: 1; }
 }
+@keyframes greetFadeIn {
+  0% { opacity: 0; transform: translateY(6px) scale(0.97); filter: blur(4px); }
+  60% { opacity: 1; filter: blur(0); }
+  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
 @keyframes pulse {
   0% { box-shadow: 0 0 0 0 rgba(76,175,125,0.3); }
   70% { box-shadow: 0 0 0 8px rgba(76,175,125,0); }
   100% { box-shadow: 0 0 0 0 rgba(76,175,125,0); }
 }
-* { transition-property: background, border-color, color, transform, opacity; transition-timing-function: cubic-bezier(0.4,0,0.2,1); }
