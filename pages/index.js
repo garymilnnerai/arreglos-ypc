@@ -447,7 +447,10 @@ export default function App() {
                 style={{ flexShrink: 0, opacity: 0.9, filter: isDark ? 'invert(1)' : 'none' }} />
               <div>
                 <div style={{ fontSize: 18, fontWeight: 600, color: D.text, letterSpacing: '-.3px', lineHeight: 1.15 }}>Arreglos de Conferencias</div>
-                <div style={{ fontSize: 12, color: D.text3, letterSpacing: '.03em', marginTop: 3 }}>Ypacaraí · {role === 'admin' ? 'Administrador' : 'Colaborador'}</div>
+                <div style={{ fontSize: 12, color: D.text3, letterSpacing: '.03em', marginTop: 2 }}>Ypacaraí · {role === 'admin' ? 'Administrador' : 'Colaborador'}</div>
+            <div style={{ fontSize: 13, fontWeight: 300, color: D.accent, marginTop: 3, letterSpacing: '-0.2px', fontStyle: 'italic' }}>
+              {role === 'admin' ? 'Hola Gary!' : 'Hola Agustín!'}
+            </div>
               </div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -1064,10 +1067,10 @@ export default function App() {
               </div>
 
               {/* Documento */}
-              <div id="programa-doc" style={{ background: '#FFFFFF', maxWidth: 600, margin: '16px auto', width: '100%', padding: '36px 40px', fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif', color: '#111', boxSizing: 'border-box', lineHeight: 1.5 }}>
+              <div id="programa-doc" style={{ background: '#FFFFFF', maxWidth: 600, margin: '16px auto', width: '100%', padding: '24px 32px', fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif', color: '#111', boxSizing: 'border-box', lineHeight: 1.5 }}>
 
                 {/* HEADER */}
-                <div style={{ marginBottom: 32 }}>
+                <div style={{ marginBottom: 20 }}>
                   <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 20 }}>
                     <div>
                       <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#888', marginBottom: 6 }}>Congregación Ypacaraí Guaraní</div>
@@ -1082,8 +1085,8 @@ export default function App() {
                 </div>
 
                 {/* SECCIÓN 1 */}
-                <div style={{ marginBottom: 28 }}>
-                  <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#999', marginBottom: 14 }}>Conferenciantes que visitan Ypacaraí</div>
+                <div style={{ marginBottom: 18 }}>
+                  <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#999', marginBottom: 10 }}>Conferenciantes que visitan Ypacaraí</div>
                   {sundays.map((s, si) => {
                     const ds = dateStr(s);
                     const a = assignments[ds];
@@ -1091,7 +1094,7 @@ export default function App() {
                     const lbl = s.toLocaleDateString('es-PY', { day: 'numeric', month: 'long' });
                     const dow = s.toLocaleDateString('es-PY', { weekday: 'short' });
                     return (
-                      <div key={ds} style={{ display: 'flex', gap: 16, paddingBottom: 12, marginBottom: 12, borderBottom: '1px solid #F0F0F0' }}>
+                      <div key={ds} style={{ display: 'flex', gap: 16, paddingBottom: 8, marginBottom: 8, borderBottom: '1px solid #F0F0F0' }}>
                         <div style={{ width: 52, flexShrink: 0, textAlign: 'center', background: '#F7F7F7', borderRadius: 8, padding: '6px 4px' }}>
                           <div style={{ fontSize: 9, fontWeight: 600, color: '#999', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{dow}</div>
                           <div style={{ fontSize: 16, fontWeight: 700, color: '#111', lineHeight: 1 }}>{s.getDate()}</div>
@@ -1107,7 +1110,7 @@ export default function App() {
                                 {a.tel && <span style={{ fontSize: 11, color: '#AAA' }}>{a.tel}</span>}
                               </div>
                               <div style={{ fontSize: 11, color: '#666', marginBottom: 5 }}>Bq. {a.bqNum} — {ALL_B[a.bqNum] || ''}</div>
-                              <div style={{ display: 'flex', gap: 14, fontSize: 10.5, color: '#888' }}>
+                              <div style={{ display: 'flex', gap: 12, fontSize: 10, color: '#888', marginTop: 2 }}>
                                 {r.presidente && <span>Pres. <span style={{ fontWeight: 600, color: '#555' }}>{r.presidente}</span></span>}
                                 {r.lector && <span>Lector <span style={{ fontWeight: 600, color: '#555' }}>{r.lector}</span></span>}
                               </div>
@@ -1121,14 +1124,22 @@ export default function App() {
 
                 {/* SECCIÓN 2 */}
                 {salidas.length > 0 && (
-                  <div style={{ marginBottom: 28 }}>
+                  <div style={{ marginBottom: 18 }}>
                     <div style={{ height: 1, background: '#E5E5E5', marginBottom: 14 }} />
-                    <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#999', marginBottom: 14 }}>Conferenciantes que salen de Ypacaraí</div>
+                    <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#999', marginBottom: 10 }}>Conferenciantes que salen de Ypacaraí</div>
                     {salidas.map((e, i) => (
-                      <div key={i} style={{ display: 'flex', gap: 16, paddingBottom: 12, marginBottom: 12, borderBottom: '1px solid #F0F0F0' }}>
-                        <div style={{ width: 52, flexShrink: 0, textAlign: 'center', background: '#F7F7F7', borderRadius: 8, padding: '6px 4px' }}>
+                      <div key={i} style={{ display: 'flex', gap: 16, paddingBottom: 8, marginBottom: 8, borderBottom: '1px solid #F0F0F0' }}>
+                        <div style={{ width: 52, flexShrink: 0, textAlign: 'center', background: '#F7F7F7', borderRadius: 8, padding: '5px 4px' }}>
                           <div style={{ fontSize: 9, fontWeight: 600, color: '#999', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{e.day === 'sab' ? 'Sáb' : 'Dom'}</div>
-                          <div style={{ fontSize: 12, fontWeight: 700, color: '#111', lineHeight: 1.2 }}>{e.time || '—'}</div>
+                          <div style={{ fontSize: 11, fontWeight: 700, color: '#111', lineHeight: 1.2 }}>{e.time || '—'}</div>
+                          {(() => {
+                            const domingosM = getSundaysOfMonth(curYear, detailMonth);
+                            const salidaDate = domingosM.find(s2 => {
+                              const a2 = assignments[dateStr(s2)];
+                              return a2 && !a2.asamblea;
+                            });
+                            return <div style={{ fontSize: 9, color: '#BBB', marginTop: 1 }}>{salidaDate ? salidaDate.getDate() + ' ' + MONTHS[detailMonth].slice(0,3) : ''}</div>;
+                          })()}
                         </div>
                         <div style={{ flex: 1 }}>
                           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 2 }}>
