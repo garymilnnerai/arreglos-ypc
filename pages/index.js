@@ -1186,11 +1186,9 @@ export default function App() {
                           <div style={{ fontSize: 9, fontWeight: 600, color: '#888', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{e.day === 'sab' ? 'Sáb' : 'Dom'}</div>
                           <div style={{ fontSize: 13, fontWeight: 700, color: '#111', lineHeight: 1.1, marginTop: 1 }}>{(() => {
                             const domingosM = getSundaysOfMonth(curYear, detailMonth);
-                            const idx = salenEntries ? salenEntries.indexOf(e) : -1;
-                            const match = domingosM.find((s2, si) => {
-                              const a2 = assignments[dateStr(s2)];
-                              return a2 && !a2.asamblea;
-                            });
+                            const idx = salidas.indexOf(e);
+                            const activeDomM = domingosM.filter(s2 => assignments[dateStr(s2)] && !assignments[dateStr(s2)].asamblea);
+                            const match = activeDomM[idx] || activeDomM[0];
                             return match ? match.getDate() : '—';
                           })()}</div>
                           {e.time && <div style={{ fontSize: 9, color: '#AAA', marginTop: 2, fontWeight: 400 }}>{e.time}</div>}
