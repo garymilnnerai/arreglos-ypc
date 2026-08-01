@@ -24,25 +24,23 @@ export default function App({ Component, pageProps }) {
         <meta name="twitter:image" content="https://arreglos-ypc.vercel.app/og-image.svg" />
         <style>{`
           @media print {
-            body > * { display: none !important; }
-            #programa-doc { display: block !important; }
+            body { margin: 0; }
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
             #programa-doc {
-              position: fixed;
-              top: 0; left: 0;
-              width: 100%;
-              margin: 0;
-              padding: 20mm 20mm;
+              width: 210mm;
+              min-height: 297mm;
+              margin: 0 auto;
+              padding: 18mm 18mm;
               font-family: Georgia, serif;
-              color: #000;
-              background: #fff;
+              color: #000 !important;
+              background: #fff !important;
+              font-size: 11pt;
             }
             @page {
-              size: A4;
+              size: A4 portrait;
               margin: 0;
             }
-          }
-          @media screen {
-            #programa-doc { display: block; }
           }
         `}</style>
       </Head>

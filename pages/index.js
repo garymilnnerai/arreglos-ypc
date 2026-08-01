@@ -768,8 +768,18 @@ export default function App() {
                       const mcKeyR = `${curYear}-${detailMonth}`;
                       const allSalenNames = (outgoing[mcKeyR] || []).map(e => e.speaker);
                       const osvaldoSale = allSalenNames.includes(CONDUCTOR_PERMANENTE);
-                      const presidentesDisp = PRESIDENTES.filter(p => !allSalenNames.includes(p) && !(osvaldoSale && p === SUPLENTE_CONDUCTOR));
-                      const lectoresDisp = LECTORES.filter(l => !allSalenNames.includes(l) && !(osvaldoSale && l === SUPLENTE_CONDUCTOR) && l !== r.presidente);
+                      // For adjustment: show all valid options (not the ones who are actually out THIS sunday)
+                      // salenHoy = people leaving on this specific sunday
+                      const mcKeyR2 = `${curYear}-${detailMonth}`;
+                      const sundayIndex = getSundaysOfMonth(curYear, detailMonth).findIndex(sx => dateStr(sx) === ds);
+                      const salenEstedomingo = (outgoing[mcKeyR2] || []).filter(e => {
+                        const domingosDelMes = getSundaysOfMonth(curYear, detailMonth);
+                        if (e.day === 'sab') return false;
+                        // approximate: if only one entry per person, they go on one sunday
+                        return true; // simplify: exclude all who sale this month
+                      }).map(e => e.speaker);
+                      const presidentesDisp = PRESIDENTES.filter(p => !salenEstedomingo.includes(p) && !(osvaldoSale && p === SUPLENTE_CONDUCTOR));
+                      const lectoresDisp = LECTORES.filter(l => !salenEstedomingo.includes(l) && !(osvaldoSale && l === SUPLENTE_CONDUCTOR) && l !== r.presidente);
                       const updateRole = (field, val) => { setRoles(prev => ({ ...prev, [ds]: { ...prev[ds], [field]: val } })); setPending(true); };
                       return (
                         <div style={{ borderTop: `1px solid ${D.border}`, paddingTop: 8 }} onClick={e => e.stopPropagation()}>
@@ -1012,7 +1022,7 @@ export default function App() {
           return (
             <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', zIndex: 200, display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
               {/* Toolbar */}
-              <div style={{ position: 'sticky', top: 0, background: isDark ? '#1C1C1F' : '#FAF7F2', padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid ${D.border}`, zIndex: 10, flexShrink: 0 }}>
+              <div className="no-print" style={{ position: 'sticky', top: 0, background: isDark ? '#1C1C1F' : '#FAF7F2', padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid ${D.border}`, zIndex: 10, flexShrink: 0 }}>
                 <button onClick={() => setShowPrograma(false)}
                   style={{ background: 'none', border: 'none', cursor: 'pointer', color: D.text3, fontSize: 13, fontFamily: 'Geist, system-ui, sans-serif', display: 'flex', alignItems: 'center', gap: 6 }}>
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.3"><path d="M9 2L4 7l5 5"/></svg>
@@ -1031,7 +1041,19 @@ export default function App() {
                     </svg>
                     Compartir
                   </button>
-                  <button onClick={() => window.print()}
+                  <button onClick={() => {
+                    const doc = document.getElementById('programa-doc');
+                    if (!doc) return;
+                    const w = window.open('', '_blank');
+                    w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Programa ${monthName} ${curYear}</title><style>
+                      *{box-sizing:border-box;margin:0;padding:0;}
+                      body{font-family:Georgia,serif;color:#1a1a1a;background:#fff;padding:18mm;}
+                      @page{size:A4 portrait;margin:18mm;}
+                      @media print{body{padding:0;}}
+                    </style></head><body>${doc.innerHTML}</body></html>`);
+                    w.document.close();
+                    setTimeout(() => { w.print(); }, 400);
+                  }}
                     style={{ background: 'none', border: `1px solid ${D.accent}44`, borderRadius: 8, cursor: 'pointer', color: D.accent, display: 'flex', alignItems: 'center', gap: 4, fontSize: 13, fontFamily: 'Geist, system-ui, sans-serif', padding: '4px 10px' }}>
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.3">
                       <rect x="2" y="5" width="10" height="7" rx="1"/><path d="M4 5V2h6v3"/><path d="M4 9h6"/>
@@ -1042,7 +1064,7 @@ export default function App() {
               </div>
 
               {/* Documento */}
-              <div id="programa-doc" style={{ background: '#FFFFFF', maxWidth: 600, margin: '16px auto', width: '100%', padding: '32px 28px', fontFamily: 'Georgia, serif', color: '#1A1A1A' }}>
+              <div id="programa-doc" style={{ background: '#FFFFFF', maxWidth: 600, margin: '16px auto', width: '100%', padding: '32px 28px', fontFamily: 'Georgia, serif', color: '#1A1A1A', boxSizing: 'border-box' }}>
                 {/* Header */}
                 <div style={{ textAlign: 'center', marginBottom: 24, borderBottom: '2px solid #1A1A1A', paddingBottom: 16 }}>
                   <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>Congregación Ypacaraí Guaraní</div>
