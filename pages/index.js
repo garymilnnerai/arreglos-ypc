@@ -812,14 +812,14 @@ export default function App() {
                   </button>
                 </div>
               </div>
-              {getSundaysOfMonth(curYear, detailMonth).map(s => {
+              <div style={{ background: D.bg2, border: `1px solid ${D.border}`, borderRadius: 14, overflow: 'hidden' }}>
+              {getSundaysOfMonth(curYear, detailMonth).map((s, sIdx) => {
                 const ds = dateStr(s); const a = assignments[ds];
                 const lbl = s.toLocaleDateString('es-PY', { day: 'numeric', month: 'long' });
-                const bgC = a ? a.asamblea ? D.accentDim : D.greenDim : 'transparent';
-                const bdC = a ? a.asamblea ? `rgba(123,140,222,0.25)` : `rgba(76,175,125,0.25)` : D.border;
+                const totalSundays = getSundaysOfMonth(curYear, detailMonth).length;
                 return (
                   <div key={ds}
-                    style={{ background: sundayFlash === ds ? D.greenDim : bgC, border: `1px solid ${sundayFlash === ds ? 'rgba(76,175,125,0.4)' : bdC}`, borderRadius: 12, padding: '14px 16px', marginBottom: 8, transition: 'background 0.4s ease', transform: sundayFlash === ds ? 'scale(1.01)' : 'scale(1)' }}>
+                    style={{ background: sundayFlash === ds ? D.greenDim : 'transparent', padding: '14px 16px', borderBottom: sIdx < totalSundays - 1 ? `1px solid ${D.border}` : 'none', transition: 'background 0.4s ease' }}>
                     {/* Conferencia */}
                     <div onClick={() => { setModalSunday({ date: ds, assignment: a }); setSunBQNum(a?.bqNum || null); setForm({ asamblea: a?.asamblea || false, name: a?.name || '', cong: a?.cong || '', tel: a?.tel || '' }); }}
                       style={{ cursor: 'pointer', marginBottom: a && !a.asamblea ? 10 : 0 }}>
