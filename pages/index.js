@@ -812,7 +812,7 @@ export default function App() {
                   </button>
                 </div>
               </div>
-              <div style={{ background: D.bg2, border: `1px solid ${D.border}`, borderRadius: 14, overflow: 'hidden' }}>
+              <div style={{ background: isDark ? 'rgba(76,175,125,0.07)' : 'rgba(42,110,72,0.06)', border: `1px solid ${isDark ? 'rgba(76,175,125,0.18)' : 'rgba(42,110,72,0.15)'}`, borderRadius: 14, overflow: 'hidden' }}>
               {getSundaysOfMonth(curYear, detailMonth).map((s, sIdx) => {
                 const ds = dateStr(s); const a = assignments[ds];
                 const lbl = s.toLocaleDateString('es-PY', { day: 'numeric', month: 'long' });
