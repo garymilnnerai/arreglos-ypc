@@ -898,15 +898,14 @@ export default function App() {
               <div style={{ height: '.5px', background: D.border, margin: '16px 0' }} />
 
               {/* BLOQUE 2: CONFERENCIANTES QUE SALEN */}
-              <div style={{ fontSize: 11, fontWeight: 600, color: D.text3, letterSpacing: '.1em', textTransform: 'uppercase', marginBottom: 10 }}>Conferenciantes que salen de la congregación Ypacaraí</div>
 
               {/* CONFERENCIANTES QUE SALEN */}
               {(() => {
                 const mcKey = `${curYear}-${detailMonth}`;
                 const entries = outgoing[mcKey] || [];
-                const isOpen = outgoingOpen[mcKey] || false;
-
-                const toggleOpen = () => setOutgoingOpen(o => ({ ...o, [mcKey]: !o[mcKey] }));
+                const editLockKey = `${mcKey}-editlock`;
+                const isEditMode = outgoingOpen[editLockKey] || false;
+                const toggleEditMode = () => setOutgoingOpen(o => ({ ...o, [editLockKey]: !o[editLockKey] }));
 
                 const addEntry = () => {
                   const newEntries = [...entries, { speaker: '', bqNum: '', cong: '', day: 'dom', time: '' }];
@@ -938,34 +937,54 @@ export default function App() {
 
                 return (
                   <div style={{ marginBottom: 6 }}>
-                    {/* Header — always visible */}
-                    <div onClick={toggleOpen}
-                      style={{ background: VDim, border: `1px solid ${VBorder}`, borderRadius: isOpen ? '14px 14px 0 0' : 14, padding: '13px 16px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke={VC} strokeWidth="1.4" strokeLinecap="round">
+                    {/* Header con candado */}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke={VC} strokeWidth="1.4" strokeLinecap="round">
                           <circle cx="7" cy="5" r="3"/>
                           <path d="M2 14c0-3 10-3 10 0"/>
                           <path d="M13 8l3-3M13 5l3 3"/>
                         </svg>
-                        <span style={{ fontSize: 13, fontWeight: 500, color: VC, letterSpacing: '.02em' }}>Conferenciantes que salen</span>
+                        <span style={{ fontSize: 11, fontWeight: 600, color: D.text3, letterSpacing: '.1em', textTransform: 'uppercase' }}>Conferenciantes que salen</span>
                         {entries.length > 0 && <span style={{ fontSize: 11, color: VC, background: VDim, border: `1px solid ${VBorder}`, borderRadius: 20, padding: '1px 8px' }}>{entries.length}</span>}
                       </div>
-                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke={VC} strokeWidth="1.3">
-                        <path d={isOpen ? 'M2 9l5-5 5 5' : 'M2 5l5 5 5-5'}/>
-                      </svg>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        {isEditMode && (
+                          <button onClick={() => {
+                            setOutgoing(o => ({ ...o, [mcKey]: [...(o[mcKey] || []), { speaker: '', bqNum: '', cong: '', day: 'dom', time: '' }] }));
+                            setPending(true);
+                          }} style={{ fontSize: 11, color: VC, background: VDim, border: `1px solid ${VBorder}`, borderRadius: 20, padding: '4px 10px', cursor: 'pointer', fontFamily: 'Geist, system-ui, sans-serif' }}>
+                            + Agregar
+                          </button>
+                        )}
+                        {/* Candado */}
+                        <button onClick={toggleEditMode} title={isEditMode ? 'Cerrar edición' : 'Editar salidas'}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: isEditMode ? VC : D.text3, padding: 4, display: 'flex', alignItems: 'center' }}>
+                          {isEditMode ? (
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
+                              <rect x="3" y="7" width="10" height="8" rx="2"/>
+                              <path d="M5 7V4a3 3 0 015.83-1"/>
+                            </svg>
+                          ) : (
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
+                              <rect x="3" y="7" width="10" height="8" rx="2"/>
+                              <path d="M5 7V5a3 3 0 016 0v2"/>
+                            </svg>
+                          )}
+                        </button>
+                      </div>
                     </div>
 
-                    {/* Expanded content */}
-                    {isOpen && (
-                      <div style={{ background: VDim, border: `1px solid ${VBorder}`, borderTop: 'none', borderRadius: '0 0 14px 14px', padding: '12px 16px 14px' }}>
+                    {/* Contenido siempre visible */}
+                    <div style={{ background: VDim, border: `1px solid ${VBorder}`, borderRadius: 14, padding: '12px 16px 14px' }}>
                         {entries.length === 0 && (
-                          <div style={{ fontSize: 12, color: D.text3, fontStyle: 'italic', marginBottom: 10 }}>Sin salidas programadas este mes</div>
+                          <div style={{ fontSize: 12, color: D.text3, fontStyle: 'italic' }}>Sin salidas programadas este mes</div>
                         )}
                         {entries.map((e, idx) => {
                           const bqs = speakerBqs(e.speaker);
                           const editKey = `${mcKey}-${idx}`;
-                          const isEditing = outgoingOpen[editKey] || false;
-                          const toggleEdit = () => setOutgoingOpen(o => ({ ...o, [editKey]: !o[editKey] }));
+                          const isEditing = isEditMode && (outgoingOpen[editKey] || false);
+                          const toggleEdit = () => isEditMode && setOutgoingOpen(o => ({ ...o, [editKey]: !o[editKey] }));
                           const isComplete = e.speaker && e.bqNum && e.cong && e.time;
                           return (
                             <div key={idx} style={{ marginBottom: 8, paddingBottom: 8, borderBottom: idx < entries.length - 1 ? `1px solid ${VBorder}` : 'none' }}>
@@ -1030,13 +1049,7 @@ export default function App() {
                             </div>
                           );
                         })}
-                        <button onClick={addEntry}
-                          style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4, background: 'none', border: 'none', cursor: 'pointer', color: VC, fontSize: 13, fontFamily: 'Geist, system-ui, sans-serif', padding: 0 }}>
-                          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.3"><circle cx="7" cy="7" r="6"/><path d="M7 4v6M4 7h6"/></svg>
-                          Agregar salida
-                        </button>
-                      </div>
-                    )}
+                    </div>
                   </div>
                 );
               })()}
