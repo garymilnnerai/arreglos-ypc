@@ -1134,15 +1134,13 @@ export default function App() {
                   <button onClick={() => {
                     const doc = document.getElementById('programa-doc');
                     if (!doc) return;
-                    const w = window.open('', '_blank');
-                    w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Programa ${monthName} ${curYear}</title><style>
-                      *{box-sizing:border-box;margin:0;padding:0;}
-                      body{font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;color:#111;background:#fff;padding:14mm 16mm;}
-                      @page{size:A4 portrait;margin:0;}
-                      @media print{body{padding:12mm 14mm;}}
-                    </style></head><body>${doc.innerHTML}</body></html>`);
-                    w.document.close();
-                    setTimeout(() => { w.print(); }, 400);
+                    const html = '<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Programa ' + monthName + ' ' + curYear + '<\/title><style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:-apple-system,BlinkMacSystemFont,Helvetica Neue,sans-serif;color:#111;background:#fff;padding:14mm 16mm;}@page{size:A4 portrait;margin:0;}@media print{body{padding:12mm 14mm;}}<\/style><\/head><body>' + doc.innerHTML + '<script>window.onload=function(){window.print();}<\/scr' + 'ipt><\/body><\/html>';
+                    const blob = new Blob([html], { type: 'text/html' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url; a.target = '_blank'; a.rel = 'noopener';
+                    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                    setTimeout(() => URL.revokeObjectURL(url), 5000);
                   }}
                     style={{ background: 'none', border: `1px solid ${D.accent}44`, borderRadius: 8, cursor: 'pointer', color: D.accent, display: 'flex', alignItems: 'center', gap: 4, fontSize: 13, fontFamily: 'Geist, system-ui, sans-serif', padding: '4px 10px' }}>
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.3">
