@@ -1114,9 +1114,9 @@ export default function App() {
               {/* Toolbar */}
               <div className="no-print" style={{ position: 'sticky', top: 0, background: isDark ? '#1C1C1F' : '#FAF7F2', padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid ${D.border}`, zIndex: 10, flexShrink: 0 }}>
                 <button onClick={() => setShowPrograma(false)}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: D.text3, fontSize: 13, fontFamily: 'Geist, system-ui, sans-serif', display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.3"><path d="M9 2L4 7l5 5"/></svg>
-                  Cerrar
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: D.accent, fontSize: 13, fontFamily: 'Geist, system-ui, sans-serif', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 500 }}>
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M9 2L4 7l5 5"/></svg>
+                  Volver
                 </button>
                 <div style={{ fontSize: 13, fontWeight: 500, color: D.text }}>{monthName} {curYear}</div>
                 <div style={{ display: 'flex', gap: 8 }}>
@@ -1250,6 +1250,15 @@ export default function App() {
                   </div>
                   <div style={{ fontSize: 9, color: '#CCC' }}>arreglos-ypc.vercel.app</div>
                 </div>
+              </div>
+
+              {/* Botón flotante volver — visible en móvil */}
+              <div className="no-print" style={{ position: 'sticky', bottom: 0, padding: '12px 16px', background: isDark ? 'rgba(28,28,31,0.95)' : 'rgba(250,247,242,0.95)', borderTop: `1px solid ${D.border}`, display: 'flex', gap: 10, backdropFilter: 'blur(8px)' }}>
+                <button onClick={() => setShowPrograma(false)}
+                  style={{ flex: 1, padding: '12px 0', borderRadius: 100, border: 'none', background: D.accent, color: '#fff', fontSize: 14, fontWeight: 500, cursor: 'pointer', fontFamily: 'Geist, system-ui, sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M10 3L5 8l5 5"/></svg>
+                  Volver a la app
+                </button>
               </div>
             </div>
           );
