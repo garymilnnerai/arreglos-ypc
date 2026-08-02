@@ -892,7 +892,7 @@ export default function App() {
                   </div>
                 );
               })}
-
+              </div>
 
               {/* DIVISOR */}
               <div style={{ height: '.5px', background: D.border, margin: '16px 0' }} />
