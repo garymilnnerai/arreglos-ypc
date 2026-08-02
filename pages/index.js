@@ -776,18 +776,37 @@ export default function App() {
               {/* BLOQUE 1: CONFERENCIANTES QUE VIENEN */}
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
                 <div style={{ fontSize: 11, fontWeight: 600, color: D.text3, letterSpacing: '.1em', textTransform: 'uppercase' }}>Conferenciantes que vienen a Ypacaraí</div>
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <button onClick={() => {
-                    const mcKeyA = `${curYear}-${detailMonth}`;
-                    const sundays = getSundaysOfMonth(curYear, detailMonth);
-                    const newRoles = autoAssignRoles(sundays, assignments, outgoing, {}, mcKeyA, roles);
-                    setRoles(newRoles); setPending(true);
-                  }} style={{ fontSize: 11, color: D.accent, background: D.accentDim, border: `1px solid ${D.accent}44`, borderRadius: 20, padding: '4px 10px', cursor: 'pointer', fontFamily: 'Geist, system-ui, sans-serif' }}>
-                    ✦ Auto asignar
-                  </button>
-                  <button onClick={() => setAdjustRoles(a => !a)}
-                    style={{ fontSize: 11, color: adjustRoles ? D.accent : D.text3, background: 'transparent', border: `1px solid ${adjustRoles ? D.accent : D.border2}`, borderRadius: 20, padding: '4px 10px', cursor: 'pointer', fontFamily: 'Geist, system-ui, sans-serif' }}>
-                    {adjustRoles ? '✓ Listo' : 'Ajustar'}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  {adjustRoles && (
+                    <>
+                      <button onClick={() => {
+                        const mcKeyA = `${curYear}-${detailMonth}`;
+                        const sundays = getSundaysOfMonth(curYear, detailMonth);
+                        const newRoles = autoAssignRoles(sundays, assignments, outgoing, {}, mcKeyA, roles);
+                        setRoles(newRoles); setPending(true);
+                      }} style={{ fontSize: 11, color: D.accent, background: D.accentDim, border: `1px solid ${D.accent}44`, borderRadius: 20, padding: '4px 10px', cursor: 'pointer', fontFamily: 'Geist, system-ui, sans-serif' }}>
+                        ✦ Auto
+                      </button>
+                      <button onClick={() => setAdjustRoles(false)}
+                        style={{ fontSize: 11, color: D.green, background: D.greenDim, border: `1px solid ${D.green}44`, borderRadius: 20, padding: '4px 10px', cursor: 'pointer', fontFamily: 'Geist, system-ui, sans-serif' }}>
+                        ✓ Listo
+                      </button>
+                    </>
+                  )}
+                  {/* Candado */}
+                  <button onClick={() => setAdjustRoles(a => !a)} title={adjustRoles ? 'Cerrar edición' : 'Editar asignaciones'}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: adjustRoles ? D.accent : D.text3, padding: 4, display: 'flex', alignItems: 'center' }}>
+                    {adjustRoles ? (
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
+                        <rect x="3" y="7" width="10" height="8" rx="2"/>
+                        <path d="M5 7V5a3 3 0 016 0v2"/>
+                      </svg>
+                    ) : (
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
+                        <rect x="3" y="7" width="10" height="8" rx="2"/>
+                        <path d="M5 7V4a3 3 0 015.83-1"/>
+                      </svg>
+                    )}
                   </button>
                 </div>
               </div>
@@ -1206,14 +1225,15 @@ export default function App() {
                 )}
 
                 {/* FOOTER */}
-                <div style={{ height: 1, background: '#E5E5E5', marginBottom: 16 }} />
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10.5, color: '#888', lineHeight: 1.8 }}>
-                  <div>
-                    <div style={{ fontWeight: 600, color: '#555', marginBottom: 2, fontSize: 9, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Contacto</div>
-                    <div>Gary Martínez · 0981 133425</div>
-                    <div>Agustín Egusquiza · 0984 623206</div>
+                <div style={{ height: 1, background: '#E5E5E5', marginBottom: 12 }} />
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 10, color: '#888' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span style={{ fontWeight: 600, color: '#555', fontSize: 9, letterSpacing: '0.1em', textTransform: 'uppercase' }}>Contacto:</span>
+                    <span>Gary Martínez 0981 133425</span>
+                    <span style={{ color: '#CCC' }}>·</span>
+                    <span>Agustín Egusquiza 0984 623206</span>
                   </div>
-                  <div style={{ textAlign: 'right', fontSize: 9, color: '#CCC', alignSelf: 'flex-end' }}>arreglos-ypc.vercel.app</div>
+                  <div style={{ fontSize: 9, color: '#CCC' }}>arreglos-ypc.vercel.app</div>
                 </div>
               </div>
             </div>
