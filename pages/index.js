@@ -793,18 +793,20 @@ export default function App() {
                       </button>
                     </>
                   )}
-                  {/* Candado */}
+                  {/* Candado: cerrado = modo vista, abierto = modo edición */}
                   <button onClick={() => setAdjustRoles(a => !a)} title={adjustRoles ? 'Cerrar edición' : 'Editar asignaciones'}
                     style={{ background: 'none', border: 'none', cursor: 'pointer', color: adjustRoles ? D.accent : D.text3, padding: 4, display: 'flex', alignItems: 'center' }}>
                     {adjustRoles ? (
-                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
-                        <rect x="3" y="7" width="10" height="8" rx="2"/>
-                        <path d="M5 7V5a3 3 0 016 0v2"/>
-                      </svg>
-                    ) : (
+                      /* Candado ABIERTO — modo edición */
                       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
                         <rect x="3" y="7" width="10" height="8" rx="2"/>
                         <path d="M5 7V4a3 3 0 015.83-1"/>
+                      </svg>
+                    ) : (
+                      /* Candado CERRADO — modo vista */
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
+                        <rect x="3" y="7" width="10" height="8" rx="2"/>
+                        <path d="M5 7V5a3 3 0 016 0v2"/>
                       </svg>
                     )}
                   </button>
