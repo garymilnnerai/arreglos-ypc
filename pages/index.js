@@ -287,6 +287,9 @@ export default function App() {
   const [modalBQSel, setModalBQSel] = useState(false);
   const [bqSelSearch, setBqSelSearch] = useState('');
   const [sunBQNum, setSunBQNum] = useState(null);
+  const [sunCustomTitle, setSunCustomTitle] = useState('');
+  const [modalBQCustom, setModalBQCustom] = useState(false);
+  const [customTitleDraft, setCustomTitleDraft] = useState('');
   const [form, setForm] = useState({});
   const [isDark, setIsDark] = useState(false);
   // Date selector state for BQ modal
@@ -395,13 +398,17 @@ export default function App() {
     const newA = { ...assignments };
     if (form.asamblea) { newA[ds] = { asamblea: true }; }
     else {
-      if (!sunBQNum) return alert('Elegí un bosquejo');
-      newA[ds] = { bqNum: sunBQNum, name: form.name || '', cong: form.cong || '', tel: form.tel || '' };
+      if (!sunBQNum && !sunCustomTitle) return alert('Elegí un bosquejo');
+      newA[ds] = sunCustomTitle
+        ? { bqNum: null, customTitle: sunCustomTitle, name: form.name || '', cong: form.cong || '', tel: form.tel || '' }
+        : { bqNum: sunBQNum, name: form.name || '', cong: form.cong || '', tel: form.tel || '' };
     }
     markChanged(newA);
     const flashDs = ds;
     setModalSunday(null);
     setSunBQNum(null);
+    setSunCustomTitle('');
+    setModalBQCustom(false);
     setTimeout(() => {
       try { playSound('sunday'); } catch(e) {}
       setSundayFlash(flashDs);
@@ -422,13 +429,13 @@ export default function App() {
     .sort((a, b) => sortMode === 'old' ? (lastDate(a.n) || '0').localeCompare(lastDate(b.n) || '0') : a.n - b.n);
 
   const histEntries = Object.entries(assignments)
-    .filter(([, a]) => a.bqNum)
+    .filter(([, a]) => a.bqNum || a.customTitle)
     .sort((a, b) => b[0].localeCompare(a[0]))
     .filter(([ds]) => !histYear || ds.startsWith(histYear))
     .filter(([ds]) => histMonth === null || parseInt(ds.substring(5, 7)) - 1 === histMonth);
 
-  const histYears = [...new Set(Object.entries(assignments).filter(([, a]) => a.bqNum).map(([ds]) => ds.substring(0, 4)))].sort().reverse();
-  const histMonths = histYear ? [...new Set(Object.entries(assignments).filter(([, a]) => a.bqNum).filter(([ds]) => ds.startsWith(histYear)).map(([ds]) => parseInt(ds.substring(5, 7)) - 1))] : [];
+  const histYears = [...new Set(Object.entries(assignments).filter(([, a]) => a.bqNum || a.customTitle).map(([ds]) => ds.substring(0, 4)))].sort().reverse();
+  const histMonths = histYear ? [...new Set(Object.entries(assignments).filter(([, a]) => a.bqNum || a.customTitle).filter(([ds]) => ds.startsWith(histYear)).map(([ds]) => parseInt(ds.substring(5, 7)) - 1))] : [];
 
   const sundaysForSel = getSundaysForSel();
   const D = isDark ? DARK : LIGHT;
@@ -821,11 +828,11 @@ export default function App() {
                   <div key={ds}
                     style={{ background: sundayFlash === ds ? D.greenDim : 'transparent', padding: '14px 16px', borderBottom: sIdx < totalSundays - 1 ? `1px solid ${D.border}` : 'none', transition: 'background 0.4s ease' }}>
                     {/* Conferencia */}
-                    <div onClick={() => { setModalSunday({ date: ds, assignment: a }); setSunBQNum(a?.bqNum || null); setForm({ asamblea: a?.asamblea || false, name: a?.name || '', cong: a?.cong || '', tel: a?.tel || '' }); }}
+                    <div onClick={() => { setModalSunday({ date: ds, assignment: a }); setSunBQNum(a?.bqNum || null); setSunCustomTitle(a?.customTitle || ''); setForm({ asamblea: a?.asamblea || false, name: a?.name || '', cong: a?.cong || '', tel: a?.tel || '' }); }}
                       style={{ cursor: 'pointer', marginBottom: a && !a.asamblea ? 10 : 0 }}>
                       <div style={{ fontSize: 16, fontWeight: 500, color: D.text, marginBottom: 4 }}>Domingo {lbl}</div>
                       {a?.asamblea && <div style={{ fontSize: 14, color: D.accent }}>🏛 Fin de semana de asamblea</div>}
-                      {a?.bqNum && <><div style={{ fontSize: 14, color: D.text2 }}>{a.name || '—'} · {a.cong || '—'}{a.tel ? ' · ' + a.tel : ''}</div><div style={{ fontSize: 13, color: D.text3, marginTop: 2 }}>{a.bqNum} — {ALL_B[a.bqNum] || ''}</div></>}
+                      {(a?.bqNum || a?.customTitle) && <><div style={{ fontSize: 14, color: D.text2 }}>{a.name || '—'} · {a.cong || '—'}{a.tel ? ' · ' + a.tel : ''}</div><div style={{ fontSize: 13, color: D.text3, marginTop: 2 }}>{a.customTitle ? `📌 ${a.customTitle}` : `${a.bqNum} — ${ALL_B[a.bqNum] || ''}`}</div></>}
                       {!a && <div style={{ fontSize: 12, color: D.text3, fontStyle: 'italic' }}>Sin asignar · tocar para asignar</div>}
                     </div>
                     {/* Presidente y Lector — vista o edición según adjustRoles */}
@@ -1081,7 +1088,7 @@ export default function App() {
               {histEntries.map(([ds, a]) => (
                 <div key={ds} style={{ background: D.bg2, border: `1px solid ${D.border}`, borderRadius: 14, padding: '14px 16px', marginBottom: 8, transition: 'background 0.3s ease' }}>
                   <div style={{ fontSize: 13, color: D.text3, marginBottom: 5 }}>{fmtDate(ds)}</div>
-                  <div><span style={{ fontSize: 13, fontWeight: 500, color: D.accent, marginRight: 6 }}>{a.bqNum}</span><span style={{ fontSize: 13, color: D.text }}>{ALL_B[a.bqNum] || ''}</span></div>
+                  <div>{a.customTitle ? (<span style={{ fontSize: 13, color: D.text }}>📌 {a.customTitle}</span>) : (<><span style={{ fontSize: 13, fontWeight: 500, color: D.accent, marginRight: 6 }}>{a.bqNum}</span><span style={{ fontSize: 13, color: D.text }}>{ALL_B[a.bqNum] || ''}</span></>)}</div>
                   <div style={{ fontSize: 11, color: D.text2, marginTop: 3 }}>{[a.name, a.cong, a.tel].filter(Boolean).join(' · ')}</div>
                 </div>
               ))}
@@ -1194,7 +1201,7 @@ export default function App() {
                                 <span style={{ fontSize: 11, color: '#888' }}>{a.cong}</span>
                                 {a.tel && <span style={{ fontSize: 11, color: '#AAA' }}>{a.tel}</span>}
                               </div>
-                              <div style={{ fontSize: 11, color: '#666', marginBottom: 5 }}>Bq. {a.bqNum} — {ALL_B[a.bqNum] || ''}</div>
+                              <div style={{ fontSize: 11, color: '#666', marginBottom: 5 }}>{a.customTitle ? `📌 ${a.customTitle}` : `Bq. ${a.bqNum} — ${ALL_B[a.bqNum] || ''}`}</div>
                               <div style={{ display: 'flex', gap: 12, fontSize: 10, color: '#888', marginTop: 2 }}>
                                 {r.presidente && <span>Pres. <span style={{ fontWeight: 600, color: '#555' }}>{r.presidente}</span></span>}
                                 {r.lector && <span>Lector <span style={{ fontWeight: 600, color: '#555' }}>{r.lector}</span></span>}
@@ -1347,16 +1354,16 @@ export default function App() {
 
         {/* MODAL: SUNDAY */}
         {modalSunday && !modalBQSel && (
-          <Overlay onClose={() => { setModalSunday(null); setSunBQNum(null); }} D={D}>
+          <Overlay onClose={() => { setModalSunday(null); setSunBQNum(null); setSunCustomTitle(''); setModalBQCustom(false); }} D={D}>
             <div style={{ fontSize: 17, fontWeight: 500, color: D.text, marginBottom: 18 }}>{fmtDate(modalSunday.date)}</div>
             <AsambleaCheck checked={form.asamblea} onChange={v => setForm(f => ({ ...f, asamblea: v }))} D={D} />
             {!form.asamblea && (
               <>
                 <div style={{ marginBottom: 13 }}>
                   <div style={css.label}>Bosquejo</div>
-                  <div onClick={() => { setModalBQSel(true); setBqSelSearch(''); }}
-                    style={{ width: '100%', background: sunBQNum ? D.accentDim2 : D.bg3, border: `1px solid ${sunBQNum ? 'rgba(123,140,222,0.3)' : D.border2}`, borderRadius: 10, padding: '13px 14px', fontSize: 16, fontWeight: 300, color: sunBQNum ? D.accent : D.text3, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none', cursor: 'pointer', boxSizing: 'border-box' }}>
-                    {sunBQNum ? `${sunBQNum} — ${ALL_B[sunBQNum]}` : 'Seleccionar bosquejo →'}
+                  <div onClick={() => { setModalBQSel(true); setBqSelSearch(''); setModalBQCustom(false); }}
+                    style={{ width: '100%', background: (sunBQNum || sunCustomTitle) ? D.accentDim2 : D.bg3, border: `1px solid ${(sunBQNum || sunCustomTitle) ? 'rgba(123,140,222,0.3)' : D.border2}`, borderRadius: 10, padding: '13px 14px', fontSize: 16, fontWeight: 300, color: (sunBQNum || sunCustomTitle) ? D.accent : D.text3, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none', cursor: 'pointer', boxSizing: 'border-box' }}>
+                    {sunBQNum ? `${sunBQNum} — ${ALL_B[sunBQNum]}` : sunCustomTitle ? `📌 ${sunCustomTitle}` : 'Seleccionar bosquejo →'}
                   </div>
                 </div>
                 <FField label="Conferenciante" placeholder="Nombre y apellido" value={form.name || ''} onChange={v => setForm(f => ({ ...f, name: v }))} D={D} />
@@ -1365,7 +1372,7 @@ export default function App() {
               </>
             )}
             <div style={{ display: 'flex', gap: 8, marginTop: 18 }}>
-              <Btn onClick={() => { setModalSunday(null); setSunBQNum(null); }} secondary D={D}>Cerrar</Btn>
+              <Btn onClick={() => { setModalSunday(null); setSunBQNum(null); setSunCustomTitle(''); setModalBQCustom(false); }} secondary D={D}>Cerrar</Btn>
               {modalSunday.assignment && <Btn onClick={deleteSunday} danger D={D}>Borrar</Btn>}
               <Btn onClick={saveSundayModal} D={D}>Confirmar</Btn>
             </div>
@@ -1374,45 +1381,70 @@ export default function App() {
 
         {/* MODAL: BQ SELECTOR */}
         {modalBQSel && (
-          <Overlay onClose={() => setModalBQSel(false)} D={D} tall>
-            <div style={{ fontSize: 14, fontWeight: 500, color: D.text, marginBottom: 12 }}>Elegir bosquejo</div>
-            <div style={{ position: 'relative', marginBottom: 10 }}>
-              <svg style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: D.text3 }} width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" strokeWidth="1.3"><circle cx="6.5" cy="6.5" r="4.5" /><path d="M10 10l3 3" /></svg>
-              <input value={bqSelSearch} onChange={e => setBqSelSearch(e.target.value)} placeholder="Número o título..."
-                style={{ width: '100%', background: D.bg3, border: `1px solid ${D.border2}`, borderRadius: 10, padding: '13px 14px 13px 36px', fontSize: 15, fontWeight: 300, color: D.text, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none', transition: 'background 0.3s ease' }} />
-            </div>
-            <div style={{ overflowY: 'auto', flex: 1 }}>
-              {(() => {
-                const q = bqSelSearch.trim();
-                const numQ = parseInt(q);
-                const isExcluded = numQ && EXCL.has(numQ);
-                if (isExcluded) return (
-                  <div style={{ background: 'rgba(224,92,92,0.1)', border: '1px solid rgba(224,92,92,0.25)', borderRadius: 10, padding: '14px 16px', margin: '8px 0' }}>
-                    <div style={{ fontSize: 15, fontWeight: 500, color: '#E05C5C', marginBottom: 6 }}>Bosquejo {numQ} no disponible</div>
-                    <div style={{ fontSize: 13, color: '#9A9AA8', lineHeight: 1.5 }}>Este bosquejo ya no está disponible desde Septiembre 2026. Por favor seleccioná otro.</div>
-                  </div>
-                );
-                const filtered = BOSQUEJOS.filter(b => !q || b.n.toString().includes(q) || b.t.toLowerCase().includes(q.toLowerCase()));
-                if (filtered.length === 0 && q) return (
-                  <div style={{ padding: '20px 0', textAlign: 'center', color: '#5A5A68', fontSize: 13 }}>Sin resultados</div>
-                );
-                return filtered.map(b => {
-                  const rec = isRecent(b.n);
-                  return (
-                    <div key={b.n} onClick={() => { setSunBQNum(b.n); setModalBQSel(false); }}
-                      style={{ display: 'flex', gap: 12, padding: '10px 4px', borderBottom: `1px solid ${D.border}`, cursor: 'pointer', borderLeft: rec ? `3px solid ${D.amber}` : 'none', paddingLeft: rec ? 8 : 4 }}>
-                      <div style={{ fontSize: 18, fontWeight: 300, color: D.text3, width: 34, flexShrink: 0 }}>{b.n}</div>
-                      <div>
-                        <div style={{ fontSize: 15, color: D.text, lineHeight: 1.3 }}>{b.t}</div>
-                        {rec && <div style={{ fontSize: 12, color: D.amber, marginTop: 2 }}>⚠ Presentado recientemente</div>}
+          <Overlay onClose={() => { setModalBQSel(false); setModalBQCustom(false); }} D={D} tall>
+            <div style={{ fontSize: 14, fontWeight: 500, color: D.text, marginBottom: 12 }}>{modalBQCustom ? 'Conferencia especial' : 'Elegir bosquejo'}</div>
+            {modalBQCustom ? (
+              <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+                <div style={{ fontSize: 12, color: D.text2, marginBottom: 10, lineHeight: 1.4 }}>Escribí el título de la conferencia especial (no está en la colección de bosquejos)</div>
+                <input autoFocus value={customTitleDraft} onChange={e => setCustomTitleDraft(e.target.value)} placeholder="Ej: Discurso especial del superintendente de circuito"
+                  style={{ width: '100%', background: D.bg3, border: `1px solid ${D.border2}`, borderRadius: 10, padding: '13px 14px', fontSize: 15, fontWeight: 300, color: D.text, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none', boxSizing: 'border-box' }} />
+                <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
+                  <Btn onClick={() => setModalBQCustom(false)} secondary D={D}>Volver</Btn>
+                  <Btn onClick={() => {
+                    if (!customTitleDraft.trim()) return;
+                    setSunCustomTitle(customTitleDraft.trim());
+                    setSunBQNum(null);
+                    setModalBQCustom(false);
+                    setModalBQSel(false);
+                  }} D={D}>Usar este título</Btn>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div style={{ position: 'relative', marginBottom: 10 }}>
+                  <svg style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: D.text3 }} width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" strokeWidth="1.3"><circle cx="6.5" cy="6.5" r="4.5" /><path d="M10 10l3 3" /></svg>
+                  <input value={bqSelSearch} onChange={e => setBqSelSearch(e.target.value)} placeholder="Número o título..."
+                    style={{ width: '100%', background: D.bg3, border: `1px solid ${D.border2}`, borderRadius: 10, padding: '13px 14px 13px 36px', fontSize: 15, fontWeight: 300, color: D.text, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none', transition: 'background 0.3s ease' }} />
+                </div>
+                <div onClick={() => { setModalBQCustom(true); setCustomTitleDraft(sunCustomTitle || ''); }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 10px', marginBottom: 8, borderRadius: 10, background: D.amberDim, border: `1px solid ${D.amber}55`, cursor: 'pointer' }}>
+                  <span style={{ fontSize: 15 }}>📌</span>
+                  <span style={{ fontSize: 13, color: D.text, fontWeight: 500 }}>Conferencia especial — no está en la lista</span>
+                </div>
+                <div style={{ overflowY: 'auto', flex: 1 }}>
+                  {(() => {
+                    const q = bqSelSearch.trim();
+                    const numQ = parseInt(q);
+                    const isExcluded = numQ && EXCL.has(numQ);
+                    if (isExcluded) return (
+                      <div style={{ background: 'rgba(224,92,92,0.1)', border: '1px solid rgba(224,92,92,0.25)', borderRadius: 10, padding: '14px 16px', margin: '8px 0' }}>
+                        <div style={{ fontSize: 15, fontWeight: 500, color: '#E05C5C', marginBottom: 6 }}>Bosquejo {numQ} no disponible</div>
+                        <div style={{ fontSize: 13, color: '#9A9AA8', lineHeight: 1.5 }}>Este bosquejo ya no está disponible desde Septiembre 2026. Por favor seleccioná otro.</div>
                       </div>
-                    </div>
-                  );
-                });
-              })()}
-            </div>
-            <button onClick={() => setModalBQSel(false)}
-              style={{ marginTop: 12, width: '100%', padding: '11px 0', borderRadius: 100, border: `1px solid ${D.border2}`, background: 'transparent', color: D.text3, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'Geist, system-ui, sans-serif' }}>Cancelar</button>
+                    );
+                    const filtered = BOSQUEJOS.filter(b => !q || b.n.toString().includes(q) || b.t.toLowerCase().includes(q.toLowerCase()));
+                    if (filtered.length === 0 && q) return (
+                      <div style={{ padding: '20px 0', textAlign: 'center', color: '#5A5A68', fontSize: 13 }}>Sin resultados</div>
+                    );
+                    return filtered.map(b => {
+                      const rec = isRecent(b.n);
+                      return (
+                        <div key={b.n} onClick={() => { setSunBQNum(b.n); setSunCustomTitle(''); setModalBQSel(false); }}
+                          style={{ display: 'flex', gap: 12, padding: '10px 4px', borderBottom: `1px solid ${D.border}`, cursor: 'pointer', borderLeft: rec ? `3px solid ${D.amber}` : 'none', paddingLeft: rec ? 8 : 4 }}>
+                          <div style={{ fontSize: 18, fontWeight: 300, color: D.text3, width: 34, flexShrink: 0 }}>{b.n}</div>
+                          <div>
+                            <div style={{ fontSize: 15, color: D.text, lineHeight: 1.3 }}>{b.t}</div>
+                            {rec && <div style={{ fontSize: 12, color: D.amber, marginTop: 2 }}>⚠ Presentado recientemente</div>}
+                          </div>
+                        </div>
+                      );
+                    });
+                  })()}
+                </div>
+                <button onClick={() => { setModalBQSel(false); setModalBQCustom(false); }}
+                  style={{ marginTop: 12, width: '100%', padding: '11px 0', borderRadius: 100, border: `1px solid ${D.border2}`, background: 'transparent', color: D.text3, fontSize: 12, fontWeight: 500, cursor: 'pointer', fontFamily: 'Geist, system-ui, sans-serif' }}>Cancelar</button>
+              </>
+            )}
           </Overlay>
         )}
       </div>
