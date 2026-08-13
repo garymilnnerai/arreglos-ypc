@@ -800,7 +800,8 @@ export default function App() {
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
                 <div style={{ fontSize: 11, fontWeight: 600, color: D.text3, letterSpacing: '.1em', textTransform: 'uppercase' }}>Conferenciantes que vienen a Ypacaraí</div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  {adjustRoles && (
+                  {/* Ajustar presidente/lector: solo el Admin puede entrar en modo edición */}
+                  {role === 'admin' && adjustRoles && (
                     <>
                       <button onClick={() => {
                         const mcKeyA = `${curYear}-${detailMonth}`;
@@ -816,23 +817,25 @@ export default function App() {
                       </button>
                     </>
                   )}
-                  {/* Candado: cerrado = modo vista, abierto = modo edición */}
-                  <button onClick={() => setAdjustRoles(a => !a)} title={adjustRoles ? 'Cerrar edición' : 'Editar asignaciones'}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: adjustRoles ? D.accent : D.text3, padding: 4, display: 'flex', alignItems: 'center' }}>
-                    {adjustRoles ? (
-                      /* Candado ABIERTO — modo edición */
-                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
-                        <rect x="3" y="7" width="10" height="8" rx="2"/>
-                        <path d="M5 7V4a3 3 0 015.83-1"/>
-                      </svg>
-                    ) : (
-                      /* Candado CERRADO — modo vista */
-                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
-                        <rect x="3" y="7" width="10" height="8" rx="2"/>
-                        <path d="M5 7V5a3 3 0 016 0v2"/>
-                      </svg>
-                    )}
-                  </button>
+                  {/* Candado: cerrado = modo vista, abierto = modo edición — el colaborador nunca lo ve */}
+                  {role === 'admin' && (
+                    <button onClick={() => setAdjustRoles(a => !a)} title={adjustRoles ? 'Cerrar edición' : 'Editar asignaciones'}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: adjustRoles ? D.accent : D.text3, padding: 4, display: 'flex', alignItems: 'center' }}>
+                      {adjustRoles ? (
+                        /* Candado ABIERTO — modo edición */
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
+                          <rect x="3" y="7" width="10" height="8" rx="2"/>
+                          <path d="M5 7V4a3 3 0 015.83-1"/>
+                        </svg>
+                      ) : (
+                        /* Candado CERRADO — modo vista */
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
+                          <rect x="3" y="7" width="10" height="8" rx="2"/>
+                          <path d="M5 7V5a3 3 0 016 0v2"/>
+                        </svg>
+                      )}
+                    </button>
+                  )}
                 </div>
               </div>
               <div style={{ background: isDark ? 'rgba(76,175,125,0.07)' : 'rgba(42,110,72,0.06)', border: `1px solid ${isDark ? 'rgba(76,175,125,0.18)' : 'rgba(42,110,72,0.15)'}`, borderRadius: 14, overflow: 'hidden' }}>
