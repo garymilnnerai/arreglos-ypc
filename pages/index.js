@@ -82,6 +82,8 @@ const SOLO_PRESIDENTE = ['Francisco Jara'];
 const SOLO_LECTOR = ['Agustín Martínez','Jahaziel Roa'];
 
 function autoAssignRoles(sundays, assignments, outgoing, existingRoles, mcKey, allRoles) {
+  // Las salidas (conferenciantes que salen) tienen jerarquía de importancia:
+  // se calculan primero y todo lo demás se adapta a ellas.
   const salenEntries = outgoing[mcKey] || [];
   const salenNames = salenEntries.map(e => e.speaker);
   const osvaldoSale = salenNames.includes(CONDUCTOR_PERMANENTE);
@@ -116,23 +118,41 @@ function autoAssignRoles(sundays, assignments, outgoing, existingRoles, mcKey, a
     !(osvaldoSale && l === SUPLENTE_CONDUCTOR)
   );
 
-  // Last time each person had ANY role (for LRU ordering across months)
-  const lastDate = {};
+  // lastUsed: última fecha en que cada persona ejerció CUALQUIER rol (presidente o
+  // lector), sembrada con todo el historial (meses anteriores Y posteriores, si ya
+  // están generados). Así el espaciado respeta los límites entre meses, no solo
+  // dentro del mes que se está regenerando.
+  const lastUsed = {};
   Object.entries(allRoles || {}).forEach(([ds, r]) => {
-    if (r.presidente && (!lastDate[r.presidente] || ds > lastDate[r.presidente])) lastDate[r.presidente] = ds;
-    if (r.lector && (!lastDate[r.lector] || ds > lastDate[r.lector])) lastDate[r.lector] = ds;
+    if (activeSundays.includes(ds)) return; // este mes lo recalculamos nosotros abajo
+    if (r.presidente && (!lastUsed[r.presidente] || ds > lastUsed[r.presidente])) lastUsed[r.presidente] = ds;
+    if (r.lector && (!lastUsed[r.lector] || ds > lastUsed[r.lector])) lastUsed[r.lector] = ds;
   });
 
-  // LRU sort: least recently used first (never used = highest priority)
-  const lru = (pool) => [...pool].sort((a, b) =>
-    (lastDate[a] || '0000-00-00').localeCompare(lastDate[b] || '0000-00-00')
-  );
+  const daysBetween = (a, b) => Math.abs((new Date(a + 'T12:00:00') - new Date(b + 'T12:00:00')) / 86400000);
 
-  const presOrdered = lru(basePres);
-  const lecOrdered = lru(baseLec);
+  // usedThisMonth: quién ya participó (en cualquier rol) este mes. Se prioriza
+  // siempre a quien todavía no participó, para que toda la plantilla rote antes
+  // de repetir a alguien.
+  const usedThisMonth = new Set();
 
-  const usedPres = new Set();
-  const usedLec = new Set();
+  const pickCandidate = (pool, ds, exclude) => {
+    const eligible = pool.filter(p => !exclude.has(p));
+    if (eligible.length === 0) return '';
+    const fresh = eligible.filter(p => !usedThisMonth.has(p));
+    const pickFrom = fresh.length > 0 ? fresh : eligible;
+    // Ordenar por mayor espaciado respecto a su último uso (nunca usado = máxima
+    // prioridad). Esto evita, por ejemplo, que alguien sea presidente una semana
+    // y lector la siguiente: mientras haya alternativas, gana quien lleva más
+    // tiempo sin participar.
+    const scored = pickFrom.map(p => {
+      const last = lastUsed[p] || '0000-00-00';
+      const gap = last === '0000-00-00' ? Infinity : daysBetween(last, ds);
+      return { p, gap, last };
+    }).sort((a, b) => b.gap - a.gap || a.last.localeCompare(b.last));
+    return scored[0].p;
+  };
+
   const result = {};
 
   activeSundays.forEach(ds => {
@@ -143,18 +163,13 @@ function autoAssignRoles(sundays, assignments, outgoing, existingRoles, mcKey, a
         .map(([name]) => name)
     );
 
-    // President: LRU order, not used this month, not out today
-    const presAvail = presOrdered.filter(p => !usedPres.has(p) && !outToday.has(p));
-    // If all used, allow reuse but still avoid out today
-    const presFallback = presOrdered.filter(p => !outToday.has(p));
-    const pres = presAvail[0] || presFallback[0] || presOrdered[0];
-    if (pres) usedPres.add(pres);
+    const pres = pickCandidate(basePres, ds, outToday);
+    const excludeForLec = new Set(outToday);
+    if (pres) excludeForLec.add(pres);
+    const lec = pickCandidate(baseLec, ds, excludeForLec);
 
-    // Lector: LRU order, not used this month, not same as pres, not out today
-    const lecAvail = lecOrdered.filter(l => !usedLec.has(l) && l !== pres && !outToday.has(l));
-    const lecFallback = lecOrdered.filter(l => l !== pres && !outToday.has(l));
-    const lec = lecAvail[0] || lecFallback[0] || lecOrdered.find(l => l !== pres) || '';
-    if (lec) usedLec.add(lec);
+    if (pres) { usedThisMonth.add(pres); lastUsed[pres] = ds; }
+    if (lec) { usedThisMonth.add(lec); lastUsed[lec] = ds; }
 
     result[ds] = { presidente: pres || '', lector: lec || '' };
   });
@@ -921,16 +936,28 @@ export default function App() {
                   setPending(true);
                 };
 
+                // Las salidas tienen jerarquía de importancia: cuando alguien se
+                // agrega/quita como conferenciante que sale, la lista de presidente y
+                // lector de ese mes se recalcula automáticamente para adaptarse.
+                const regenRoles = (updatedEntries) => {
+                  const sundaysForMonth = getSundaysOfMonth(curYear, detailMonth);
+                  const newOutgoingFull = { ...outgoing, [mcKey]: updatedEntries };
+                  const newRoles = autoAssignRoles(sundaysForMonth, assignments, newOutgoingFull, roles, mcKey, roles);
+                  setRoles(newRoles);
+                };
+
                 const updateEntry = (idx, field, val) => {
                   const updated = entries.map((e, i) => i === idx ? { ...e, [field]: val, ...(field === 'speaker' ? { bqNum: '' } : {}) } : e);
                   setOutgoing(o => ({ ...o, [mcKey]: updated }));
                   setPending(true);
+                  if (field === 'speaker' || field === 'day') regenRoles(updated);
                 };
 
                 const removeEntry = (idx) => {
                   const updated = entries.filter((_, i) => i !== idx);
                   setOutgoing(o => ({ ...o, [mcKey]: updated }));
                   setPending(true);
+                  regenRoles(updated);
                 };
 
                 // Check speaker limit: max 2 per month
