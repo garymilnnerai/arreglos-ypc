@@ -86,10 +86,11 @@ function autoAssignRoles(sundays, assignments, outgoing, existingRoles, mcKey, a
   const salenNames = salenEntries.map(e => e.speaker);
   const osvaldoSale = salenNames.includes(CONDUCTOR_PERMANENTE);
 
-  // Active sundays with conferences
+  // Active sundays — todos los domingos del mes salvo los de asamblea
+  // (no hace falta que ya tengan conferenciante asignado)
   const activeSundays = sundays
     .map(s => s.toISOString().split('T')[0])
-    .filter(ds => assignments[ds] && !assignments[ds].asamblea);
+    .filter(ds => !(assignments[ds] && assignments[ds].asamblea));
   const n = activeSundays.length;
   if (n === 0) return existingRoles;
 
@@ -789,7 +790,7 @@ export default function App() {
                       <button onClick={() => {
                         const mcKeyA = `${curYear}-${detailMonth}`;
                         const sundays = getSundaysOfMonth(curYear, detailMonth);
-                        const newRoles = autoAssignRoles(sundays, assignments, outgoing, {}, mcKeyA, roles);
+                        const newRoles = autoAssignRoles(sundays, assignments, outgoing, roles, mcKeyA, roles);
                         setRoles(newRoles); setPending(true);
                       }} style={{ fontSize: 11, color: D.accent, background: D.accentDim, border: `1px solid ${D.accent}44`, borderRadius: 20, padding: '4px 10px', cursor: 'pointer', fontFamily: 'Geist, system-ui, sans-serif' }}>
                         ✦ Auto
@@ -835,8 +836,8 @@ export default function App() {
                       {(a?.bqNum || a?.customTitle) && <><div style={{ fontSize: 14, color: D.text2 }}>{a.name || '—'} · {a.cong || '—'}{a.tel ? ' · ' + a.tel : ''}</div><div style={{ fontSize: 13, color: D.text3, marginTop: 2 }}>{a.customTitle ? `📌 ${a.customTitle}` : `${a.bqNum} — ${ALL_B[a.bqNum] || ''}`}</div></>}
                       {!a && <div style={{ fontSize: 12, color: D.text3, fontStyle: 'italic' }}>Sin asignar · tocar para asignar</div>}
                     </div>
-                    {/* Presidente y Lector — vista o edición según adjustRoles */}
-                    {a && !a.asamblea && (() => {
+                    {/* Presidente y Lector — vista o edición según adjustRoles (no requiere conferenciante asignado aún) */}
+                    {!a?.asamblea && (() => {
                       const r = roles[ds] || {};
                       const mcKeyR = `${curYear}-${detailMonth}`;
                       const allSalenNames = (outgoing[mcKeyR] || []).map(e => e.speaker);
@@ -849,7 +850,7 @@ export default function App() {
                       // Match by position: find which salida corresponds to this sunday
                       const activeDomR = getSundaysOfMonth(curYear, detailMonth)
                         .map(s2 => dateStr(s2))
-                        .filter(d2 => assignments[d2] && !assignments[d2].asamblea);
+                        .filter(d2 => !(assignments[d2] && assignments[d2].asamblea));
                       const idxThisSunday = activeDomR.indexOf(ds);
                       const salidaHoy = (outgoing[mcKeyR2] || [])[idxThisSunday];
                       const salenHoyNames = salidaHoy?.speaker ? [salidaHoy.speaker] : [];
