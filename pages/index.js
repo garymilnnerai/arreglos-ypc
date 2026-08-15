@@ -318,6 +318,8 @@ export default function App() {
   const [outgoingOpen, setOutgoingOpen] = useState({});
   // Candado para habilitar el ingreso/ajuste de conferenciantes que vienen — admin y colaborador
   const [venOpen, setVenOpen] = useState({});
+  // Candado para habilitar el ingreso/ajuste de la persona de contacto — admin y colaborador
+  const [contactOpen, setContactOpen] = useState({});
   // roles: { 'YYYY-MM-DD': { presidente, lector } }
   const [roles, setRoles] = useState({});
   const [showPrograma, setShowPrograma] = useState(false);
@@ -600,16 +602,19 @@ export default function App() {
           )}
 
           {/* AGENDA */}
+          {view === 'agenda' && (
+            <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+              {[2026, 2027].map(y => (
+                <button key={y} onClick={() => { setCurYear(y); setDetailMonth(null); }}
+                  style={{ flex: 1, padding: '9px 0', borderRadius: 10, border: `1px solid ${curYear === y ? D.accent : D.border}`, background: curYear === y ? D.accentDim : 'transparent', fontSize: 13, fontWeight: curYear === y ? 500 : 400, color: curYear === y ? D.accent : D.text3, cursor: 'pointer', fontFamily: 'Geist, system-ui, sans-serif' }}>
+                  {y}
+                </button>
+              ))}
+            </div>
+          )}
+
           {view === 'agenda' && !detailMonth && (
             <div>
-              <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-                {[2026, 2027].map(y => (
-                  <button key={y} onClick={() => setCurYear(y)}
-                    style={{ flex: 1, padding: '9px 0', borderRadius: 10, border: `1px solid ${curYear === y ? D.accent : D.border}`, background: curYear === y ? D.accentDim : 'transparent', fontSize: 13, fontWeight: curYear === y ? 500 : 400, color: curYear === y ? D.accent : D.text3, cursor: 'pointer', fontFamily: 'Geist, system-ui, sans-serif' }}>
-                    {y}
-                  </button>
-                ))}
-              </div>
               {MONTHS.map((mn, m) => {
                 if (curYear === 2026 && m < 6) return null;
                 const sundays = getSundaysOfMonth(curYear, m);
@@ -700,8 +705,12 @@ export default function App() {
                 const mcKey = `${curYear}-${detailMonth}`;
                 const contacts = monthContacts[mcKey] || [{ name: '', cong: '', tel: '', confirmed: false }];
                 const hasAnyConfirmed = contacts.some(c => c.confirmed);
+                const contactKey = `${curYear}-${detailMonth}-contactlock`;
+                const contactEditMode = contactOpen[contactKey] || false;
+                const toggleContactEdit = () => setContactOpen(o => ({ ...o, [contactKey]: !o[contactKey] }));
 
                 const updateContact = (idx, field, val) => {
+                  if (!contactEditMode) return;
                   const updated = contacts.map((c, i) => {
                     if (i !== idx) return c;
                     const newC = { ...c, [field]: val };
@@ -715,52 +724,83 @@ export default function App() {
                 };
 
                 const editContact = (idx) => {
+                  if (!contactEditMode) return;
                   const updated = contacts.map((c, i) => i === idx ? { ...c, confirmed: false } : c);
                   setMonthContacts({ ...monthContacts, [mcKey]: updated });
                 };
 
                 const removeContact = (idx) => {
+                  if (!contactEditMode) return;
                   const updated = contacts.filter((_, i) => i !== idx);
                   setMonthContacts({ ...monthContacts, [mcKey]: updated.length ? updated : [{ name: '', cong: '', tel: '', confirmed: false }] });
                   setPending(true);
                 };
 
                 const addContact = () => {
+                  if (!contactEditMode) return;
                   setMonthContacts({ ...monthContacts, [mcKey]: [...contacts, { name: '', cong: '', tel: '', confirmed: false }] });
                   setPending(true);
                 };
 
                 return (
                   <div style={{ background: D.bg2, border: `1px solid ${D.border}`, borderRadius: 14, padding: '16px 16px 14px', marginBottom: 6 }}>
-                    <div style={{ fontSize: 11, fontWeight: 500, color: D.text3, letterSpacing: '.1em', textTransform: 'uppercase', marginBottom: 14 }}>Persona de contacto</div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+                      <div style={{ fontSize: 11, fontWeight: 500, color: D.text3, letterSpacing: '.1em', textTransform: 'uppercase' }}>Persona de contacto</div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        {contactEditMode && (
+                          <button onClick={toggleContactEdit}
+                            style={{ fontSize: 11, color: D.green, background: D.greenDim, border: `1px solid ${D.green}44`, borderRadius: 20, padding: '4px 10px', cursor: 'pointer', fontFamily: 'Geist, system-ui, sans-serif' }}>
+                            ✓ Listo
+                          </button>
+                        )}
+                        <button onClick={toggleContactEdit} title={contactEditMode ? 'Cerrar edición' : 'Editar contacto'}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: contactEditMode ? D.accent : D.text3, padding: 4, display: 'flex', alignItems: 'center' }}>
+                          {contactEditMode ? (
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
+                              <rect x="3" y="7" width="10" height="8" rx="2"/>
+                              <path d="M5 7V4a3 3 0 015.83-1"/>
+                            </svg>
+                          ) : (
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
+                              <rect x="3" y="7" width="10" height="8" rx="2"/>
+                              <path d="M5 7V5a3 3 0 016 0v2"/>
+                            </svg>
+                          )}
+                        </button>
+                      </div>
+                    </div>
 
                     {contacts.map((c, idx) => (
                       <div key={idx}>
                         {idx > 0 && <div style={{ height: '.5px', background: D.border, margin: '12px 0' }} />}
 
-                        {/* CONFIRMADO — vista consolidada */}
-                        {c.confirmed ? (
+                        {/* CONFIRMADO o CANDADO CERRADO — vista consolidada */}
+                        {(c.confirmed || !contactEditMode) ? (
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 0' }}>
                             <div>
-                              <div style={{ fontSize: 14, fontWeight: 500, color: D.text }}>{c.name}</div>
-                              <div style={{ fontSize: 12, color: D.text2, marginTop: 2 }}>{c.cong} · {c.tel}</div>
+                              <div style={{ fontSize: 14, fontWeight: 500, color: D.text }}>{c.name || (contactEditMode ? '' : 'Sin datos')}</div>
+                              {(c.cong || c.tel) && <div style={{ fontSize: 12, color: D.text2, marginTop: 2 }}>{[c.cong, c.tel].filter(Boolean).join(' · ')}</div>}
                             </div>
-                            <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                              <div style={{ width: 20, height: 20, borderRadius: '50%', background: D.greenDim, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke={D.green} strokeWidth="1.5"><path d="M2 5.5l2.5 2.5 4.5-4"/></svg>
+                            {contactEditMode && (
+                              <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                                {c.confirmed && (
+                                  <div style={{ width: 20, height: 20, borderRadius: '50%', background: D.greenDim, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke={D.green} strokeWidth="1.5"><path d="M2 5.5l2.5 2.5 4.5-4"/></svg>
+                                  </div>
+                                )}
+                                <button onClick={() => editContact(idx)}
+                                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: D.text3, display: 'flex', alignItems: 'center', padding: 2 }}>
+                                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.2"><path d="M9.5 2.5l2 2-7 7H2.5v-2l7-7z"/></svg>
+                                </button>
+                                {contacts.length > 1 && (
+                                  <button onClick={() => removeContact(idx)}
+                                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: D.text3, fontSize: 16, lineHeight: 1, padding: 2 }}>×</button>
+                                )}
                               </div>
-                              <button onClick={() => editContact(idx)}
-                                style={{ background: 'none', border: 'none', cursor: 'pointer', color: D.text3, display: 'flex', alignItems: 'center', padding: 2 }}>
-                                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.2"><path d="M9.5 2.5l2 2-7 7H2.5v-2l7-7z"/></svg>
-                              </button>
-                              {contacts.length > 1 && (
-                                <button onClick={() => removeContact(idx)}
-                                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: D.text3, fontSize: 16, lineHeight: 1, padding: 2 }}>×</button>
-                              )}
-                            </div>
+                            )}
                           </div>
                         ) : (
-                          /* EN EDICIÓN */
+                          /* EN EDICIÓN — solo si el candado está abierto */
                           <div>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 8 }}>
                               <input value={c.name || ''} onChange={e => updateContact(idx, 'name', e.target.value)}
@@ -783,8 +823,8 @@ export default function App() {
                       </div>
                     ))}
 
-                    {/* + AGREGAR — solo si hay al menos un confirmado */}
-                    {hasAnyConfirmed && (
+                    {/* + AGREGAR — solo con el candado abierto y al menos un confirmado */}
+                    {contactEditMode && hasAnyConfirmed && (
                       <button onClick={addContact}
                         style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 14, background: 'none', border: 'none', cursor: 'pointer', color: D.accent, fontSize: 13, fontFamily: 'Geist, system-ui, sans-serif', padding: 0 }}>
                         <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.3"><circle cx="7" cy="7" r="6"/><path d="M7 4v6M4 7h6"/></svg>
