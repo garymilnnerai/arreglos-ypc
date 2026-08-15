@@ -14,14 +14,15 @@ export default function App({ Component, pageProps }) {
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta property="og:title" content="Arreglos de Conferencias" />
         <meta property="og:description" content="Coordinación de arreglos de conferencias — Congregación Ypacaraí Guaraní" />
-        <meta property="og:image" content="https://arreglos-ypc.vercel.app/og-image.svg" />
+        <meta property="og:image" content="https://arreglos-ypc.vercel.app/og-image.png" />
+        <meta property="og:image:type" content="image/png" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://arreglos-ypc.vercel.app" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Arreglos de Conferencias" />
-        <meta name="twitter:image" content="https://arreglos-ypc.vercel.app/og-image.svg" />
+        <meta name="twitter:image" content="https://arreglos-ypc.vercel.app/og-image.png" />
         <style>{`
           @media print {
             body { margin: 0; }
