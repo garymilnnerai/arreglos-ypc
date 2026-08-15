@@ -316,6 +316,8 @@ export default function App() {
   // outgoing: { 'YYYY-M': [{speaker, bqNum, cong, day, time}] }
   const [outgoing, setOutgoing] = useState({});
   const [outgoingOpen, setOutgoingOpen] = useState({});
+  // Candado para habilitar el ingreso/ajuste de conferenciantes que vienen — admin y colaborador
+  const [venOpen, setVenOpen] = useState({});
   // roles: { 'YYYY-MM-DD': { presidente, lector } }
   const [roles, setRoles] = useState({});
   const [showPrograma, setShowPrograma] = useState(false);
@@ -797,9 +799,37 @@ export default function App() {
               <div style={{ height: '.5px', background: D.border, margin: '16px 0' }} />
 
               {/* BLOQUE 1: CONFERENCIANTES QUE VIENEN */}
+              {(() => {
+                const venKey = `${curYear}-${detailMonth}-venlock`;
+                const venEditMode = venOpen[venKey] || false;
+                const toggleVenEdit = () => setVenOpen(o => ({ ...o, [venKey]: !o[venKey] }));
+                return (
+                <>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
                 <div style={{ fontSize: 11, fontWeight: 600, color: D.text3, letterSpacing: '.1em', textTransform: 'uppercase' }}>Conferenciantes que vienen a Ypacaraí</div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  {/* Candado de conferenciantes: para admin y colaborador */}
+                  {venEditMode && (
+                    <button onClick={toggleVenEdit}
+                      style={{ fontSize: 11, color: D.green, background: D.greenDim, border: `1px solid ${D.green}44`, borderRadius: 20, padding: '4px 10px', cursor: 'pointer', fontFamily: 'Geist, system-ui, sans-serif' }}>
+                      ✓ Listo
+                    </button>
+                  )}
+                  <button onClick={toggleVenEdit} title={venEditMode ? 'Cerrar edición' : 'Editar conferenciantes'}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: venEditMode ? D.accent : D.text3, padding: 4, display: 'flex', alignItems: 'center' }}>
+                    {venEditMode ? (
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
+                        <rect x="3" y="7" width="10" height="8" rx="2"/>
+                        <path d="M5 7V4a3 3 0 015.83-1"/>
+                      </svg>
+                    ) : (
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
+                        <rect x="3" y="7" width="10" height="8" rx="2"/>
+                        <path d="M5 7V5a3 3 0 016 0v2"/>
+                      </svg>
+                    )}
+                  </button>
+                  <div style={{ width: 1, height: 16, background: D.border2, margin: '0 2px' }} />
                   {/* Ajustar presidente/lector: solo el Admin puede entrar en modo edición */}
                   {role === 'admin' && adjustRoles && (
                     <>
@@ -847,8 +877,8 @@ export default function App() {
                   <div key={ds}
                     style={{ background: sundayFlash === ds ? D.greenDim : 'transparent', padding: '14px 16px', borderBottom: sIdx < totalSundays - 1 ? `1px solid ${D.border}` : 'none', transition: 'background 0.4s ease' }}>
                     {/* Conferencia */}
-                    <div onClick={() => { setModalSunday({ date: ds, assignment: a }); setSunBQNum(a?.bqNum || null); setSunCustomTitle(a?.customTitle || ''); setForm({ asamblea: a?.asamblea || false, name: a?.name || '', cong: a?.cong || '', tel: a?.tel || '' }); }}
-                      style={{ cursor: 'pointer', marginBottom: a && !a.asamblea ? 10 : 0 }}>
+                    <div onClick={() => { if (!venEditMode) return; setModalSunday({ date: ds, assignment: a }); setSunBQNum(a?.bqNum || null); setSunCustomTitle(a?.customTitle || ''); setForm({ asamblea: a?.asamblea || false, name: a?.name || '', cong: a?.cong || '', tel: a?.tel || '' }); }}
+                      style={{ cursor: venEditMode ? 'pointer' : 'default', marginBottom: a && !a.asamblea ? 10 : 0 }}>
                       <div style={{ fontSize: 16, fontWeight: 500, color: D.text, marginBottom: 4 }}>Domingo {lbl}</div>
                       {a?.asamblea && <div style={{ fontSize: 14, color: D.accent }}>🏛 Fin de semana de asamblea</div>}
                       {(a?.bqNum || a?.customTitle) && <><div style={{ fontSize: 14, color: D.text2 }}>{a.name || '—'} · {a.cong || '—'}{a.tel ? ' · ' + a.tel : ''}</div><div style={{ fontSize: 13, color: D.text3, marginTop: 2 }}>{a.customTitle ? `📌 ${a.customTitle}` : `${a.bqNum} — ${ALL_B[a.bqNum] || ''}`}</div></>}
@@ -919,6 +949,9 @@ export default function App() {
                 );
               })}
               </div>
+                </>
+                );
+              })()}
 
               {/* DIVISOR */}
               <div style={{ height: '.5px', background: D.border, margin: '16px 0' }} />
