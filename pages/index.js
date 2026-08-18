@@ -105,8 +105,21 @@ function autoAssignRoles(sundays, assignments, outgoing, existingRoles, mcKey, a
   salenEntries.forEach((e, i) => {
     if (!e.speaker) return;
     if (!salenPorFecha[e.speaker]) salenPorFecha[e.speaker] = new Set();
-    // Match to specific sunday: use index if available, otherwise mark first sunday
-    const targetDate = activeDom[i] || activeDom[0];
+    // Si la salida tiene fecha concreta y cae domingo, se usa esa fecha directamente.
+    // Si es un sábado (u otro caso sin fecha), se usa como referencia el domingo de
+    // ese mismo fin de semana; si no hay fecha (datos viejos), se recurre al índice.
+    let targetDate = null;
+    if (e.date) {
+      targetDate = activeDom.includes(e.date) ? e.date : null;
+      if (!targetDate && e.day === 'sab') {
+        const satDate = new Date(e.date + 'T12:00:00');
+        const sunDate = new Date(satDate);
+        sunDate.setDate(sunDate.getDate() + 1);
+        const sunStr = sunDate.toISOString().split('T')[0];
+        if (activeDom.includes(sunStr)) targetDate = sunStr;
+      }
+    }
+    if (!targetDate) targetDate = activeDom[i] || activeDom[0];
     if (targetDate) salenPorFecha[e.speaker].add(targetDate);
   });
 
@@ -262,6 +275,35 @@ function getSundaysOfMonth(year, month) {
 function dateStr(d) { return d.toISOString().split('T')[0]; }
 function fmtDate(ds) { const d = new Date(ds + 'T12:00:00'); return d.toLocaleDateString('es-PY', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }); }
 function fmtShort(ds) { const d = new Date(ds + 'T12:00:00'); return d.toLocaleDateString('es-PY', { day: 'numeric', month: 'long' }); }
+
+// Opciones de fecha (Sáb/Dom) para las salidas de conferenciantes, dentro de un mes dado
+function getSalidaDateOptions(year, month) {
+  const sundays = getSundaysOfMonth(year, month);
+  const opts = [];
+  sundays.forEach(sun => {
+    const sat = new Date(sun);
+    sat.setDate(sat.getDate() - 1);
+    opts.push({ value: dateStr(sat), day: 'sab', label: `Sáb. ${sat.getDate()} de ${MONTHS[sat.getMonth()]}` });
+    opts.push({ value: dateStr(sun), day: 'dom', label: `Dom. ${sun.getDate()} de ${MONTHS[sun.getMonth()]}` });
+  });
+  return opts;
+}
+
+// Formatea una entrada de salida como "Dom. 06 de Septiembre 08:30hs."
+function fmtSalida(e) {
+  if (!e.date) return e.time ? `${e.day === 'sab' ? 'Sáb.' : 'Dom.'} ${e.time}hs.` : '';
+  const d = new Date(e.date + 'T12:00:00');
+  const dayLabel = d.getDay() === 6 ? 'Sáb.' : 'Dom.';
+  const base = `${dayLabel} ${String(d.getDate()).padStart(2, '0')} de ${MONTHS[d.getMonth()]}`;
+  return e.time ? `${base} ${e.time}hs.` : base;
+}
+function fmtSalidaShort(e) {
+  if (!e.date) return e.time ? `${e.day === 'sab' ? 'Sáb' : 'Dom'} ${e.time}` : '';
+  const d = new Date(e.date + 'T12:00:00');
+  const dayLabel = d.getDay() === 6 ? 'Sáb' : 'Dom';
+  const base = `${dayLabel} ${String(d.getDate()).padStart(2, '0')}`;
+  return e.time ? `${base} - ${e.time}` : base;
+}
 
 // All available month options from Jul 2026 to Dec 2027
 const MONTH_OPTIONS = [];
@@ -679,7 +721,7 @@ export default function App() {
                           {salidas.map((e, i) => (
                             <div key={i} style={{ fontSize: 12, color: D.text2, marginBottom: 2 }}>
                               <span style={{ fontWeight: 500, color: VC2 }}>{e.speaker}</span>
-                              {e.time ? ` · ${e.day === 'sab' ? 'Sab' : 'Dom'} ${e.time}` : ''}
+                              {fmtSalidaShort(e) ? ` · ${fmtSalidaShort(e)}` : ''}
                               {e.bqNum ? ` · Bq. ${e.bqNum}` : ''}
                             </div>
                           ))}
@@ -1018,7 +1060,7 @@ export default function App() {
                 const toggleEditMode = () => setOutgoingOpen(o => ({ ...o, [editLockKey]: !o[editLockKey] }));
 
                 const addEntry = () => {
-                  const newEntries = [...entries, { speaker: '', bqNum: '', cong: '', day: 'dom', time: '' }];
+                  const newEntries = [...entries, { speaker: '', bqNum: '', cong: '', day: 'dom', date: '', time: '' }];
                   setOutgoing(o => ({ ...o, [mcKey]: newEntries }));
                   setPending(true);
                 };
@@ -1037,7 +1079,7 @@ export default function App() {
                   const updated = entries.map((e, i) => i === idx ? { ...e, [field]: val, ...(field === 'speaker' ? { bqNum: '' } : {}) } : e);
                   setOutgoing(o => ({ ...o, [mcKey]: updated }));
                   setPending(true);
-                  if (field === 'speaker' || field === 'day') regenRoles(updated);
+                  if (field === 'speaker' || field === 'date') regenRoles(updated);
                 };
 
                 const removeEntry = (idx) => {
@@ -1073,7 +1115,7 @@ export default function App() {
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                         {isEditMode && (
                           <button onClick={() => {
-                            setOutgoing(o => ({ ...o, [mcKey]: [...(o[mcKey] || []), { speaker: '', bqNum: '', cong: '', day: 'dom', time: '' }] }));
+                            setOutgoing(o => ({ ...o, [mcKey]: [...(o[mcKey] || []), { speaker: '', bqNum: '', cong: '', day: 'dom', date: '', time: '' }] }));
                             setPending(true);
                           }} style={{ fontSize: 11, color: VC, background: VDim, border: `1px solid ${VBorder}`, borderRadius: 20, padding: '4px 10px', cursor: 'pointer', fontFamily: 'Geist, system-ui, sans-serif' }}>
                             + Agregar
@@ -1107,7 +1149,7 @@ export default function App() {
                           const editKey = `${mcKey}-${idx}`;
                           const isEditing = isEditMode && (outgoingOpen[editKey] || false);
                           const toggleEdit = () => isEditMode && setOutgoingOpen(o => ({ ...o, [editKey]: !o[editKey] }));
-                          const isComplete = e.speaker && e.bqNum && e.cong && e.time;
+                          const isComplete = e.speaker && e.bqNum && e.cong && e.date && e.time;
                           return (
                             <div key={idx} style={{ marginBottom: 8, paddingBottom: 8, borderBottom: idx < entries.length - 1 ? `1px solid ${VBorder}` : 'none' }}>
                               {!isEditing ? (
@@ -1117,7 +1159,7 @@ export default function App() {
                                     {isComplete ? (
                                       <>
                                         <div style={{ fontSize: 14, fontWeight: 500, color: VC }}>{e.speaker}</div>
-                                        <div style={{ fontSize: 12, color: D.text2, marginTop: 2 }}>{e.cong} · {e.day === 'sab' ? 'Sáb' : 'Dom'} {e.time} · Bq. {e.bqNum}</div>
+                                        <div style={{ fontSize: 12, color: D.text2, marginTop: 2 }}>{e.cong} · {fmtSalida(e)} · Bq. {e.bqNum}</div>
                                       </>
                                     ) : (
                                       <div style={{ fontSize: 12, color: D.text3, fontStyle: 'italic' }}>Salida incompleta · tocar para editar</div>
@@ -1157,10 +1199,16 @@ export default function App() {
                                     placeholder="Congregación destino"
                                     style={{ background: D.bg3, border: `1px solid ${e.cong ? VC+'55' : D.border2}`, borderRadius: 8, padding: '8px 10px', fontSize: 13, color: e.cong ? VC : D.text, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none', width: '100%', marginBottom: 8 }} />
                                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-                                    <select value={e.day} onChange={ev => updateEntry(idx, 'day', ev.target.value)}
-                                      style={{ background: D.bg3, border: `1px solid ${D.border2}`, borderRadius: 8, padding: '8px 10px', fontSize: 13, color: D.text, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none' }}>
-                                      <option value="dom">Domingo</option>
-                                      <option value="sab">Sábado</option>
+                                    <select value={e.date || ''} onChange={ev => {
+                                        const opt = getSalidaDateOptions(curYear, detailMonth).find(o => o.value === ev.target.value);
+                                        const updated = entries.map((en, i) => i === idx ? { ...en, date: ev.target.value, day: opt ? opt.day : en.day } : en);
+                                        setOutgoing(o => ({ ...o, [mcKey]: updated }));
+                                        setPending(true);
+                                        regenRoles(updated);
+                                      }}
+                                      style={{ background: D.bg3, border: `1px solid ${e.date ? VC+'55' : D.border2}`, borderRadius: 8, padding: '8px 10px', fontSize: 13, color: e.date ? VC : D.text3, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none' }}>
+                                      <option value="">Fecha...</option>
+                                      {getSalidaDateOptions(curYear, detailMonth).map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                                     </select>
                                     <input value={e.time || ''} onChange={ev => updateEntry(idx, 'time', ev.target.value)}
                                       placeholder="Horario (ej: 09:30)"
@@ -1338,8 +1386,12 @@ export default function App() {
                     {salidas.map((e, i) => (
                       <div key={i} style={{ display: 'flex', gap: 16, paddingBottom: 8, marginBottom: 8, borderBottom: '1px solid #F0F0F0' }}>
                         <div style={{ width: 56, flexShrink: 0, textAlign: 'center', background: '#F7F7F7', borderRadius: 8, padding: '5px 4px' }}>
-                          <div style={{ fontSize: 9, fontWeight: 600, color: '#888', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{e.day === 'sab' ? 'Sáb' : 'Dom'}</div>
+                          <div style={{ fontSize: 9, fontWeight: 600, color: '#888', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{(() => {
+                            if (e.date) return new Date(e.date + 'T12:00:00').getDay() === 6 ? 'Sáb' : 'Dom';
+                            return e.day === 'sab' ? 'Sáb' : 'Dom';
+                          })()}</div>
                           <div style={{ fontSize: 13, fontWeight: 700, color: '#111', lineHeight: 1.1, marginTop: 1 }}>{(() => {
+                            if (e.date) return new Date(e.date + 'T12:00:00').getDate();
                             const domingosM = getSundaysOfMonth(curYear, detailMonth);
                             const idx = salidas.indexOf(e);
                             const activeDomM = domingosM.filter(s2 => assignments[dateStr(s2)] && !assignments[dateStr(s2)].asamblea);
