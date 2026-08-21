@@ -658,7 +658,7 @@ export default function App() {
             </div>
           )}
 
-          {view === 'agenda' && !detailMonth && (
+          {view === 'agenda' && detailMonth === null && (
             <div>
               {MONTHS.map((mn, m) => {
                 if (curYear === 2026 && m < 6) return null;
