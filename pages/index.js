@@ -756,16 +756,23 @@ export default function App() {
 
                 const updateContact = (idx, field, val) => {
                   if (!contactEditMode) return;
-                  const updated = contacts.map((c, i) => {
-                    if (i !== idx) return c;
-                    const newC = { ...c, [field]: val };
-                    const wasConfirmed = c.confirmed;
-                    if (newC.name && newC.cong && newC.tel) newC.confirmed = true;
-                    if (!wasConfirmed && newC.confirmed) playSound('contact');
-                    return newC;
-                  });
+                  const updated = contacts.map((c, i) => i === idx ? { ...c, [field]: val } : c);
                   setMonthContacts({ ...monthContacts, [mcKey]: updated });
                   setPending(true);
+                };
+
+                // Solo se confirma (y se consolida la vista) al salir de un campo,
+                // nunca mientras se está escribiendo — así el campo no se cierra
+                // con cada letra.
+                const checkConfirmContact = (idx) => {
+                  if (!contactEditMode) return;
+                  const c = contacts[idx];
+                  if (!c || c.confirmed) return;
+                  if (c.name && c.cong && c.tel) {
+                    const updated = contacts.map((cc, i) => i === idx ? { ...cc, confirmed: true } : cc);
+                    setMonthContacts({ ...monthContacts, [mcKey]: updated });
+                    playSound('contact');
+                  }
                 };
 
                 const editContact = (idx) => {
@@ -848,14 +855,14 @@ export default function App() {
                           /* EN EDICIÓN — solo si el candado está abierto */
                           <div>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 8 }}>
-                              <input value={c.name || ''} onChange={e => updateContact(idx, 'name', e.target.value)}
+                              <input value={c.name || ''} onChange={e => updateContact(idx, 'name', e.target.value)} onBlur={() => checkConfirmContact(idx)}
                                 placeholder="Nombre" autoFocus={idx === contacts.length - 1}
                                 style={{ background: D.bg3, border: `1px solid ${c.name ? D.accent+'55' : D.border2}`, borderRadius: 8, padding: '9px 12px', fontSize: 14, color: D.text, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none', width: '100%' }} />
-                              <input value={c.cong || ''} onChange={e => updateContact(idx, 'cong', e.target.value)}
+                              <input value={c.cong || ''} onChange={e => updateContact(idx, 'cong', e.target.value)} onBlur={() => checkConfirmContact(idx)}
                                 placeholder="Congregación"
                                 style={{ background: D.bg3, border: `1px solid ${c.cong ? D.accent+'55' : D.border2}`, borderRadius: 8, padding: '9px 12px', fontSize: 14, color: D.text, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none', width: '100%' }} />
                             </div>
-                            <input value={c.tel || ''} onChange={e => updateContact(idx, 'tel', e.target.value)}
+                            <input value={c.tel || ''} onChange={e => updateContact(idx, 'tel', e.target.value)} onBlur={() => checkConfirmContact(idx)}
                               placeholder="Nro. de contacto"
                               style={{ background: D.bg3, border: `1px solid ${c.tel ? D.accent+'55' : D.border2}`, borderRadius: 8, padding: '9px 12px', fontSize: 14, color: D.text, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none', width: '100%' }} />
                             {c.name && c.cong && c.tel && (
