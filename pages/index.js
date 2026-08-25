@@ -1373,9 +1373,9 @@ export default function App() {
                                 {a.tel && <span style={{ fontSize: 11, color: '#AAA' }}>{a.tel}</span>}
                               </div>
                               <div style={{ fontSize: 11, color: '#666', marginBottom: 5 }}>{a.customTitle ? `📌 ${a.customTitle}` : `${ALL_B_GI[a.bqNum] || ALL_B[a.bqNum] || ''} (${a.bqNum})`}</div>
-                              <div style={{ display: 'flex', gap: 12, fontSize: 10, color: '#888', marginTop: 2 }}>
-                                {r.presidente && <span>Pres. <span style={{ fontWeight: 600, color: '#555' }}>{r.presidente}</span></span>}
-                                {r.lector && <span>Lector <span style={{ fontWeight: 600, color: '#555' }}>{r.lector}</span></span>}
+                              <div style={{ display: 'flex', gap: 12, fontSize: 10, marginTop: 2 }}>
+                                {r.presidente && <span style={{ color: '#4A9C8C', fontWeight: 600 }}>Pres.: <span style={{ fontWeight: 600, color: '#1F6B5C' }}>{r.presidente}</span></span>}
+                                {r.lector && <span style={{ color: '#4A9C8C', fontWeight: 600 }}>Lector: <span style={{ fontWeight: 600, color: '#1F6B5C' }}>{r.lector}</span></span>}
                               </div>
                             </>
                           )}
