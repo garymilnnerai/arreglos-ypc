@@ -1312,7 +1312,7 @@ export default function App() {
                   <button onClick={() => {
                     const doc = document.getElementById('programa-doc');
                     if (!doc) return;
-                    const html = '<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Programa ' + monthName + ' ' + curYear + '<\/title><style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:-apple-system,BlinkMacSystemFont,Helvetica Neue,sans-serif;color:#111;background:#fff;padding:14mm 16mm;}@page{size:A4 portrait;margin:0;}@media print{body{padding:12mm 14mm;}}<\/style><\/head><body>' + doc.innerHTML + '<script>window.onload=function(){window.print();}<\/scr' + 'ipt><\/body><\/html>';
+                    const html = '<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Programa ' + monthName + ' ' + curYear + '<\/title><style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:-apple-system,BlinkMacSystemFont,Helvetica Neue,sans-serif;color:#111;background:#fff;padding:14mm 16mm;-webkit-print-color-adjust:exact;print-color-adjust:exact;}@page{size:A4 portrait;margin:0;}@media print{body{padding:12mm 14mm;-webkit-print-color-adjust:exact;print-color-adjust:exact;}*{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}<\/style><\/head><body>' + doc.innerHTML + '<script>window.onload=function(){window.print();}<\/scr' + 'ipt><\/body><\/html>';
                     const blob = new Blob([html], { type: 'text/html' });
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
@@ -1349,7 +1349,7 @@ export default function App() {
 
                 {/* SECCIÓN 1 */}
                 <div style={{ marginBottom: 18 }}>
-                  <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#999', marginBottom: 10 }}>Conferenciantes que visitan Ypacaraí</div>
+                  <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: '0.04em', textTransform: 'uppercase', color: '#2F8577', marginBottom: 10 }}>Conferenciantes que visitan Ypacaraí</div>
                   {sundays.map((s, si) => {
                     const ds = dateStr(s);
                     const a = assignments[ds];
@@ -1358,9 +1358,9 @@ export default function App() {
                     const dow = s.toLocaleDateString('es-PY', { weekday: 'short' });
                     return (
                       <div key={ds} style={{ display: 'flex', gap: 16, paddingBottom: 8, marginBottom: 8, borderBottom: '1px solid #F0F0F0' }}>
-                        <div style={{ width: 52, flexShrink: 0, textAlign: 'center', background: '#F7F7F7', borderRadius: 8, padding: '6px 4px' }}>
-                          <div style={{ fontSize: 9, fontWeight: 600, color: '#999', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{dow}</div>
-                          <div style={{ fontSize: 16, fontWeight: 700, color: '#111', lineHeight: 1 }}>{s.getDate()}</div>
+                        <div style={{ width: 52, flexShrink: 0, textAlign: 'center', background: '#E3F5F1', borderRadius: 8, padding: '6px 4px' }}>
+                          <div style={{ fontSize: 9, fontWeight: 600, color: '#4A9C8C', textTransform: 'uppercase', letterSpacing: '0.08em' }}>{dow}</div>
+                          <div style={{ fontSize: 16, fontWeight: 700, color: '#1F6B5C', lineHeight: 1 }}>{s.getDate()}</div>
                         </div>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           {!a || a.asamblea ? (
@@ -1389,15 +1389,15 @@ export default function App() {
                 {salidas.length > 0 && (
                   <div style={{ marginBottom: 18 }}>
                     <div style={{ height: 1, background: '#E5E5E5', marginBottom: 14 }} />
-                    <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#999', marginBottom: 10 }}>Conferenciantes que salen de Ypacaraí</div>
+                    <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: '0.04em', textTransform: 'uppercase', color: '#C2664D', marginBottom: 10 }}>Conferenciantes que salen de Ypacaraí</div>
                     {salidas.map((e, i) => (
                       <div key={i} style={{ display: 'flex', gap: 16, paddingBottom: 8, marginBottom: 8, borderBottom: '1px solid #F0F0F0' }}>
-                        <div style={{ width: 56, flexShrink: 0, textAlign: 'center', background: '#F7F7F7', borderRadius: 8, padding: '5px 4px' }}>
-                          <div style={{ fontSize: 9, fontWeight: 600, color: '#888', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{(() => {
+                        <div style={{ width: 56, flexShrink: 0, textAlign: 'center', background: '#FBE9E5', borderRadius: 8, padding: '5px 4px' }}>
+                          <div style={{ fontSize: 9, fontWeight: 600, color: '#C2664D', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{(() => {
                             if (e.date) return new Date(e.date + 'T12:00:00').getDay() === 6 ? 'Sáb' : 'Dom';
                             return e.day === 'sab' ? 'Sáb' : 'Dom';
                           })()}</div>
-                          <div style={{ fontSize: 13, fontWeight: 700, color: '#111', lineHeight: 1.1, marginTop: 1 }}>{(() => {
+                          <div style={{ fontSize: 13, fontWeight: 700, color: '#A34632', lineHeight: 1.1, marginTop: 1 }}>{(() => {
                             if (e.date) return new Date(e.date + 'T12:00:00').getDate();
                             const domingosM = getSundaysOfMonth(curYear, detailMonth);
                             const idx = salidas.indexOf(e);
@@ -1405,12 +1405,12 @@ export default function App() {
                             const match = activeDomM[idx] || activeDomM[0];
                             return match ? match.getDate() : '—';
                           })()}</div>
-                          {e.time && <div style={{ fontSize: 9, color: '#AAA', marginTop: 2, fontWeight: 400 }}>{e.time}</div>}
+                          {e.time && <div style={{ fontSize: 9, color: '#C2664D', marginTop: 2, fontWeight: 400 }}>{e.time}</div>}
                         </div>
                         <div style={{ flex: 1 }}>
                           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginBottom: 2 }}>
                             <span style={{ fontSize: 14, fontWeight: 600, color: '#111' }}>{e.speaker}</span>
-                            <span style={{ fontSize: 11, color: '#888' }}>→ {e.cong}</span>
+                            <span style={{ fontSize: 11, color: '#C2664D', fontWeight: 600 }}>→ {e.cong}</span>
                           </div>
                           {e.bqNum && <div style={{ fontSize: 11, color: '#666' }}>{ALL_B_GI[e.bqNum] || ALL_B[e.bqNum] || ''} ({e.bqNum})</div>}
                         </div>
