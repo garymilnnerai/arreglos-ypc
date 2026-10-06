@@ -58,7 +58,11 @@ const BOSQUEJOS = Object.entries(ALL_B).filter(([n]) => !EXCL.has(parseInt(n))).
 // Títulos oficiales en guaraní (mismos 160 números aprobados que ALL_B)
 const ALL_B_GI = {1:'¿Ndépa reikuaa porã Ñandejárape?',2:'¿Ndépa rehasáta umi ára paha?',3:'Jaservíkena Jehovápe peteĩ ñe\'ẽme iñorganisasión ndive',4:'Umi mba\'e ohechaukáva Ñandejára oexistiha',5:'¿Mba\'épa jajapo va\'erã javy\'a hağua ñande rogapýpe?',6:'¿Mba\'épa ikatu ñaaprende pe dilúvio oiko va\'ekuégui Noé tiémpope?',7:'Jaiporiahuverekókena ñande rapichápe Jehová ñandeporiahuverekoháicha',8:'Jaipurúkena ñande rekove jaservi hag̃ua Ñandejárape',9:'Ñahendu ha jajapo Ñandejára ñe\'ẽ he\'íva',10:'Ñaneonrrádo va\'erã opa mba\'épe',11:'Jasegi Jesús ehémplo ha ani jaiko ko múndope ojeikoháicha',12:'Jarrespetáramo umi autoridápe ñambovy\'áta Ñandejárape',13:'Mba\'éichapa ohecha Ñandejára pe sexo ha ñemenda',14:'Ñane rekopotĩrupi ñamomba\'eguasu Jehovápe',15:'Jajapó memékena iporãva enterove rehehápe',16:'Ñamombaretékena ñane amista Jehovándi',17:'Ñamomba\'eguasu Ñandejárape entéro mba\'e jarekóva rehehápe',18:'Nembaretékena Jehová rupive',19:'Mba\'éichapa ikatu reikuaa nerenonderã?',20:'¿Oğuahẽmapa pe tiémpo Ñandejára ogoverna hağua ko múndo?',21:'¿Mba\'épa ikatu jajapo Ñandejára Rréino rehehápe?',22:'Revy\'ápa umi mba\'e Jehová ome\'ẽvare ndéve?',23:'¿Mba\'épa Ñandejára volunta ñandéve ğuarã?',24:'Nde retopa “peteĩ pérla iporãitereíva”',25:'¡Ñamboykete ko múndo oiko ha opensa lája!',26:'¿Ojepy\'apýpa Ñandejára ñanderehe?',27:'Mba\'éicha ikatu eñepyrũ porã nematrimóniope',28:'Toĩkena rrespéto ha mborayhu nematrimóniope',29:'Umi rresponsabilida oguerekóva túa ha sy kuéra',30:'Mba\'éicha ikatu ñañemongeta porãve ñane famíliandive',31:'¿Ndépa rehechakuaa reikotevẽha Ñandejárare?',32:'¿Mba\'épa jajapo va\'erã ani hağua jajepy\'apyeterei?',33:'¿Og̃uahẽnepa peteĩ ára oĩtaha tekojoja entéro peguarã?',34:'Rejapopareína oñekotevẽva rejesalva hağua',35:'¿Ikatúnepa jaikove pára siémpre? ¿Mba\'épa nde rejapo va\'erã?',36:'¿Mba\'épa jajapo va\'erã isentído hağua ñande rekove?',37:'Eñemoĩkena ko\'ãğa Ñandejára sãmbyhy ndive',38:'¿Mba\'éichapa ikatu reikove oñehundi vove ko múndo aña?',39:'Jajerovia Jehová katuete oganataha!',40:'¿Mba\'épa oikóta ko\'ẽroite?',41:'Pepytánte ha pehecháta mba\'éicha Jehová pendesalva',42:'¿Ikatúpa pe mborayhu ipu\'aka pe ódiore?',43:'¿Jajapópa ñaína Ñandejára ojeruréva?',44:'Jaheka memékena Ñandejára rréino',45:'Jahákena kontinuadoité pe tapé oporogueraháva pe jeikove',46:'Aníke reheja araka\'eve ikangy nde jerovia',47:'‘Jajeroviákena Ñandejára marandu porãre’',48:'Mba\'éichapa ikatu ñane ñe\'ẽrendu ijetu\'ujave',49:'Ikatúnepa jaiko peteĩ yvy potĩme?',50:'Mba\'éichapa redesidíta pe rejapova\'erã?',51:'Ombopyahupahína nde rekove pe añetegua?',52:'Mávapepa readorareína?',53:'Jahechápa opa mba\'e Ñandejára ohechaháicha?',54:'Ñamombaretékena ñande jerovia Jehováre',55:'¿Mba\'éichapa ikatu reime porãve Ñandejára renondépe?',56:'¿Mba\'éichagua líder rehepa ikatu jajerovia?',57:'Jagueropu\'akákena oĩramo oñemoĩva ñanderehe',58:'¿Mávapa umi añetehápe osegíva Jesús ehémplo?',60:'Jaikuaa maerãpa jaikove',61:'¿Máva promésarepa nde rejerovia?',62:'¿Moõpa ikatu retopa esperánsa isegúrova?',63:'Nekyre\'ỹpa repredikave hağua?',64:'¿Jahayhuvépa umi ñane gustavánte jahayhu Ñandejárape rangue?',65:'¿Ikatúpa jaiko py\'aguapýpe ko mundo añáme?',66:'¿Nekyre\'ýpa emba\'apo hag̃ua pe koséchape?',67:'Ejepy\'amongeta Ñandejára ñe\'ẽre ha ikreasiónre',68:'Ndepojerákena eporoperdoná hag̃ua',69:'¿Mba\'érepa iñimportánte jahechauka pe mborayhu teetéva?',70:'¿Mba\'érepa Ñandejára omeresé jajerovia mbarete hesé?',71:'Japytákena japayhápe ko\'anga',72:'Pe mborayhu rupi ojekuaa pe rreligión añetéva',73:'Ñañeha\'ãkena ñanearandu',74:'Jehová ohecha opa mba\'e jajapóva',75:'Eñemoĩkena Ñandejára Rréino ykére',76:'Ñanepytyvõnepa la Biblia ñambohovái hağua ñane provlemakuéra?',77:'Japororresivikuaákena siémpre',78:'Vy\'ápeke jaservi Jehovápe',79:'Mávapa reiporavóta ne amigorã, ¿Ñandejárape terãpa ko mundo?',80:'¿Rejeroviápa pe Siénsia he\'ivarente tera Ñandejára ñe\'ẽre?',81:'Mávapa ikatu oservi Ñandejárape?',83:'¿Tekotevẽpa kristiáno kuéra iñe\'ẽrendu umi Diés Mandamiento?',86:'¿Mba\'épa tekotevẽ, Ñandejára ohendu hag̃ua ñane ñembo\'e?',88:'Mba\'érepa jaiko va\'erã Ñandejára Ñe\'ẽ ombo\'eháicha',89:'Eju ha hei\'u pe y ha\'éva pe añetegua',90:'Eñeha\'ãkena Ehupyty hag̃ua pe jeikove añeteguáva',91:'Oĩma pe Mesías ha ogovernáma',93:'¿Araka\'e opáta umi desastres naturales?',95:'Mba\'épa he\'i la Biblia espiritísmo rehe',96:'Ko\'ẽrõitéma oñehundíta rrelihión japu',98:'Ani jaheja ko múndo ñanemongy\'a',99:'Mba\'érepa ikatu jajerovia Ñandejára Ñe\'ẽre',100:'Mba\'épa jajapova\'erã ñane amigoite hağua Ñandejára ha ñande rapichakuéra?',101:'Jehová: opa mba\'e Apohare ijojaha\'ỹva',102:'Ñañatende porãkena umi profesíare',103:'Ikatu javy\'a jajapóramo Ñandejára oipotáva',104:'Túvakuéra, ¿pehekombo\'e porãpa hína pene famíliape?',107:'Ikatu ñane konsiénsia potĩ jaikóramo jepe ko múndo añáme',108:'Aníkena jakyhyje ñane renonderãgui',110:'Umi família omotenondéva Jehovápe ovy\'a hogapýpe',111:'Ñandejára ñanepytyvõta jakuera hağua umi mba\'asýgui ha avei ñaime porã hağua hendive',112:'Ikatu japorohayhu jaikóramo jepe ko múndo añáme',113:'Mba\'éichapa mitãrusu ha mitãkuñanguéra ikatu ombohovái ko tiémpo ijetu\'uetéva?',114:'Eguerohorýkena Ñandejára rembiapokue iporãmba jepéva',115:'Mba\'épa ikatu jajapo ani hağua ja\'a Satanás ñuhãme',116:'Nearandúkena reiporavo hağua ne irũrã',118:'Jahechákena mitãrusukuérape Jehová ohechaháicha',121:'Peteĩ puévlo ojesalvátava ko mundo añágui',125:'Mba\'érepa ñaikotevẽ peteĩ ñanemosãsóva pekádogui',127:'Mba\'épa oiko ñandehegui ñamano rire?',128:'Ojehasa asýpa añete infiérnope?',129:'¿Ombo\'épa la Biblia pe Trinida?',130:'Ko yvy noñehundimo\'ãi araka\'eve',131:'Añetehápepa oĩ Satanás?',132:'Ñemoingove jey rupi oĩ pu\'aka ñemanóre',133:'¿Mba\'érepa iñimportánte jaikuaa mba\'éichapa oñepyrũ raka\'e yvyporakuéra?',134:'Ohejava\'erãpa kristianokuéra pe sábado opytu\'u hağua?',135:'Ñamomba\'ékena tuguy ha ñande rekove',136:'Iporãpa jaiporu sánto ra\'anga ñamomba\'eguasu hağua Ñandejárape?',137:'Oikoparaka\'e umi milágro omombe\'úva la Biblia?',138:'Ñaneakãguapýkena ko múndo añáme',140:'¿Mávapa añetehápe Jesús?',142:'Jajeroviákena Jehová oñangarekotaha ñanderehe',143:'Jajeroviákena Ñandejára ñanekonsolávare',146:'Eipurúkena ne edukasión emomba\'éguasu hag̃ua Jehovápe',147:'Jajeroviákena Jehová ñandesalvataha',150:'Reikuaa porãpa Ñandejárape?',152:'Araka\'e ha mba\'érepa oikóta Armagedón?',153:'Ñanemandu\'ákena Jehová ára guasu hi\'ãguimbaitemaha',156:'Jakyhyjeva\'erãpa pe huísio áragui?',159:'Aníke jaheja ko múndo aña ombyai ñande jerovia',160:'Jahechaukákena ñande kristiáno teeteha',161:'¿Mba\'érepa Jesús ohasa asy ha omano?',162:'Ikatu ñasẽ ko múndo ypytũgui',166:'Jajerovia ha ani jakyhyje umi mba\'e oikótavagui',169:'Mba\'érepa jajapova\'erã la Biblia he\'íva?',170:'Mávapa ikatupyryve ogoverna hağua yvyporakuérape?',171:'Nde ikatu reiko py\'aguapýpe ko\'ãğa ha opa ára ğuarã',172:'Ñaime porãpa Ñandejára renondépe?',173:'Oguerohorýpa Ñandejára opaichagua rrelihión?',174:'Mba\'épa jajapova\'erã jaiko hağua Ñandejára múndo pyahúpe?',175:'Mba\'éichapa jaikuaa la Biblia ouha Ñandejáragui?',176:'Araka\'épa jaikóta py\'aguapýpe ha kyhyje\'ỹme?',177:'Mávapa ikatu ñanembopy\'aguapy jahasa asy jave?',178:'Akóintekena ñaneñe\'ẽrendu ha ñanderekopotĩ',179:'Ñamboyke ko múndo oikuave\'ẽva ha ñamotenonde Ñandejára Rréino',180:'¿Mba\'érepa tekotevẽ jaguerovia oikove jeytaha umi omanova\'ekue?',181:'Rehechakuaápa hi\'ãguimbaitemaha?',182:'¿Mba\'épa ojapo hína Ñandejára Rréino ñanderehehápe?',183:'Ani ñamaña umi mba\'e ndovaléivare mba\'everã',184:'¿Pe ñemano piko omohu\'ã entéro mba\'e?',185:'¿Nepytyvõpa pe añetegua nde rekovépe?',186:'Ñañemoag̃uíkena Jehováa pueblo ovy\'ávare',187:'¿Mba\'érepa Ñandejára ñanderayhúramo oheja oiko hetaite mba\'e vai?',188:'¿Ndépa rejerovia Jehováre?',189:'Jaiko Ñandejárandi ñanepytyvõta ko\'ág̃a ha opa ára g̃uarã',190:'¿Ikatúnepa jaiko vy\'ápe peteĩ famíliaicha?',191:'Jahayhúramo Ñandejárape ha jajerovia hese ñandepu\'akáta ko múndore',192:'¿Mba\'épa ikatu rejapo rehupyty hag̃ua pe vída etérna?',193:'Jehová ñandesalváta ko mundo añágui',194:'¿Mba\'éichapa ñanepytyvõ pe arandu oúva Jehovágui?'};
 
+const CIRCUITO_LABEL = 'Semana de la Visita del Sup. de Circuito';
 const CIRCUITO_PREFIX = 'Visita del Sup. de Circuito: ';
+const isCirc = (t) => !!t && t.startsWith('Visita del Sup. de Circuito');
+const circTitle = (t) => (t || '').replace(/^Visita del Sup\. de Circuito:?\s*/, '');
+const fmtCustom = (t) => isCirc(t) ? `🧭 ${CIRCUITO_LABEL}${circTitle(t) ? ' — ' + circTitle(t) : ''}` : `📌 ${t}`;
 
 const SPEAKERS = [
   { name: 'Agustín Egusquiza', bqs: [11,17,40,55,68,112,153,160] },
@@ -351,7 +355,6 @@ export default function App() {
   const [sunCustomTitle, setSunCustomTitle] = useState('');
   const [modalBQCustom, setModalBQCustom] = useState(false);
   const [customTitleDraft, setCustomTitleDraft] = useState('');
-  const [bqCircuito, setBqCircuito] = useState(false);
   const [form, setForm] = useState({});
   const [isDark, setIsDark] = useState(false);
   // Date selector state for BQ modal
@@ -464,10 +467,14 @@ export default function App() {
     const newA = { ...assignments };
     if (form.asamblea) { newA[ds] = { asamblea: true }; }
     else {
+      if (form.circuito) {
+        newA[ds] = { bqNum: null, customTitle: CIRCUITO_PREFIX + (form.circTitle || '').trim(), name: form.name || '', cong: form.cong || '', tel: form.tel || '' };
+      } else {
       if (!sunBQNum && !sunCustomTitle) return alert('Elegí un bosquejo');
       newA[ds] = sunCustomTitle
         ? { bqNum: null, customTitle: sunCustomTitle, name: form.name || '', cong: form.cong || '', tel: form.tel || '' }
         : { bqNum: sunBQNum, name: form.name || '', cong: form.cong || '', tel: form.tel || '' };
+      }
     }
     markChanged(newA);
     const flashDs = ds;
@@ -971,13 +978,13 @@ export default function App() {
                   <div key={ds}
                     style={{ background: sundayFlash === ds ? D.greenDim : 'transparent', padding: '14px 16px', borderBottom: sIdx < totalSundays - 1 ? `1px solid ${D.border}` : 'none', transition: 'background 0.4s ease' }}>
                     {/* Conferencia */}
-                    <div onClick={() => { if (!venEditMode) return; setModalSunday({ date: ds, assignment: a }); setSunBQNum(a?.bqNum || null); setSunCustomTitle(a?.customTitle || ''); setForm({ asamblea: a?.asamblea || false, name: a?.name || '', cong: a?.cong || '', tel: a?.tel || '' }); }}
+                    <div onClick={() => { if (!venEditMode) return; setModalSunday({ date: ds, assignment: a }); setSunBQNum(a?.bqNum || null); setSunCustomTitle(a?.customTitle || ''); setForm({ asamblea: a?.asamblea || false, circuito: isCirc(a?.customTitle), circTitle: circTitle(a?.customTitle), name: a?.name || '', cong: a?.cong || '', tel: a?.tel || '' }); }}
                       style={{ cursor: venEditMode ? 'pointer' : 'default', marginBottom: a && !a.asamblea ? 10 : 0 }}>
                       <div style={{ fontSize: 16, fontWeight: 500, color: D.text, marginBottom: 4 }}>Domingo {lbl}</div>
                       {a?.asamblea && <div style={{ fontSize: 14, color: D.accent }}>🏛 Fin de semana de asamblea</div>}
                       {(a?.bqNum || a?.customTitle) && <><div style={{ fontSize: 14, color: D.text2 }}>{a.name || '—'} · {a.cong || '—'}{a.tel ? ' · ' + a.tel : ''}</div>
                         {a.customTitle ? (
-                          <div style={{ fontSize: 13, color: D.text3, marginTop: 2 }}>📌 {a.customTitle}</div>
+                          <div style={{ fontSize: 13, color: D.text3, marginTop: 2 }}>{fmtCustom(a.customTitle)}</div>
                         ) : (
                           <>
                             <div style={{ fontSize: 13, color: D.text3, marginTop: 2 }}>{a.bqNum} — {ALL_B[a.bqNum] || ''}</div>
@@ -1260,7 +1267,7 @@ export default function App() {
               {histEntries.map(([ds, a]) => (
                 <div key={ds} style={{ background: D.bg2, border: `1px solid ${D.border}`, borderRadius: 14, padding: '14px 16px', marginBottom: 8, transition: 'background 0.3s ease' }}>
                   <div style={{ fontSize: 13, color: D.text3, marginBottom: 5 }}>{fmtDate(ds)}</div>
-                  <div>{a.customTitle ? (<span style={{ fontSize: 13, color: D.text }}>📌 {a.customTitle}</span>) : (<><span style={{ fontSize: 13, fontWeight: 500, color: D.accent, marginRight: 6 }}>{a.bqNum}</span><span style={{ fontSize: 13, color: D.text }}>{ALL_B[a.bqNum] || ''}</span></>)}</div>
+                  <div>{a.customTitle ? (<span style={{ fontSize: 13, color: D.text }}>{fmtCustom(a.customTitle)}</span>) : (<><span style={{ fontSize: 13, fontWeight: 500, color: D.accent, marginRight: 6 }}>{a.bqNum}</span><span style={{ fontSize: 13, color: D.text }}>{ALL_B[a.bqNum] || ''}</span></>)}</div>
                   {!a.customTitle && ALL_B_GI[a.bqNum] && <div style={{ fontSize: 12, color: D.text3, opacity: 0.75, marginTop: 1 }}>{ALL_B_GI[a.bqNum]}</div>}
                   <div style={{ fontSize: 11, color: D.text2, marginTop: 3 }}>{[a.name, a.cong, a.tel].filter(Boolean).join(' · ')}</div>
                 </div>
@@ -1374,7 +1381,7 @@ export default function App() {
                                 <span style={{ fontSize: 11, color: '#888' }}>{a.cong}</span>
                                 {a.tel && <span style={{ fontSize: 11, color: '#AAA' }}>{a.tel}</span>}
                               </div>
-                              <div style={{ fontSize: 11, color: '#666', marginBottom: 5 }}>{a.customTitle ? `📌 ${a.customTitle}` : `${ALL_B_GI[a.bqNum] || ALL_B[a.bqNum] || ''} (${a.bqNum})`}</div>
+                              <div style={{ fontSize: 11, color: '#666', marginBottom: 5 }}>{a.customTitle ? fmtCustom(a.customTitle) : `${ALL_B_GI[a.bqNum] || ALL_B[a.bqNum] || ''} (${a.bqNum})`}</div>
                               <div style={{ display: 'flex', gap: 12, fontSize: 10, marginTop: 2 }}>
                                 {r.presidente && <span style={{ color: '#4A9C8C', fontWeight: 600 }}>Pres.: <span style={{ fontWeight: 600, color: '#1F6B5C' }}>{r.presidente}</span></span>}
                                 {r.lector && <span style={{ color: '#4A9C8C', fontWeight: 600 }}>Lector: <span style={{ fontWeight: 600, color: '#1F6B5C' }}>{r.lector}</span></span>}
@@ -1535,8 +1542,17 @@ export default function App() {
         {modalSunday && !modalBQSel && (
           <Overlay onClose={() => { setModalSunday(null); setSunBQNum(null); setSunCustomTitle(''); setModalBQCustom(false); }} D={D}>
             <div style={{ fontSize: 17, fontWeight: 500, color: D.text, marginBottom: 18 }}>{fmtDate(modalSunday.date)}</div>
-            <AsambleaCheck checked={form.asamblea} onChange={v => setForm(f => ({ ...f, asamblea: v }))} D={D} />
+            <AsambleaCheck checked={form.asamblea} onChange={v => setForm(f => ({ ...f, asamblea: v, circuito: v ? false : f.circuito }))} D={D} />
             {!form.asamblea && (
+              <AsambleaCheck checked={form.circuito} label={CIRCUITO_LABEL} onChange={v => setForm(f => ({ ...f, circuito: v }))} D={D} />
+            )}
+            {!form.asamblea && form.circuito && (
+              <>
+                <FField label="Título del discurso" placeholder="Escribí el título del discurso" value={form.circTitle || ''} onChange={v => setForm(f => ({ ...f, circTitle: v }))} D={D} />
+                <FField label="Conferenciante" placeholder="Nombre y apellido" value={form.name || ''} onChange={v => setForm(f => ({ ...f, name: v }))} D={D} />
+              </>
+            )}
+            {!form.asamblea && !form.circuito && (
               <>
                 <div style={{ marginBottom: 13 }}>
                   <div style={css.label}>Bosquejo</div>
@@ -1560,26 +1576,18 @@ export default function App() {
 
         {/* MODAL: BQ SELECTOR */}
         {modalBQSel && (
-          <Overlay onClose={() => { setModalBQSel(false); setModalBQCustom(false); setBqCircuito(false); }} D={D} tall>
-            <div style={{ fontSize: 14, fontWeight: 500, color: D.text, marginBottom: 12 }}>{modalBQCustom ? (bqCircuito ? 'Visita del Sup. de Circuito' : 'Conferencia especial') : 'Elegir bosquejo'}</div>
+          <Overlay onClose={() => { setModalBQSel(false); setModalBQCustom(false); }} D={D} tall>
+            <div style={{ fontSize: 14, fontWeight: 500, color: D.text, marginBottom: 12 }}>{modalBQCustom ? 'Conferencia especial' : 'Elegir bosquejo'}</div>
             {modalBQCustom ? (
               <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-                {bqCircuito && (
-                  <div onClick={() => { setBqCircuito(false); setModalBQCustom(false); }}
-                    style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 10px', marginBottom: 12, borderRadius: 10, background: D.accentDim2, border: `1px solid ${D.accent}55`, cursor: 'pointer' }}>
-                    <span style={{ width: 18, height: 18, borderRadius: 5, background: D.accent, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>✓</span>
-                    <span style={{ fontSize: 13, color: D.text, fontWeight: 500 }}>Visita del Sup. de Circuito</span>
-                  </div>
-                )}
-                <div style={{ fontSize: 12, color: D.text2, marginBottom: 10, lineHeight: 1.4 }}>{bqCircuito ? 'Escribí el tema del discurso' : 'Escribí el título de la conferencia especial (no está en la colección de bosquejos)'}</div>
-                <input autoFocus value={customTitleDraft} onChange={e => setCustomTitleDraft(e.target.value)} placeholder={bqCircuito ? 'Tema del discurso' : 'Ej: Discurso especial'}
+                <div style={{ fontSize: 12, color: D.text2, marginBottom: 10, lineHeight: 1.4 }}>Escribí el título de la conferencia especial (no está en la colección de bosquejos)</div>
+                <input autoFocus value={customTitleDraft} onChange={e => setCustomTitleDraft(e.target.value)} placeholder="Ej: Discurso especial del superintendente de circuito"
                   style={{ width: '100%', background: D.bg3, border: `1px solid ${D.border2}`, borderRadius: 10, padding: '13px 14px', fontSize: 15, fontWeight: 300, color: D.text, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none', boxSizing: 'border-box' }} />
                 <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
-                  <Btn onClick={() => { setModalBQCustom(false); setBqCircuito(false); }} secondary D={D}>Volver</Btn>
+                  <Btn onClick={() => setModalBQCustom(false)} secondary D={D}>Volver</Btn>
                   <Btn onClick={() => {
                     if (!customTitleDraft.trim()) return;
-                    setSunCustomTitle(bqCircuito ? `${CIRCUITO_PREFIX}${customTitleDraft.trim()}` : customTitleDraft.trim());
-                    setBqCircuito(false);
+                    setSunCustomTitle(customTitleDraft.trim());
                     setSunBQNum(null);
                     setModalBQCustom(false);
                     setModalBQSel(false);
@@ -1593,12 +1601,7 @@ export default function App() {
                   <input value={bqSelSearch} onChange={e => setBqSelSearch(e.target.value)} placeholder="Número o título..."
                     style={{ width: '100%', background: D.bg3, border: `1px solid ${D.border2}`, borderRadius: 10, padding: '13px 14px 13px 36px', fontSize: 15, fontWeight: 300, color: D.text, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none', transition: 'background 0.3s ease' }} />
                 </div>
-                <div onClick={() => { setBqCircuito(true); setModalBQCustom(true); setCustomTitleDraft((sunCustomTitle || '').startsWith(CIRCUITO_PREFIX) ? sunCustomTitle.slice(CIRCUITO_PREFIX.length) : ''); }}
-                  style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 10px', marginBottom: 8, borderRadius: 10, background: D.accentDim2, border: `1px solid ${D.accent}55`, cursor: 'pointer' }}>
-                  <span style={{ width: 18, height: 18, borderRadius: 5, border: `1.5px solid ${D.accent}`, flexShrink: 0 }} />
-                  <span style={{ fontSize: 13, color: D.text, fontWeight: 500 }}>Visita del Sup. de Circuito</span>
-                </div>
-                <div onClick={() => { setBqCircuito(false); setModalBQCustom(true); setCustomTitleDraft((sunCustomTitle || '').startsWith(CIRCUITO_PREFIX) ? '' : (sunCustomTitle || '')); }}
+                <div onClick={() => { setModalBQCustom(true); setCustomTitleDraft(sunCustomTitle || ''); }}
                   style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 10px', marginBottom: 8, borderRadius: 10, background: D.amberDim, border: `1px solid ${D.amber}55`, cursor: 'pointer' }}>
                   <span style={{ fontSize: 15 }}>📌</span>
                   <span style={{ fontSize: 13, color: D.text, fontWeight: 500 }}>Conferencia especial — no está en la lista</span>
@@ -1658,13 +1661,13 @@ function Overlay({ children, onClose, tall, D }) {
   );
 }
 
-function AsambleaCheck({ checked, onChange, D }) {
+function AsambleaCheck({ checked, onChange, D, label = 'Fin de semana de asamblea' }) {
   const accent = D ? D.accent : '#7B8CDE';
   const accentDim = D ? D.accentDim : 'rgba(123,140,222,0.08)';
   return (
     <label style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', background: accentDim, border: `1px solid ${accent}33`, borderRadius: 10, cursor: 'pointer', marginBottom: 16 }}>
       <input type="checkbox" checked={checked || false} onChange={e => onChange(e.target.checked)} style={{ width: 16, height: 16, accentColor: accent }} onClick={e => e.stopPropagation()} />
-      <span style={{ fontSize: 14, fontWeight: 400, color: accent }}>Fin de semana de asamblea</span>
+      <span style={{ fontSize: 14, fontWeight: 400, color: accent }}>{label}</span>
     </label>
   );
 }
