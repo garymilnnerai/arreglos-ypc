@@ -62,14 +62,13 @@ const SPEAKERS = [
   { name: 'Agustín Egusquiza', bqs: [11,17,40,55,68,112,153,160] },
   { name: 'Bernardo Roa',      bqs: [30,74,76,190] },
   { name: 'Celso Roa',         bqs: [1,2,25,62] },
-  { name: 'Claudelino Rojas',  bqs: [66,172,190] },
   { name: 'Gary Martínez',     bqs: [1,2,6,28,29,40,50,52,90,100,110,116,140,169,174,181] },
   { name: 'Osvaldo Díaz',      bqs: [2,7,176,183] },
   { name: 'Rafael Minesi',     bqs: [3,9,10,48,77] },
 ];
 
 const PRESIDENTES = [
-  'Agustín Egusquiza','Bernardo Roa','Celso Roa','Claudelino Rojas',
+  'Agustín Egusquiza','Bernardo Roa','Celso Roa',
   'Gary Martínez','Rafael Minesi','Francisco Jara','Isidro Benítez'
 ];
 const LECTORES = [
