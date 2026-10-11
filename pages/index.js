@@ -80,14 +80,15 @@ const PRESIDENTES = [
 ];
 const LECTORES = [
   'Agustín Egusquiza','Bernardo Roa','Celso Roa','Claudelino Rojas',
-  'Gary Martínez','Rafael Minesi','Isidro Benítez','Agustín Martínez','Jahaziel Roa'
+  'Gary Martínez','Rafael Minesi','Isidro Benítez','Agustín Martínez','Jahaziel Roa',
+  'Mario Fretes','Josué Martínez'
 ];
 const CONDUCTOR_PERMANENTE = 'Osvaldo Díaz';
 const SUPLENTE_CONDUCTOR = 'Agustín Egusquiza';
 // Solo pueden ser presidente (nunca lector)
 const SOLO_PRESIDENTE = ['Francisco Jara'];
 // Solo pueden ser lector (nunca presidente)
-const SOLO_LECTOR = ['Agustín Martínez','Jahaziel Roa'];
+const SOLO_LECTOR = ['Agustín Martínez','Jahaziel Roa','Mario Fretes','Josué Martínez'];
 
 function autoAssignRoles(sundays, assignments, outgoing, existingRoles, mcKey, allRoles) {
   // Las salidas (conferenciantes que salen) tienen jerarquía de importancia:
