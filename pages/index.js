@@ -1324,12 +1324,34 @@ export default function App() {
                     const doc = document.getElementById('programa-doc');
                     if (!doc) return;
                     const html = '<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Programa ' + monthName + ' ' + curYear + '<\/title><style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:-apple-system,BlinkMacSystemFont,Helvetica Neue,sans-serif;color:#111;background:#fff;padding:14mm 16mm;-webkit-print-color-adjust:exact;print-color-adjust:exact;}@page{size:A4 portrait;margin:0;}@media print{body{padding:12mm 14mm;-webkit-print-color-adjust:exact;print-color-adjust:exact;}*{-webkit-print-color-adjust:exact;print-color-adjust:exact;}.np{display:none!important;}}.np{position:fixed;top:12px;right:12px;z-index:9999;background:#2F8577;color:#fff;border:none;border-radius:24px;padding:12px 20px;font-size:15px;font-weight:600;font-family:inherit;box-shadow:0 2px 10px rgba(0,0,0,.25);cursor:pointer;}<\/style><\/head><body><button class="np" onclick="window.print()">Imprimir / Guardar PDF<\/button>' + doc.innerHTML + '<script>window.onload=function(){window.print();}<\/scr' + 'ipt><\/body><\/html>';
-                    const blob = new Blob([html], { type: 'text/html' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url; a.target = '_blank'; a.rel = 'noopener';
-                    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-                    setTimeout(() => URL.revokeObjectURL(url), 5000);
+                    // 1) Imprimir desde un marco oculto en la misma página (conserva el toque del usuario;
+                    //    funciona en móvil y tablet sin abrir otra pestaña)
+                    let printed = false;
+                    try {
+                      const old = document.getElementById('print-frame');
+                      if (old) old.remove();
+                      const f = document.createElement('iframe');
+                      f.id = 'print-frame';
+                      f.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;';
+                      document.body.appendChild(f);
+                      const cleanHtml = html
+                        .replace(/<script>[\s\S]*?<\/script>/, '')
+                        .replace(/<button class="np"[\s\S]*?<\/button>/, '');
+                      const d = f.contentWindow.document;
+                      d.open(); d.write(cleanHtml); d.close();
+                      f.contentWindow.focus();
+                      f.contentWindow.print();
+                      printed = true;
+                    } catch (err) { printed = false; }
+                    // 2) Respaldo: abrir en otra pestaña (con botón Imprimir)
+                    if (!printed) {
+                      const blob = new Blob([html], { type: 'text/html' });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url; a.target = '_blank'; a.rel = 'noopener';
+                      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                      setTimeout(() => URL.revokeObjectURL(url), 5000);
+                    }
                   }}
                     style={{ background: 'none', border: `1px solid ${D.accent}44`, borderRadius: 8, cursor: 'pointer', color: D.accent, display: 'flex', alignItems: 'center', gap: 4, fontSize: 13, fontFamily: 'Geist, system-ui, sans-serif', padding: '4px 10px' }}>
                     <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.3">
