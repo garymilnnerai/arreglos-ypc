@@ -90,12 +90,19 @@ const SOLO_PRESIDENTE = ['Francisco Jara'];
 // Solo pueden ser lector (nunca presidente)
 const SOLO_LECTOR = ['Agustín Martínez','Jahaziel Roa','Mario Fretes','Josué Martínez'];
 
+// Domingo del fin de semana al que pertenece una salida (null si aún no tiene fecha)
+function salidaSunday(e) {
+  if (!e || !e.date) return null;
+  const d = new Date(e.date + 'T12:00:00');
+  if (d.getDay() === 6) d.setDate(d.getDate() + 1);
+  return d.toISOString().split('T')[0];
+}
+
 function autoAssignRoles(sundays, assignments, outgoing, existingRoles, mcKey, allRoles) {
   // Las salidas (conferenciantes que salen) tienen jerarquía de importancia:
   // se calculan primero y todo lo demás se adapta a ellas.
   const salenEntries = outgoing[mcKey] || [];
   const salenNames = salenEntries.map(e => e.speaker);
-  const osvaldoSale = salenNames.includes(CONDUCTOR_PERMANENTE);
 
   // Active sundays — todos los domingos del mes salvo los de asamblea
   // (no hace falta que ya tengan conferenciante asignado)
@@ -132,12 +139,10 @@ function autoAssignRoles(sundays, assignments, outgoing, existingRoles, mcKey, a
 
   // Base pools — strict rules
   const basePres = PRESIDENTES.filter(p =>
-    !SOLO_LECTOR.includes(p) &&
-    !(osvaldoSale && p === SUPLENTE_CONDUCTOR)
+    !SOLO_LECTOR.includes(p)
   );
   const baseLec = LECTORES.filter(l =>
-    !SOLO_PRESIDENTE.includes(l) &&
-    !(osvaldoSale && l === SUPLENTE_CONDUCTOR)
+    !SOLO_PRESIDENTE.includes(l)
   );
 
   // lastUsed: última fecha en que cada persona ejerció CUALQUIER rol (presidente o
@@ -184,6 +189,9 @@ function autoAssignRoles(sundays, assignments, outgoing, existingRoles, mcKey, a
         .filter(([, dates]) => dates.has(ds))
         .map(([name]) => name)
     );
+    // Si Osvaldo sale ese fin de semana, el suplente (Agustín Egusquiza) queda
+    // bloqueado solo ese fin de semana: ni presidente ni lector.
+    if ((salenPorFecha[CONDUCTOR_PERMANENTE] || new Set()).has(ds)) outToday.add(SUPLENTE_CONDUCTOR);
 
     const pres = pickCandidate(basePres, ds, outToday);
     const excludeForLec = new Set(outToday);
@@ -1011,17 +1019,19 @@ export default function App() {
                         .map(s2 => dateStr(s2))
                         .filter(d2 => !(assignments[d2] && assignments[d2].asamblea));
                       const idxThisSunday = activeDomR.indexOf(ds);
-                      const salidaHoy = (outgoing[mcKeyR2] || [])[idxThisSunday];
-                      const salenHoyNames = salidaHoy?.speaker ? [salidaHoy.speaker] : [];
+                      const salenHoyNames = (outgoing[mcKeyR2] || [])
+                        .filter((e, i) => e.speaker && (e.date ? salidaSunday(e) === ds : i === idxThisSunday))
+                        .map(e => e.speaker);
+                      const osvaldoSaleHoy = salenHoyNames.includes(CONDUCTOR_PERMANENTE);
                       const presidentesDisp = PRESIDENTES.filter(p =>
                         !SOLO_LECTOR.includes(p) &&
                         !salenHoyNames.includes(p) &&
-                        !(osvaldoSaleR && p === SUPLENTE_CONDUCTOR)
+                        !(osvaldoSaleHoy && p === SUPLENTE_CONDUCTOR)
                       );
                       const lectoresDisp = LECTORES.filter(l =>
                         !SOLO_PRESIDENTE.includes(l) &&
                         !salenHoyNames.includes(l) &&
-                        !(osvaldoSaleR && l === SUPLENTE_CONDUCTOR) &&
+                        !(osvaldoSaleHoy && l === SUPLENTE_CONDUCTOR) &&
                         l !== r.presidente
                       );
                       const updateRole = (field, val) => { setRoles(prev => ({ ...prev, [ds]: { ...prev[ds], [field]: val } })); setPending(true); };
@@ -1109,6 +1119,10 @@ export default function App() {
 
                 // Check speaker limit: max 2 per month
                 const speakerCount = (name) => entries.filter(e => e.speaker === name).length;
+                // Si Osvaldo sale un fin de semana, Agustín Egusquiza no puede salir ese mismo fin de semana
+                const weekendsOf = (name, exceptIdx) => entries
+                  .map((x, i) => (x.speaker === name && i !== exceptIdx) ? salidaSunday(x) : null)
+                  .filter(Boolean);
 
                 const speakerBqs = (name) => SPEAKERS.find(s => s.name === name)?.bqs || [];
 
@@ -1203,8 +1217,13 @@ export default function App() {
                                       <option value="">Conferenciante...</option>
                                       {SPEAKERS.map(s => {
                                         const count = speakerCount(s.name);
-                                        const disabled = s.name !== e.speaker && count >= 2;
-                                        return <option key={s.name} value={s.name} disabled={disabled}>{s.name}{disabled ? ' (límite)' : ''}</option>;
+                                        const myWk = salidaSunday(e);
+                                        const blockedWk = !!myWk && (
+                                          (s.name === SUPLENTE_CONDUCTOR && weekendsOf(CONDUCTOR_PERMANENTE, idx).includes(myWk)) ||
+                                          (s.name === CONDUCTOR_PERMANENTE && weekendsOf(SUPLENTE_CONDUCTOR, idx).includes(myWk))
+                                        );
+                                        const disabled = (s.name !== e.speaker && count >= 2) || blockedWk;
+                                        return <option key={s.name} value={s.name} disabled={disabled}>{s.name}{blockedWk ? ' (bloqueado ese fin de semana)' : (disabled ? ' (límite)' : '')}</option>;
                                       })}
                                     </select>
                                     <select value={e.bqNum} onChange={ev => updateEntry(idx, 'bqNum', ev.target.value)} disabled={!e.speaker}
@@ -1226,7 +1245,12 @@ export default function App() {
                                       }}
                                       style={{ background: D.bg3, border: `1px solid ${e.date ? VC+'55' : D.border2}`, borderRadius: 8, padding: '8px 10px', fontSize: 13, color: e.date ? VC : D.text3, fontFamily: 'Geist, system-ui, sans-serif', outline: 'none' }}>
                                       <option value="">Fecha...</option>
-                                      {getSalidaDateOptions(curYear, detailMonth).map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                                      {getSalidaDateOptions(curYear, detailMonth).map(o => {
+                                        const wk = salidaSunday({ date: o.value });
+                                        const conflict = (e.speaker === SUPLENTE_CONDUCTOR && weekendsOf(CONDUCTOR_PERMANENTE, idx).includes(wk)) ||
+                                          (e.speaker === CONDUCTOR_PERMANENTE && weekendsOf(SUPLENTE_CONDUCTOR, idx).includes(wk));
+                                        return <option key={o.value} value={o.value} disabled={conflict}>{o.label}{conflict ? ' (bloqueado)' : ''}</option>;
+                                      })}
                                     </select>
                                     <input value={e.time || ''} onChange={ev => updateEntry(idx, 'time', ev.target.value)}
                                       placeholder="Horario (ej: 09:30)"
